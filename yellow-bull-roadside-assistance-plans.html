@@ -153,11 +153,145 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       </div>
     </div>
   </div>
-  <section id="subscription" class="section align-top">
+
+<section class="section">
     <div class="section-wrapper">
       <div class="breadcrumb dark">
         <a class='breadcrumb-link dark' href='index.html'>Home /</a> Plans
       </div>
+    <div class="section-wrapper">
+      <div class="margin-bottom-24">
+        <h2 data-direction="bottom" class="section-header text-center promo-header">
+          Enjoy Our 1st September to 30th November 2024 Promotions!
+        </h2>
+      </div>
+  
+      <div class="promotion-slider-container">
+        <!-- Slider Wrapper -->
+        <div class="promotion-slider">
+          <!-- Slide 1 -->
+          <div class="slide">
+            <img src="C:/Users/HP/OneDrive - Institut Teknologi Sepuluh Nopember/Desktop/WORK/cc2.png" alt="Car Care Package Promotion">
+            <div class="promo-text">
+              Car Care Package @ Only $208 with 2 Free Servicing Shared up to 2 Vehicles
+            </div>
+          </div>
+  
+          <!-- Slide 2 -->
+          <div class="slide">
+            <img src="C:/Users/HP/OneDrive - Institut Teknologi Sepuluh Nopember/Desktop/WORK/sg-my-services.jpg" alt="Additional Promotion">
+            <div class="promo-text">
+              YellowBull provides 24/7 Roadside Assistance in Singapore & Malaysia!
+            </div>
+          </div>
+        </div>
+  
+        <!-- Dots for navigation -->
+        <div class="dots-container">
+          <span class="dot" onclick="currentSlide(0)"></span>
+          <span class="dot" onclick="currentSlide(1)"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Slider JavaScript -->
+  <script>
+    let slideIndex = 0;
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.dot');
+    const slider = document.querySelector('.promotion-slider');
+  
+    function showSlides(n) {
+      slider.style.transform = `translateX(-${n * 100}%)`;
+      dots.forEach((dot, index) => {
+        dot.className = index === n ? 'dot active' : 'dot';
+      });
+    }
+  
+    function currentSlide(n) {
+      slideIndex = n;
+      showSlides(slideIndex);
+    }
+  
+    // Auto slide
+    function autoSlide() {
+      slideIndex = (slideIndex + 1) % slides.length;
+      showSlides(slideIndex);
+    }
+  
+    // Auto-slide every 7 seconds (7000 ms)
+    setInterval(autoSlide, 8000);
+  
+    // Initialize the slider
+    showSlides(slideIndex);
+  </script>
+  
+  <!-- CSS for the Slider and Dots -->
+  <style>
+    .promotion-slider-container {
+      position: relative;
+      max-width: 100%;
+      margin: auto;
+      overflow: hidden;
+    }
+  
+    .promotion-slider {
+      display: flex;
+      transition: transform 2s ease; /* Smoother and longer transition */
+      
+    }
+  
+    .slide {
+      min-width: 100%; /* Ensure slides take up full width */
+      display: flex;
+      position: relative;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+  
+    .slide img {
+      width: 70%;
+      max-height: 591px;
+      border-radius: 10px;
+    }
+  
+    .promo-text {
+      position: relative;
+      max-width: 80%;
+      margin-top: 10px;
+      color: white;
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 18px;
+    }
+  
+    /* Dots (indicators) */
+    .dots-container {
+      text-align: center;
+      margin-top: 10px;
+    }
+  
+    .dot {
+      cursor: pointer;
+      height: 15px;
+      width: 15px;
+      margin: 0 5px;
+      background-color: #bbb;
+      border-radius: 50%;
+      display: inline-block;
+      transition: background-color 0.6s ease;
+    }
+  
+    .dot.active {
+      background-color: #717171;
+    }
+  
+  </style>
+  <section id="subscription" class="section align-top">
       <div class="max-width-445 text-center margin-bottom-40">
         <div class="eyebrow title-case">Explore Yellow Bull Coverage Plans</div>
         <h1 class="section-header green">emergency roadside Assistance plans For less than $0.27/day!</h1>
