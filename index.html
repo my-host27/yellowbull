@@ -6,6 +6,11 @@
   lang="en"
 >
   <head>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <meta charset="utf-8" />
     <title>30 mins Emergency Roadside Assistance 24/7 | Yellow Bull</title>
     <meta
@@ -50,7 +55,7 @@
       href="https://fonts.gstatic.com"
       rel="preconnect"
       crossorigin="anonymous"
-    />    
+    />
     <script
       src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"
       type="text/javascript"
@@ -173,10 +178,7 @@
         class="navbar w-nav"
       >
         <div class="navbar-wrapper">
-          <a
-            aria-current="page"
-            class="brand w-nav-brand w--current"
-            href="/"
+          <a aria-current="page" class="brand w-nav-brand w--current" href="/"
             ><img
               src="images/YellowRanger-Logo.png"
               loading="lazy"
@@ -270,217 +272,359 @@
             <div>Plans</div>
             <div class="link-line"></div>
           </a>
-          <a
-            class="mobile-nav-link w-inline-block"
-            href="/about-yellow-bull"
-          >
+          <a class="mobile-nav-link w-inline-block" href="/about-yellow-bull">
             <div>About Us</div>
+            <div class="link-line"></div>
+          </a>
+
+          <a class="mobile-nav-link w-inline-block" href="/about-yellow-bull">
+            <div>E-Fusion</div>
             <div class="link-line"></div>
           </a>
         </div>
       </div>
     </div>
+
     <section class="section hero">
-      <div class="section-wrapper">
-        <div
-          id="w-node-_74911716-b0d3-1e06-d89c-3bd509034035-ee0dd397"
-          class="hero-image-wrapper"
-        >
-          <div
-            id="w-node-_1c202b4d-1747-ac6a-172e-628867b3416b-ee0dd397"
-            class="hero-content-wrapper"
-          >
-            <div class="hero-eyebrow white margin-bottom-16">
-              24/7 Roadside Assistance
-            </div>
-            <h1 class="hero-header home-page">
-              Don&#x27;t Let a Car Breakdown Ruin Your Day
-            </h1>
-            <div class="max-width-250">
-              <div class="body-text white">
-                Yellow Bull gets to you fast — 30 mins rescue response
+      <div class="container">
+        <div class="row align-items-center d-flex flex-wrap gap-md-0 gap-3">
+          <!-- Kolom Teks -->
+          <div class="col-md-4 pe-md-3">
+            <div class="hero-content-wrapper">
+              <div class="hero-eyebrow white margin-bottom-16">
+                24/7 Roadside Assistance
               </div>
-            </div>
-            <a
-              href="tel:+6591013232"
-              id="hero-button"
-              class="raised-button margin-top-40 w-inline-block"
-            >
-              <div class="raised-button-front">
-                <div>Tap for immediate assistance</div>
+              <h1 class="section-header" style="color: #fdb91b">
+                Don&#x27;t Let a Car Breakdown Ruin Your Day
+              </h1>
+
+              <div class="max-width-250">
+                <div class="body-text white">
+                  <br />
+                  Yellow Bull gets to you fast — 30 mins rescue response
+                </div>
               </div>
-              <div class="raised-button-back"></div>
-            </a>
-            <div class="hero-image-bg"></div>
+              <a
+                href="tel:+6591013232"
+                id="hero-button"
+                class="raised-button margin-top-40 w-inline-block"
+              >
+                <div class="raised-button-front">
+                  <div>Tap for immediate assistance</div>
+                </div>
+                <div class="raised-button-back"></div>
+              </a>
+            </div>
           </div>
+
+          <!-- Kolom Carousel -->
+          <div class="col-md-8 ps-md-3">
+            <div id="demo" class="carousel slide" data-bs-ride="carousel">
+              <!-- Indicators -->
+              <div class="carousel-indicators">
+                <button
+                  type="button"
+                  data-bs-target="#demo"
+                  data-bs-slide-to="0"
+                  class="active"
+                ></button>
+                <button
+                  type="button"
+                  data-bs-target="#demo"
+                  data-bs-slide-to="1"
+                ></button>
+                <button
+                  type="button"
+                  data-bs-target="#demo"
+                  data-bs-slide-to="2"
+                ></button>
+                <button
+                  type="button"
+                  data-bs-target="#demo"
+                  data-bs-slide-to="3"
+                ></button>
+                <button
+                  type="button"
+                  data-bs-target="#demo"
+                  data-bs-slide-to="4"
+                ></button>
+              </div>
+
+              <!-- Slideshow -->
+              <div class="carousel-inner">
+                <div class="carousel-item active">
+                  <img
+                    src="images/safra-member.jpg"
+                    alt="Slide 1"
+                    class="d-block w-100"
+                  />
+                </div>
+                <div class="carousel-item">
+                  <img
+                    src="images/cc2.jpg"
+                    alt="Slide 2"
+                    class="d-block w-100"
+                  />
+                </div>
+                <div class="carousel-item">
+                  <img
+                    src="images/yrr-battery.jpg"
+                    alt="Slide 3"
+                    class="d-block w-100"
+                  />
+                </div>
+                <div class="carousel-item">
+                  <img
+                    src="images/oil-service.jpg"
+                    alt="Slide 4"
+                    class="d-block w-100"
+                  />
+                </div>
+                <div class="carousel-item">
+                  <img
+                    src="yrr-insurance.jpg"
+                    alt="Slide 5"
+                    class="d-block w-100"
+                  />
+                </div>
+              </div>
+
+              <!-- Navigasi -->
+              <button
+                class="carousel-control-prev"
+                type="button"
+                data-bs-target="#demo"
+                data-bs-slide="prev"
+              >
+                <span class="carousel-control-prev-icon"></span>
+              </button>
+              <button
+                class="carousel-control-next"
+                type="button"
+                data-bs-target="#demo"
+                data-bs-slide="next"
+              >
+                <span class="carousel-control-next-icon"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="see-more-wrapper">
+          <a href="#promo-section" class="see-more-link">
+            See More of Our Services <span class="arrow-down">↓</span>
+          </a>
         </div>
       </div>
     </section>
 
     <!--promo poster-->
-<section class="section">
-  <div class="section-wrapper">
-    <div class="margin-bottom-24">
-      <h2 data-direction="bottom" class="section-header text-center promo-header">
-        See Our Services & Newest Promotions Here!
-      </h2>
-    </div>
-
-    <div class="promotion-slider-container">
-      <!-- Slider Wrapper -->
-      <div class="promotion-slider">
-        <!-- Slide 1 -->
-        <div class="slide">
-          <img src="images/cc2.jpg" alt="Car Care Package Promotion">
-          <div class="promo-text">
-            Promo Until 31st December 2024 - Get One Year Car Care Package @ Only $208 with 2 Free Servicing Shared up to 2 Vehicles
-          </div>
+    <section id="promo-section" class="section">
+      <div class="section-wrapper">
+        <div class="margin-bottom-24">
+          <h2
+            data-direction="bottom"
+            class="section-header text-center promo-header"
+          >
+            Check Out Our Newest Promotions!
+          </h2>
         </div>
 
-        <!-- Slide 2 -->
-        <div class="slide">
-          <img src="images/safra-member.jpg" alt="exclusive SAFRA and CSC Member Car Care Package Promotion">
-          <div class="promo-text">
-            Get 20% OFF Annual Car Care Package - Exclusively For SAFRA & CSC Member!
-          </div>
-        </div>
-        
-        <!-- Slide 3 -->
-        <div class="slide">
-          <img src="images/yrr-battery.jpg" alt="Car Battery Replacement and Towing in SG and Malaysia">
-          <div class="promo-text">
-            YellowBull provides 24/7 Roadside Assistance and Car Towing in Singapore & Malaysia!
-          </div>
-        </div>
+        <div class="promotion-slider-container">
+          <!-- Slider Wrapper -->
+          <div class="promotion-slider">
+            <!-- Slide 1 -->
+            <div class="slide">
+              <img src="images/cc2.jpg" alt="Car Care Package Promotion" />
+              <div class="promo-text">
+                Promo Until 31st December 2024 - Get One Year Car Care Package @
+                Only $208 with 2 Free Servicing Shared up to 2 Vehicles
+              </div>
+            </div>
 
-        <!-- Slide 4 -->
-        <div class="slide">
-          <img src="images/oil-service.jpg" alt="Mega Oil Gasoline Engine Oil - YellowBull Car Servicing">
-          <div class="promo-text">
-            We Provide Engine Oil Change with Mega Oil – Get Your Car Running Smoothly!
-          </div>
-        </div>
+            <!-- Slide 2 -->
+            <div class="slide">
+              <img
+                src="images/safra-member.jpg"
+                alt="exclusive SAFRA and CSC Member Car Care Package Promotion"
+              />
+              <div class="promo-text">
+                Get 20% OFF Annual Car Care Package - Exclusively For SAFRA &
+                CSC Member!
+              </div>
+            </div>
 
-        <!-- Slide 5 -->
-        <div class="slide">
-          <img src="images/yrr-insurance.jpg" alt="Car Insurance Renewal">
-          <div class="promo-text">
-            Renewing your car insurance? We offer convenient and fast way for your car insurance renewal. <br>
-            Contact us to get the best quote for your car insurance!
+            <!-- Slide 3 -->
+            <div class="slide">
+              <img
+                src="images/yrr-battery.jpg"
+                alt="Car Battery Replacement and Towing in SG and Malaysia"
+              />
+              <div class="promo-text">
+                YellowBull provides 24/7 Roadside Assistance and Car Towing in
+                Singapore & Malaysia!
+              </div>
+            </div>
+
+            <!-- Slide 4 -->
+            <div class="slide">
+              <img
+                src="images/oil-service.jpg"
+                alt="Mega Oil Gasoline Engine Oil - YellowBull Car Servicing"
+              />
+              <div class="promo-text">
+                We Provide Engine Oil Change with Mega Oil – Get Your Car
+                Running Smoothly!
+              </div>
+            </div>
+
+            <!-- Slide 5 -->
+            <div class="slide">
+              <img src="images/yrr-insurance.jpg" alt="Car Insurance Renewal" />
+              <div class="promo-text">
+                Renewing your car insurance? We offer convenient and fast way
+                for your car insurance renewal. <br />
+                Contact us to get the best quote for your car insurance!
+              </div>
+            </div>
+          </div>
+
+          <!-- Dots for navigation -->
+          <div class="dots-container">
+            <span class="dot" onclick="currentSlide(0)"></span>
+            <span class="dot" onclick="currentSlide(1)"></span>
+            <span class="dot" onclick="currentSlide(2)"></span>
+            <span class="dot" onclick="currentSlide(3)"></span>
+            <span class="dot" onclick="currentSlide(4)"></span>
           </div>
         </div>
       </div>
+    </section>
 
-      <!-- Dots for navigation -->
-      <div class="dots-container">
-        <span class="dot" onclick="currentSlide(0)"></span>
-        <span class="dot" onclick="currentSlide(1)"></span>
-        <span class="dot" onclick="currentSlide(2)"></span>
-        <span class="dot" onclick="currentSlide(3)"></span>
-        <span class="dot" onclick="currentSlide(4)"></span>
-      </div>
-    </div>
-  </div>
-</section>
+    <!-- Slider JavaScript -->
+    <script>
+      let slideIndex = 0;
+      const slides = document.querySelectorAll(".slide");
+      const dots = document.querySelectorAll(".dot");
+      const slider = document.querySelector(".promotion-slider");
 
-<!-- Slider JavaScript -->
-<script>
-  let slideIndex = 0;
-  const slides = document.querySelectorAll('.slide');
-  const dots = document.querySelectorAll('.dot');
-  const slider = document.querySelector('.promotion-slider');
+      function showSlides(n) {
+        slider.style.transform = `translateX(-${n * 100}%)`;
+        dots.forEach((dot, index) => {
+          dot.className = index === n ? "dot active" : "dot";
+        });
+      }
 
-  function showSlides(n) {
-    slider.style.transform = `translateX(-${n * 100}%)`;
-    dots.forEach((dot, index) => {
-      dot.className = index === n ? 'dot active' : 'dot';
-    });
-  }
+      function currentSlide(n) {
+        slideIndex = n;
+        showSlides(slideIndex);
+      }
 
-  function currentSlide(n) {
-    slideIndex = n;
-    showSlides(slideIndex);
-  }
+      // Auto slide
+      function autoSlide() {
+        slideIndex = (slideIndex + 1) % slides.length;
+        showSlides(slideIndex);
+      }
 
-  // Auto slide
-  function autoSlide() {
-    slideIndex = (slideIndex + 1) % slides.length;
-    showSlides(slideIndex);
-  }
+      // Auto-slide every 11 seconds (11000 ms)
+      setInterval(autoSlide, 11000);
 
-  // Auto-slide every 11 seconds (11000 ms)
-  setInterval(autoSlide, 11000);
+      // Initialize the slider
+      showSlides(slideIndex);
+    </script>
 
-  // Initialize the slider
-  showSlides(slideIndex);
-</script>
+    <!-- CSS for the Slider and Dots -->
+    <style>
+      .see-more-wrapper {
+        text-align: center;
+        margin-top: 12pt; /* Adjust spacing as needed */
+      }
+      .see-more-link {
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 1.25rem;
+        display: inline-block;
+        transition: color 0.3s ease;
+      }
 
-<!-- CSS for the Slider and Dots -->
-<style>
-  .promotion-slider-container {
-    position: relative;
-    max-width: 100%;
-    margin: auto;
-    overflow: hidden;
-  }
+      .see-more-link:hover {
+        color: #fdb91b;
+      }
 
-  .promotion-slider {
-    display: flex;
-    transition: transform 2s ease; /* Smoother and longer transition */
-    
-  }
+      .arrow-down {
+        font-size: 1.5rem;
+        animation: bounce 1.5s infinite;
+      }
 
-  .slide {
-    min-width: 100%; /* Ensure slides take up full width */
-    display: flex;
-    position: relative;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-  }
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(5px);
+        }
+      }
+      .promotion-slider-container {
+        position: relative;
+        max-width: 100%;
+        margin: auto;
+        overflow: hidden;
+      }
 
-  .slide img {
-    width: 70%;
-    max-height: 591px;
-    border-radius: 10px;
-  }
+      .promotion-slider {
+        display: flex;
+        transition: transform 2s ease; /* Smoother and longer transition */
+      }
 
-  .promo-text {
-    position: relative;
-    max-width: 80%;
-    margin-top: 10px;
-    color: white;
-    background-color: rgba(0, 0, 0, 0.6);
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-size: 18px;
-  }
+      .slide {
+        min-width: 100%; /* Ensure slides take up full width */
+        display: flex;
+        position: relative;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+      }
 
-  /* Dots (indicators) */
-  .dots-container {
-    text-align: center;
-    margin-top: 10px;
-  }
+      .slide img {
+        width: 70%;
+        max-height: 591px;
+        border-radius: 10px;
+      }
 
-  .dot {
-    cursor: pointer;
-    height: 15px;
-    width: 15px;
-    margin: 0 5px;
-    background-color: #bbb;
-    border-radius: 50%;
-    display: inline-block;
-    transition: background-color 0.6s ease;
-  }
+      .promo-text {
+        position: relative;
+        max-width: 80%;
+        margin-top: 10px;
+        color: white;
+        background-color: rgba(0, 0, 0, 0.6);
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-size: 18px;
+      }
 
-  .dot.active {
-    background-color: #717171;
-  }
+      /* Dots (indicators) */
+      .dots-container {
+        text-align: center;
+        margin-top: 10px;
+      }
 
-</style>
+      .dot {
+        cursor: pointer;
+        height: 15px;
+        width: 15px;
+        margin: 0 5px;
+        background-color: #bbb;
+        border-radius: 50%;
+        display: inline-block;
+        transition: background-color 0.6s ease;
+      }
 
-    
+      .dot.active {
+        background-color: #717171;
+      }
+    </style>
 
     <section class="section">
       <div class="section-wrapper">
@@ -547,6 +691,7 @@
         </div>
       </div>
     </section>
+
     <section class="section">
       <div class="section-wrapper">
         <div class="max-width-380 margin-bottom-24">
@@ -710,7 +855,9 @@
             </div>
             <div class="max-width-380 margin-top-24">
               <p class="font-size-14">
-                Car breakdowns are usually very very stressful. But Uncle Eric’s professionalism and positive attitude really makes it so much better. I highly recommend him!
+                Car breakdowns are usually very very stressful. But Uncle Eric’s
+                professionalism and positive attitude really makes it so much
+                better. I highly recommend him!
               </p>
             </div>
           </div>
@@ -743,9 +890,14 @@
             </div>
             <div class="max-width-380 margin-top-24">
               <p class="font-size-14">
-                Called Eric late night for emergency assistance  as my car ran into big problem on the road. He immediately rushed down all the way from Sin Ming to Chinatown to assist me. His prompt and professional service recovery deserves 5-stars review. On top of that, his service fee is very reasonable. He did not take advantage simply because it is an emergency incident. He is a trustworthy and honest mechanic.
-                
-                I will definitely recommend Eric to all my friends
+                Called Eric late night for emergency assistance as my car ran
+                into big problem on the road. He immediately rushed down all the
+                way from Sin Ming to Chinatown to assist me. His prompt and
+                professional service recovery deserves 5-stars review. On top of
+                that, his service fee is very reasonable. He did not take
+                advantage simply because it is an emergency incident. He is a
+                trustworthy and honest mechanic. I will definitely recommend
+                Eric to all my friends
               </p>
             </div>
           </div>
@@ -778,7 +930,15 @@
             </div>
             <div class="max-width-380 margin-top-24">
               <p class="font-size-14">
-                My car halted in the middle of the highway, and as it was my first time experiencing such a situation I was clueless and feeling overwhelmed. Mr Eric gave me clear instructions on the procedures, and came over with towing service after EMAS dropped off my car at a pickup location. Mr Eric provided a swift diagnosis on the spot, and even helped me changed my tire on the spot. His reassuring presence, helpful and kind nature was such a blessing on that day! I am very grateful to him, and his dedicated to his craft :) Thank you, Mr Eric! Highly recommend!!
+                My car halted in the middle of the highway, and as it was my
+                first time experiencing such a situation I was clueless and
+                feeling overwhelmed. Mr Eric gave me clear instructions on the
+                procedures, and came over with towing service after EMAS dropped
+                off my car at a pickup location. Mr Eric provided a swift
+                diagnosis on the spot, and even helped me changed my tire on the
+                spot. His reassuring presence, helpful and kind nature was such
+                a blessing on that day! I am very grateful to him, and his
+                dedicated to his craft :) Thank you, Mr Eric! Highly recommend!!
               </p>
             </div>
           </div>
@@ -811,7 +971,11 @@
             </div>
             <div class="max-width-380 margin-top-24">
               <p class="font-size-14">
-                My trusted go-to place. Found out about BH Auto as they are partnered with CSC, and tried them out. Their services and prices are reliable and affordable. Eric is the boss, and Kelvin and Ravi are doing the work. Well done team BH with my recent accident repair and reporting submission.
+                My trusted go-to place. Found out about BH Auto as they are
+                partnered with CSC, and tried them out. Their services and
+                prices are reliable and affordable. Eric is the boss, and Kelvin
+                and Ravi are doing the work. Well done team BH with my recent
+                accident repair and reporting submission.
               </p>
             </div>
           </div>
@@ -844,7 +1008,13 @@
             </div>
             <div class="max-width-380 margin-top-24">
               <p class="font-size-14">
-                Eric is very helpful and share with me important knowledge to maintain the car whenever I send my car for servicing. The mechanic, Ravi is meticulous and skillful to rectify the issues promptly. As a Yellow Bull member, I also enjoy discounts on repairs and servicing which translates to substantial cost savings. Thank you for being a reliable and trusted workshop. Highly recommend.
+                Eric is very helpful and share with me important knowledge to
+                maintain the car whenever I send my car for servicing. The
+                mechanic, Ravi is meticulous and skillful to rectify the issues
+                promptly. As a Yellow Bull member, I also enjoy discounts on
+                repairs and servicing which translates to substantial cost
+                savings. Thank you for being a reliable and trusted workshop.
+                Highly recommend.
               </p>
             </div>
           </div>
@@ -1364,9 +1534,7 @@
                 flat tyre, flat car battery, vehicle jump-start, lockout, and
                 fuel delivery.
               </p>
-              <a
-                class="text-link dark"
-                href="/emergency-roadside-assistance"
+              <a class="text-link dark" href="/emergency-roadside-assistance"
                 >Request for emergency roadside assistance</a
               >
             </div>
@@ -1397,9 +1565,7 @@
                 Yellow Bull&#x27;s car aircon repair service is the cool
                 solution to beat the heat!
               </p>
-              <a
-                class="text-link dark"
-                href="/car-aircon-service-and-repairs"
+              <a class="text-link dark" href="/car-aircon-service-and-repairs"
                 >Request for urgent car aircon repair</a
               >
             </div>
@@ -1896,10 +2062,7 @@
     <section class="section footer">
       <div class="section-wrapper">
         <div class="flex-space-between margin-bottom-48 wrap">
-          <a
-            aria-current="page"
-            class="brand w-nav-brand w--current"
-            href="/"
+          <a aria-current="page" class="brand w-nav-brand w--current" href="/"
             ><img
               src="images/YellowRanger-Logo.png"
               loading="lazy"
@@ -1970,10 +2133,7 @@
               </a>
             </li>
             <li>
-              <a
-                class="footer-link w-inline-block"
-                href="/about-yellow-bull"
-              >
+              <a class="footer-link w-inline-block" href="/about-yellow-bull">
                 <div>About</div>
                 <div class="link-line white"></div>
               </a>
