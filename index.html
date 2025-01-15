@@ -633,14 +633,14 @@
 
           <div class="carousel-item">
             <div class="ratio ratio-16x9">
-              <iframe src="https://www.youtube.com/embed/tBbSMYaeZUM?si=aVddDhwUiE9moeI1"
+              <iframe id="videoSlideIframe" src="https://www.youtube.com/embed/tBbSMYaeZUM?si=aVddDhwUiE9moeI1"
                 title="Fire Terminator Hydrodynamic Spray Fire Extinguisher Overview"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowfullscreen>
               </iframe>
             </div>
             <div class="promo-text">
-              The ultimate 100% organic fire extinguisher spray—fast, permanent, eco-friendly, with a 10-year shelf
+              The ultimate 100% organic fire extinguisher spray—with a 10-year shelf
               life—perfect for your home, car, kitchen, garage, or boat.
               Order with us at 9101 3232 (Eric)!
             </div>
@@ -656,49 +656,51 @@
         </button>
       </div>
   </section>
+  <script src="https://www.youtube.com/iframe_api"></script>
   <script>
-    const carousel = document.querySelector('#promoCarousel');
-    const videoSlide = carousel.querySelector('.carousel-item iframe');
+  let player;
+  const carousel = document.querySelector('#promoCarousel');
 
-    // Check if the video is playing or paused
-    let isVideoPlaying = false;
+  // Function to stop carousel auto-slide
+  const stopAutoSlide = () => {
+    carousel.setAttribute('data-bs-interval', 'false');
+  };
 
-    // Function to stop carousel auto-slide
-    const stopAutoSlide = () => {
-      carousel.setAttribute('data-bs-interval', 'false');
-    };
+  // Function to resume carousel auto-slide
+  const startAutoSlide = () => {
+    carousel.setAttribute('data-bs-interval', '5000');
+  };
 
-    // Function to resume carousel auto-slide
-    const startAutoSlide = () => {
-      carousel.setAttribute('data-bs-interval', '5000');
-    };
-
-    // Listen for the play event to stop auto-slide
-    videoSlide.addEventListener('play', () => {
-      isVideoPlaying = true;
-      stopAutoSlide();
-    });
-
-    // Listen for the pause event to resume auto-slide
-    videoSlide.addEventListener('pause', () => {
-      isVideoPlaying = false;
-      startAutoSlide();
-    });
-
-    // Listen for carousel slide change
-    carousel.addEventListener('slid.bs.carousel', (e) => {
-      // If the current slide is the video slide and the video is playing, stop the auto-slide
-      if (e.relatedTarget.contains(videoSlide) && isVideoPlaying) {
-        stopAutoSlide();
-      } else {
-        startAutoSlide();
+  // YouTube API will call this function when ready
+  function onYouTubeIframeAPIReady() {
+    player = new YT.Player('videoSlideIframe', {
+      events: {
+        onStateChange: onPlayerStateChange
       }
     });
-  </script>
+  }
 
+  // Handle YouTube player state changes
+  function onPlayerStateChange(event) {
+    if (event.data === YT.PlayerState.PLAYING) {
+      stopAutoSlide(); // Stop auto-slide when video plays
+    } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
+      startAutoSlide(); // Resume auto-slide when video pauses or ends
+    }
+  }
 
-
-  <!-- CSS for the Slider and Dots -->
+  // Listen for carousel slide change
+  carousel.addEventListener('slid.bs.carousel', (e) => {
+    // Resume auto-slide if video slide is not active
+    const activeSlide = e.relatedTarget.querySelector('iframe');
+    if (activeSlide && activeSlide.id === 'videoSlideIframe') {
+      player.pauseVideo(); // Pause video if the slide changes
+    } else {
+      startAutoSlide();
+    }
+  });
+</script>
+<!-- CSS for the Slider and Dots -->
   <style>
     .small-carousel {
       max-width: 800px;
