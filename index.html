@@ -132,6 +132,127 @@
           .section {
             overflow-x: clip;
           }
+                  /* Full-Screen Carousel */
+        #fullScreenCarousel {
+          position: relative;
+          height: 100vh;
+          overflow: hidden;
+          background: black;
+          /* Fallback background color */
+        }
+
+        #fullScreenCarousel .carousel-item {
+          height: 100vh;
+          position: relative;
+          transition: opacity 1s ease-in-out, transform 2s ease-in-out;
+          transform: scale(1.1);
+          /* Awal lebih besar */
+          display: none;
+          align-items: center;
+          justify-content: center;
+        }
+
+        #fullScreenCarousel .carousel-item.active {
+          display: flex;
+          opacity: 1;
+          transform: scale(1);
+          /* Zoom-Out ke ukuran normal */
+        }
+
+        #fullScreenCarousel .carousel-background {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-size: cover;
+          background-position: center;
+          background-repeat: no-repeat;
+          z-index: 1;
+          filter: brightness(60%);
+        }
+
+        #fullScreenCarousel .carousel-caption-left {
+          position: relative;
+          z-index: 2;
+          color: #fff;
+          text-align: center;
+          /* Teks berada di tengah */
+          max-width: 1000px;
+          padding: 2rem;
+        }
+
+        #fullScreenCarousel .carousel-caption-left h1 {
+          font-size: 2.5rem;
+          /* Responsif */
+          font-family: inherit;
+          /* Mengikuti style font section lain */
+          animation: fadeInUp 0.8s ease-out;
+        }
+
+        #fullScreenCarousel .carousel-caption-left p {
+          font-size: 1.2rem;
+          line-height: 1.5;
+          margin-bottom: 1rem;
+          animation: fadeInUp 1s ease-out;
+        }
+
+        #fullScreenCarousel .button-group .btn {
+          margin-right: 10px;
+          font-size: 1rem;
+          padding: 0.7rem 1.5rem;
+        }
+
+        #fullScreenCarousel .carousel-control-prev,
+        #fullScreenCarousel .carousel-control-next {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 40px;
+          /* Lebih kecil */
+          height: 40px;
+          /* Lebih kecil */
+          background-color: rgba(0, 0, 0, 0.5);
+          border-radius: 50%;
+          /* Bentuk bulat */
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 10;
+          color: bl;
+          font-size: 18px;
+          /* Ukuran ikon lebih kecil */
+          transition: background-color 0.3s ease;
+        }
+
+        #fullScreenCarousel .carousel-control-prev {
+          left: 10px;
+        }
+
+        #fullScreenCarousel .carousel-control-next {
+          right: 10px;
+        }
+
+        #fullScreenCarousel .carousel-control-prev:hover,
+        #fullScreenCarousel .carousel-control-next:hover {
+          background-color: #faae02;
+          /* Warna hover lebih cerah */
+          color: #ffffff;
+        }
+
+        /* Animasi Fade-In */
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+          
           .footer-link:hover .link-line,
           .nav-link:hover .link-line,
           .mobile-nav-link:hover .link-line,
@@ -276,265 +397,320 @@
             <div>About Us</div>
             <div class="link-line"></div>
           </a>
-
-          <a class="mobile-nav-link w-inline-block" href="/about-yellow-bull">
-            <div>E-Fusion</div>
-            <div class="link-line"></div>
-          </a>
         </div>
       </div>
     </div>
 
-    <section class="section hero">
-      <div class="container">
-        <div class="row align-items-center d-flex flex-wrap gap-md-0 gap-3">
-          <!-- Kolom Teks -->
-          <div class="col-md-4 pe-md-3">
-            <div class="hero-content-wrapper">
-              <div class="hero-eyebrow white margin-bottom-16">
-                24/7 Roadside Assistance
-              </div>
-              <h1 class="section-header" style="color: #fdb91b">
-                Don&#x27;t Let a Car Breakdown Ruin Your Day
-              </h1>
+  <div id="fullScreenCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      <!-- First Slide -->
+      <div class="carousel-item active">
+        <div class="carousel-background" style="background-image: url('images/car-package.jpg');"></div>
+        <div class="carousel-caption-left">
+          <h1>Yellow Bull Annual Car Care Packages</h1>
+          <p> Choose a plan tailored to your needs and <b>enjoy 2x oil servicing, 24/7 emergency roadside assistance
+              covering Singapore and Malaysia, plus exclusive discounts on other services</b>—all designed to keep your
+            car running smoothly and safely.
+          </p>
+          <div class="button-group">
+            <a href="tel:+6591013232" class="btn btn-warning">Contact Us</a>
+            <a href="#promo-section" class="btn btn-outline-light">See Plans</a>
+          </div>
+        </div>
+      </div>
 
-              <div class="max-width-250">
-                <div class="body-text white">
-                  <br />
-                  Yellow Bull gets to you fast — 30 mins rescue response
-                </div>
-              </div>
-              <a
-                href="tel:+6591013232"
-                id="hero-button"
-                class="raised-button margin-top-40 w-inline-block"
-              >
-                <div class="raised-button-front">
-                  <div>Tap for immediate assistance</div>
-                </div>
-                <div class="raised-button-back"></div>
-              </a>
+      <div class="carousel-item">
+        <div class="carousel-background" style="background-image: url('images/car-towing.jpg');"></div>
+        <div class="carousel-caption-left">
+          <h1>24-Hours Towing & Roadside Assistance</h1>
+          <p>Don't let a car breakdown ruin your day.<br> Our 24/7 towing and roadside assistance services include jump
+            starts, battery replacements, and emergency towing. Reliable, fast, and always there when you need us
+            most. <br> <b>Get 10% off on roadside assistance for SAFRA, Civil Service Club, Ez-Link Members</b></p>
+          <div class="button-group">
+            <a href="tel:+6591013232" class="btn btn-warning">Request Immediate Assistance</a>
+            <a href="/vehicle-recovery-and-towing" class="btn btn-outline-light">Learn More</a>
+          </div>
+        </div>
+      </div>
+      <!-- Second Slide -->
+      <div class="carousel-item">
+        <div class="carousel-background" style="background-image: url('images/car-service.jpg');"></div>
+        <div class="carousel-caption-left">
+          <h1>Engine Repairs & Maintenance</h1>
+          <p>Power through every journey.<br>From routine oil changes to complex engine repairs, our skilled mechanics
+            ensure your car runs smoothly and efficiently. Trust us to keep your engine in top shape.</p>
+          <div class="button-group">
+            <a href="tel:+6591013232" class="btn btn-warning">Book An Appointment</a>
+            <a href="#services" class="btn btn-outline-light">Learn More</a>
+          </div>
+        </div>
+      </div>
+      <!-- Third Slide -->
+      <div class="carousel-item">
+        <div class="carousel-background" style="background-image: url('images/tire-service.jpg');"></div>
+        <div class="carousel-caption-left">
+          <h1>Tire & Wheel Services</h1>
+          <p>Drive with confidence.<br>Flat tire? Uneven wear? We handle replacements, balancing, and alignment with
+            precision. Our services ensure a smoother ride, better fuel efficiency, and improved safety.</p>
+          <div class="button-group">
+            <a href="tel:+6591013232" class="btn btn-warning">Book An Appointment</a>
+            <a href="#services" class="btn btn-outline-light">Learn More</a>
+          </div>
+        </div>
+      </div>
+      <!-- Fourth Slide -->
+      <div class="carousel-item">
+        <div class="carousel-background" style="background-image: url('images/insurance.jpg');"></div>
+        <div class="carousel-caption-left">
+          <h1>Insure Your Car Today!</h1>
+          <p>Looking to renew your car insurance? We make the process fast and hassle-free.<br>
+            <b>Renew with us and get a FREE Bottle of Drakos Fire Terminator Spray</b> —your added peace of mind on the
+            road!
+          </p>
+          <div class="button-group">
+            <a href="https://wa.me/+6591013232?text=Hello,%20I%20want%20to%20enquire%20for%20my%20car%20insurance."
+              target="_blank" class="btn btn-warning">WhatsApp Us</a>
+            <a href="#services" class="btn btn-outline-light">Learn More</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Carousel Controls -->
+    <button class="carousel-control-prev">❮</button>
+    <button class="carousel-control-next">❯</button>
+
+  </div>
+
+  <script>
+
+    const items = document.querySelectorAll('.carousel-item');
+    let currentIndex = 0;
+
+    // Preload images
+    items.forEach((item) => {
+      const bg = item.querySelector('.carousel-background');
+      const img = new Image();
+      img.src = bg.style.backgroundImage.replace(/url\("(.*)"\)/, '$1');
+      img.onload = () => {
+        bg.style.backgroundImage = `url('${img.src}')`;
+      };
+    });
+
+    function showSlide(index) {
+      items.forEach((item, i) => {
+        if (i === index) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
+        }
+      });
+    }
+
+    function nextSlide() {
+      currentIndex = (currentIndex + 1) % items.length;
+      showSlide(currentIndex);
+    }
+
+    function prevSlide() {
+      currentIndex = (currentIndex - 1 + items.length) % items.length;
+      showSlide(currentIndex);
+    }
+
+    // Auto-slide setiap 7 detik
+    setInterval(nextSlide, 7000);
+
+    // Tambahkan event listener untuk tombol prev/next
+    document.querySelector('.carousel-control-prev').addEventListener('click', prevSlide);
+    document.querySelector('.carousel-control-next').addEventListener('click', nextSlide);
+  </script>
+
+  <!--promo poster-->
+  <section id="promo-section" class="section">
+    <div class="section-wrapper">
+      <div class="margin-bottom-24">
+        <h2 data-direction="bottom" class="section-header text-center promo-header">
+          Check Out Our Newest Promotions and Annual Packages!
+        </h2>
+      </div>
+
+      <!-- Kolom Carousel Bootstrap -->
+      <div id="promoCarousel" class="carousel slide small-carousel" data-bs-ride="carousel">
+        <!-- Indikator Carousel -->
+        <div class="carousel-indicators">
+          <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="0" class="active"></button>
+          <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="1"></button>
+          <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="2"></button>
+          <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="3"></button>
+          <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="4"></button>
+          <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="5"></button>
+          <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="6"></button>
+          <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="7"></button>
+        </div>
+
+        <!-- Slideshow -->
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <img src="images/annual.jpg" alt="YellowBull Annual Car Oil Change Servicing Package" class="d-block w-80"
+              loading="lazy" />
+            <div class="promo-text">
+              Sign Up for YellowBull Annual Car Care Package and Get the Benefits Up to 2 times Servicing with
+              Year-Round Coverage !
             </div>
           </div>
 
-         <!-- Kolom Carousel -->
-<div class="col-md-8 ps-md-3">
-  <div id="demo" class="carousel slide" data-bs-ride="carousel">
-    <!-- Indicators -->
-    <div class="carousel-indicators">
-      <button type="button" data-bs-target="#demo" data-bs-slide-to="0" class="active"></button>
-      <button type="button" data-bs-target="#demo" data-bs-slide-to="1"></button>
-      <button type="button" data-bs-target="#demo" data-bs-slide-to="2"></button>
-      <button type="button" data-bs-target="#demo" data-bs-slide-to="3"></button>
-      <button type="button" data-bs-target="#demo" data-bs-slide-to="4"></button>
-      <button type="button" data-bs-target="#demo" data-bs-slide-to="5"></button>
-      <button type="button" data-bs-target="#demo" data-bs-slide-to="6"></button>
-    </div>
+          <div class="carousel-item">
+            <img src="images/exclusive-members-promo.jpg" alt="10% OFF Car Services for SAFRA, CSC & SGCM Members!"
+              class="d-block w-80" loading="lazy" />
+            <div class="promo-text">
+              Are you SAFRA, CSC Members & SG CarMart Users? Get exclusive 10% OFF for YellowBull Roadside Assistance -
+              30 Mins Fast Recue Services !
+            </div>
+          </div>
 
-    <!-- Slideshow -->
-    <div class="carousel-inner">
-      <!-- Item pertama, aktif pertama kali -->
-      <div class="carousel-item active">
-        <img src="images/annual.jpg" alt="YellowBull Annual Car Oil Change Servicing Package" class="d-block w-100" loading="lazy" />
-      </div>
+          <div class="carousel-item">
+            <img src="images/safra-member.jpg" alt="Get 20% OFF YellowBull Car Care Package for SAFRA and CSC Members"
+              class="d-block w-80" loading="lazy" />
+            <div class="promo-text">
+              Get 20% OFF Annual Car Care Package - Exclusively For SAFRA &
+              CSC Member!
+            </div>
+          </div>
 
-      <!-- Item kedua -->
-      <div class="carousel-item">
-        <img src="images/exclusive-members-promo.jpg" alt="10% OFF Car Services for SAFRA, CSC & SGCM Members!" class="d-block w-100" loading="lazy" />
-      </div>
+          <div class="carousel-item">
+            <img src="images/cc2.jpg" alt="YellowBull Annual Car Care Package Benefits" class="d-block w-80"
+              loading="lazy" />
+            <div class="promo-text">
+              Promo Until 31st December 2024 - Get One Year Car Care Package @
+              Only $208 with 2 Free Servicing Shared up to 2 Vehicles
+            </div>
+          </div>
 
-      <!-- Item ketiga -->
-      <div class="carousel-item">
-        <img src="images/safra-member.jpg" alt="Get 20% OFF YellowBull Car Care Package for SAFRA and CSC Members" class="d-block w-100" loading="lazy" />
-      </div>
+          <div class="carousel-item">
+            <img src="images/yrr-battery.jpg"
+              alt="YellowBull SG provides on-site car battery replacement 24/7 islandwide" class="d-block w-80"
+              loading="lazy" />
+            <div class="promo-text">
+              YellowBull provides 24/7 Roadside Assistance and Car Towing in
+              Singapore & Malaysia!
+            </div>
+          </div>
 
-      <!-- Item keempat -->
-      <div class="carousel-item">
-        <img src="images/cc2.jpg" alt="YellowBull Annual Car Care Package Benefits" class="d-block w-100" loading="lazy" />
-      </div>
+          <div class="carousel-item">
+            <img src="images/yrr-insurance.jpg"
+              alt="Car Insurance Renewal - YellowBull helps you get it done fast and reliable!" class="d-block w-80"
+              loading="lazy" />
+            <div class="promo-text">
+              Renewing your car insurance? We offer convenient and fast way
+              for your car insurance renewal. <br />
+              Contact us to get the best quote for your car insurance!
+            </div>
+          </div>
 
-      <!-- Item kelima -->
-      <div class="carousel-item">
-        <img src="images/yrr-battery.jpg" alt="YellowBull SG provides on-site car battery replacement 24/7 islandwide" class="d-block w-100" loading="lazy" />
-      </div>
+          <div class="carousel-item">
+            <img src="images/fire-terminator.jpg" alt="Fire Terminator - all fire solution only @ $55"
+              class="d-block w-80" loading="lazy" />
+            <div class="promo-text">
+              Buy Now! Fire Terminator FT JN1010® Hydrodynamic Spray @ $55 – Your Ultimate Fire Safety Solution! <br />
+              All-in-One Fire Protection: Tackles all Classes of Fire: A/B/C/D/E/F.
+            </div>
+          </div>
 
-      <!-- Item keenam -->
-      <div class="carousel-item">
-        <img src="images/yrr-insurance.jpg" alt="Car Insurance Renewal - YellowBull helps you get it done fast and reliable!" class="d-block w-100" loading="lazy" />
-      </div>
-
-      <!-- Item ketujuh -->
-      <div class="carousel-item">
-        <img src="images/fire-terminator.jpg" alt="Fire Terminator - all fire solution only @ $55" class="d-block w-100" loading="lazy" />
-      </div>
-    </div>
-
-    <!-- Navigasi -->
-    <button class="carousel-control-prev" type="button" data-bs-target="#demo" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon"></span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#demo" data-bs-slide="next">
-      <span class="carousel-control-next-icon"></span>
-    </button>
-  </div>
-</div>
-
-      <div class="see-more-wrapper">
-          <a href="#promo-section" class="see-more-link">
-            See More of Our Services <span class="arrow-down">↓</span>
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!--promo poster-->
-    <section id="promo-section" class="section">
-      <div class="section-wrapper">
-        <div class="margin-bottom-24">
-          <h2
-            data-direction="bottom"
-            class="section-header text-center promo-header"
-          >
-            Check Out Our Newest Promotions and Annual Packages!
-          </h2>
+          <div class="carousel-item">
+            <div class="ratio ratio-16x9">
+              <iframe src="https://www.youtube.com/embed/tBbSMYaeZUM?si=aVddDhwUiE9moeI1"
+                title="Fire Terminator Hydrodynamic Spray Fire Extinguisher Overview"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen>
+              </iframe>
+            </div>
+            <div class="promo-text">
+              The ultimate 100% organic fire extinguisher spray—fast, permanent, eco-friendly, with a 10-year shelf
+              life—perfect for your home, car, kitchen, garage, or boat.
+              Order with us at 9101 3232 (Eric)!
+            </div>
+          </div>
         </div>
 
-        <!-- Kolom Carousel Bootstrap -->
-<div id="promoCarousel" class="carousel slide small-carousel" data-bs-ride="carousel">
-  <!-- Indikator Carousel -->
-  <div class="carousel-indicators">
-    <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="0" class="active"></button>
-    <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="1"></button>
-    <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="2"></button>
-    <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="3"></button>
-    <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="4"></button>
-    <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="5"></button>
-    <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="6"></button>
-  </div>
+        <!-- Navigasi -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#promoCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#promoCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon"></span>
+        </button>
+      </div>
+  </section>
+  <script>
+    const carousel = document.querySelector('#promoCarousel');
+    const videoSlide = carousel.querySelector('.carousel-item iframe');
 
-<!-- Slideshow -->
-<div class="carousel-inner">
-  <div class="carousel-item active">
-    <img src="images/annual.jpg" alt="YellowBull Annual Car Oil Change Servicing Package" class="d-block w-80" loading="lazy"/>
-    <div class="promo-text">
-      Sign Up for YellowBull Annual Car Care Package and Get the Benefits Up to 2 times Servicing with Year-Round Coverage !
-    </div>
-  </div>
+    // Check if the video is playing or paused
+    let isVideoPlaying = false;
 
-  <div class="carousel-item">
-    <img src="images/exclusive-members-promo.jpg" alt="10% OFF Car Services for SAFRA, CSC & SGCM Members!" class="d-block w-80" loading="lazy" />
-    <div class="promo-text">
-      Are you SAFRA, CSC Members & SG CarMart Users? Get exclusive 10% OFF for YellowBull Roadside Assistance - 30 Mins Fast Recue Services !
-    </div>
-  </div>
+    // Function to stop carousel auto-slide
+    const stopAutoSlide = () => {
+      carousel.setAttribute('data-bs-interval', 'false');
+    };
 
-  <div class="carousel-item">
-    <img src="images/safra-member.jpg" alt="Get 20% OFF YellowBull Car Care Package for SAFRA and CSC Members" class="d-block w-80" loading="lazy" />
-    <div class="promo-text">
-      Get 20% OFF Annual Car Care Package - Exclusively For SAFRA &
-      CSC Member!
-    </div>
-  </div>
+    // Function to resume carousel auto-slide
+    const startAutoSlide = () => {
+      carousel.setAttribute('data-bs-interval', '5000');
+    };
 
-  <div class="carousel-item">
-    <img src="images/cc2.jpg" alt="YellowBull Annual Car Care Package Benefits" class="d-block w-80" loading="lazy" />
-    <div class="promo-text">
-      Promo Until 31st December 2024 - Get One Year Car Care Package @
-      Only $208 with 2 Free Servicing Shared up to 2 Vehicles
-    </div>
-  </div>
+    // Listen for the play event to stop auto-slide
+    videoSlide.addEventListener('play', () => {
+      isVideoPlaying = true;
+      stopAutoSlide();
+    });
 
-  <div class="carousel-item">
-    <img src="images/yrr-battery.jpg" alt="YellowBull SG provides on-site car battery replacement 24/7 islandwide" class="d-block w-80" loading="lazy" />
-    <div class="promo-text">
-      YellowBull provides 24/7 Roadside Assistance and Car Towing in
-      Singapore & Malaysia!
-    </div>
-  </div>
+    // Listen for the pause event to resume auto-slide
+    videoSlide.addEventListener('pause', () => {
+      isVideoPlaying = false;
+      startAutoSlide();
+    });
 
-  <div class="carousel-item">
-    <img src="images/yrr-insurance.jpg" alt="Car Insurance Renewal - YellowBull helps you get it done fast and reliable!" class="d-block w-80" loading="lazy" />
-    <div class="promo-text">
-      Renewing your car insurance? We offer convenient and fast way
-      for your car insurance renewal. <br />
-      Contact us to get the best quote for your car insurance!
-    </div>
-  </div>
-
-  <div class="carousel-item">
-    <img src="images/fire-terminator.jpg" alt="Fire Terminator - all fire solution only @ $55" class="d-block w-80" loading="lazy" />
-    <div class="promo-text">
-      Buy Now! Fire Terminator FT JN1010® Hydrodynamic Spray @ $55 – Your Ultimate Fire Safety Solution! <br />
-      All-in-One Fire Protection: Tackles all Classes of Fire: A/B/C/D/E/F.
-    </div>
-  </div>
-</div>
-
-  <!-- Navigasi -->
-  <button class="carousel-control-prev" type="button" data-bs-target="#promoCarousel" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon"></span>
-  </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#promoCarousel" data-bs-slide="next">
-    <span class="carousel-control-next-icon"></span>
-  </button>
-</div>
-    </section>
-    <!-- CSS for the Slider and Dots -->
-    <style>
-      .see-more-wrapper {
-        text-align: center;
-        margin-top: 12pt; /* Adjust spacing as needed */
+    // Listen for carousel slide change
+    carousel.addEventListener('slid.bs.carousel', (e) => {
+      // If the current slide is the video slide and the video is playing, stop the auto-slide
+      if (e.relatedTarget.contains(videoSlide) && isVideoPlaying) {
+        stopAutoSlide();
+      } else {
+        startAutoSlide();
       }
-      .see-more-link {
-        color: white;
-        text-decoration: none;
-        font-weight: bold;
-        font-size: 1.25rem;
-        display: inline-block;
-        transition: color 0.3s ease;
-      }
+    });
+  </script>
 
-      .see-more-link:hover {
-        color: #fdb91b;
-      }
 
-      .arrow-down {
-        font-size: 1.5rem;
-        animation: bounce 1.5s infinite;
-        display: inline-block;
-      }
 
-      @keyframes bounce {
-        0%,
-        100% {
-          transform: translateY(0);
-        }
-        50% {
-          transform: translateY(5px);
-        }
-      }
-      .small-carousel {
-  max-width: 800px; /* Lebar maksimal carousel */
-  margin: 0 auto;   /* Pusatkan carousel */
-}
+  <!-- CSS for the Slider and Dots -->
+  <style>
+    .small-carousel {
+      max-width: 800px;
+      /* Lebar maksimal carousel */
+      margin: 0 auto;
+      /* Pusatkan carousel */
+    }
 
-.small-carousel img {
-  max-height: 600px; /* Tinggi maksimal gambar */
-  object-fit: cover; /* Atur agar gambar sesuai */
-}
-      
-      .promo-text {
-        text-align: center;
-        position: relative;
-        max-width: 100%;
-        margin-top: 10px;
-        color: white;
-        background-color: rgba(0, 0, 0, 0.6);
-        padding: 10px 20px;
-        border-radius: 5px;
-        font-size: 18px;
-      }
-    </style>
+    .small-carousel img {
+      max-height: 600px;
+      /* Tinggi maksimal gambar */
+      object-fit: cover;
+      /* Atur agar gambar sesuai */
+    }
+
+    .promo-text {
+      text-align: center;
+      position: relative;
+      max-width: 100%;
+      margin-top: 10px;
+      color: white;
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 18px;
+    }
+  </style>
+
 
     <section class="section">
       <div class="section-wrapper">
@@ -2386,23 +2562,23 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/ScrollTrigger.min.js"></script>
     <script>
-      //Lenis
-      const lenis = new Lenis({
-        duration: 2,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        direction: "vertical",
-        gestureDirection: "vertical",
-        smooth: true,
-        mouseMultiplier: 1,
-        smoothTouch: false,
-        touchMultiplier: 2,
-        infinite: false,
-      });
-      function raf(time) {
-        lenis.raf(time);
-        requestAnimationFrame(raf);
-      }
-      requestAnimationFrame(raf);
+      // //Lenis
+      // const lenis = new Lenis({
+      //   duration: 2,
+      //   easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      //   direction: "vertical",
+      //   gestureDirection: "vertical",
+      //   smooth: true,
+      //   mouseMultiplier: 1,
+      //   smoothTouch: false,
+      //   touchMultiplier: 2,
+      //   infinite: false,
+      // });
+      // function raf(time) {
+      //   lenis.raf(time);
+      //   requestAnimationFrame(raf);
+      // }
+      // requestAnimationFrame(raf);
       //Images
       gsap.utils.toArray(".image-100").forEach((image) => {
         ScrollTrigger.create({
