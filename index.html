@@ -105,6 +105,22 @@
         -webkit-clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
         clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
       }
+
+      html {
+      font-size: 16px;
+    }
+    h1 {
+      font-size: clamp(2rem, 5vw, 4rem);
+    }
+    p {
+      font-size: clamp(1rem, 3vw, 1.5rem);
+      line-height: 1.6;
+    }
+    @media (max-width: 768px) {
+      html {
+        font-size: 14px;
+      }
+    }
     </style>
     <script type="application/ld+json">
       {
