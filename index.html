@@ -425,47 +425,59 @@
 
   </div>
 
-  <script>
-    const items = document.querySelectorAll('.carousel-item');
-    let currentIndex = 0;
+ <script>
+  const items = document.querySelectorAll('.carousel-item');
+  let currentIndex = 0;
 
-    // Preload images
-    items.forEach((item) => {
-      const bg = item.querySelector('.carousel-background');
-      const img = new Image();
-      img.src = bg.style.backgroundImage.replace(/url\("(.*)"\)/, '$1');
-      img.onload = () => {
-        bg.style.backgroundImage = `url('${img.src}')`;
-      };
+  // Preload images with lazy loading
+  items.forEach((item) => {
+    const bg = item.querySelector('.carousel-background');
+    const imgUrl = bg.style.backgroundImage.replace(/url\("(.*)"\)/, '$1');
+
+    // Create an img element to use lazy loading
+    const img = document.createElement('img');
+    img.src = imgUrl;
+    img.loading = 'lazy'; // Enable lazy loading
+    img.style.display = 'none'; // Hide the img element
+
+    // Append the img to preload it
+    bg.appendChild(img);
+
+    img.onload = () => {
+      // Update the background image after it loads
+      bg.style.backgroundImage = `url('${img.src}')`;
+      bg.removeChild(img); // Remove the hidden image element
+    };
+  });
+
+  function showSlide(index) {
+    items.forEach((item, i) => {
+      if (i === index) {
+        item.classList.add('active');
+      } else {
+        item.classList.remove('active');
+      }
     });
+  }
 
-    function showSlide(index) {
-      items.forEach((item, i) => {
-        if (i === index) {
-          item.classList.add('active');
-        } else {
-          item.classList.remove('active');
-        }
-      });
-    }
+  function nextSlide() {
+    currentIndex = (currentIndex + 1) % items.length;
+    showSlide(currentIndex);
+  }
 
-    function nextSlide() {
-      currentIndex = (currentIndex + 1) % items.length;
-      showSlide(currentIndex);
-    }
+  function prevSlide() {
+    currentIndex = (currentIndex - 1 + items.length) % items.length;
+    showSlide(currentIndex);
+  }
 
-    function prevSlide() {
-      currentIndex = (currentIndex - 1 + items.length) % items.length;
-      showSlide(currentIndex);
-    }
+  // Auto-slide every 7 seconds
+  setInterval(nextSlide, 7000);
 
-    // Auto-slide setiap 7 detik
-    setInterval(nextSlide, 7000);
+  // Add event listeners for prev/next buttons
+  document.querySelector('.carousel-control-prev').addEventListener('click', prevSlide);
+  document.querySelector('.carousel-control-next').addEventListener('click', nextSlide);
+</script>
 
-    // Tambahkan event listener untuk tombol prev/next
-    document.querySelector('.carousel-control-prev').addEventListener('click', prevSlide);
-    document.querySelector('.carousel-control-next').addEventListener('click', nextSlide);
-  </script>
 
   <!--promo poster-->
   <section id="promo-section" class="section" style="padding-top: 100px; padding-bottom: 10px;">
