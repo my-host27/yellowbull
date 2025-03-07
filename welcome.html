@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Yellow Bull</title>
+
+    <script type="module">
+        import { checkAuthState, logoutUser } from "./firebase-config.js";
+
+        // Cek status user saat halaman dimuat
+        window.onload = () => {
+            checkAuthState();
+        };
+
+        // Pastikan fungsi logout tersedia di global scope agar tombol bisa memanggilnya
+        window.logoutUser = logoutUser;
+    </script>
+</head>
+<body>
+    <h1>Welcome to Yellow Bull</h1>
+    <p id="userInfo">Checking user info...</p>
+    
+    <button onclick="logoutUser()">Logout</button>
+</body>
+</html>
