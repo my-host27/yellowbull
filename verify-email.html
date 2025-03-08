@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification</title>
+    <script type="module">
+        import { getAuth, applyActionCode } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+        import { db, doc, updateDoc } from "./firebase-config.js";
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const oobCode = urlParams.get("oobCode");
+
+            if (!oobCode) {
+                alert("Invalid verification link!");
+                window.location.href = "/login";
+                return;
+            }
+
+            const auth = getAuth(); 
+
+            try {
+                await applyActionCode(auth, oobCode);
+                console.log("✅ Email successfully verified!");
+
+                if (auth.currentUser) {
+                    await updateDoc(doc(db, "Users", auth.currentUser.uid), {
+                        emailVerified: true
+                    });
+                }
+
+                alert("🎉 Email berhasil diverifikasi! Mengarahkan ke profil...");
+                window.location.href = "/profile"; 
+            } catch (error) {
+                console.error("🔥 Error verifying email:", error);
+                alert("❌ Gagal memverifikasi email. Silakan coba lagi.");
+                window.location.href = "/login";
+            }
+        });
+    </script>
+</head>
+<body>
+    <h2>Verifying your email...</h2>
+</body>
+</html>

@@ -7,6 +7,8 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <meta charset="utf-8" />
   <title>30 mins Emergency Roadside Assistance 24/7 | Yellow Bull</title>
+
+
   <meta
     content="Singapore&#x27;s fastest — 30 mins — islandwide emergency roadside assistance: Car Towing, on-site Car Battery Replacement, Vehicle Jumpstart, Flat Tyre Assistance, Fuel Delivery and Minor Mechanical Repairs."
     name="description" />
@@ -91,6 +93,7 @@
 
 .extra-button:hover {
     background-color: #ffaa00; /* Efek hover */
+    color: #000;
 }
 
 
@@ -122,6 +125,8 @@
       }
     </script>
 </head>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <body class="body">
   <div class="div-block">
@@ -319,8 +324,8 @@
         </a>
     
         <!-- ✅ Button tambahan sebelum menu -->
-        <a id="extra-button" href="/extra-page" class="button extra-button w-inline-block">
-            <div>Login / Register</div>
+        <a id="extra-button" href="/login" class="button extra-button w-inline-block">
+            <div>Login</div>
         </a>
     
         <div data-w-id="a47e3ac2-1d55-4978-0bd2-3d453ab029da" class="hamburger-menu">
@@ -462,12 +467,10 @@
   const items = document.querySelectorAll('.carousel-item');
   let currentIndex = 0;
 
-  // Preload images with lazy loading
   items.forEach((item) => {
     const bg = item.querySelector('.carousel-background');
     const imgUrl = bg.style.backgroundImage.replace(/url\("(.*)"\)/, '$1');
 
-    // Create an img element to use lazy loading
     const img = document.createElement('img');
     img.src = imgUrl;
     img.loading = 'lazy'; // Enable lazy loading
