@@ -52,8 +52,6 @@ jobs:
       - name: Move required files for deployment
         run: |
           mkdir -p build
-          mv index.html build/
-          mv firebase-config.js build/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
