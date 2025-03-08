@@ -13,12 +13,45 @@ import {
     getFirestore, doc, setDoc, getDoc, updateDoc, Timestamp 
 } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
 
-import { firebaseConfig } from "./config.js";
+// ✅ Fungsi untuk memuat `firebaseConfig` dari `env.js`
+async function loadEnv() {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = "/public/env.js"; // Pastikan path ini sesuai dengan lokasi env.js
+        script.onload = () => {
+            console.log("✅ env.js loaded successfully.");
+            resolve(window.env);
+        };
+        script.onerror = () => reject(new Error("❌ Failed to load env.js"));
+        document.head.appendChild(script);
+    });
+}
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const googleProvider = new GoogleAuthProvider();
+// ✅ Variabel global untuk Firebase
+let auth, db, googleProvider, firebaseConfig;
+
+// ✅ Tunggu `firebaseConfig` sebelum inisialisasi Firebase
+(async () => {
+    const env = await loadEnv();
+
+    firebaseConfig = {
+        apiKey: env.FIREBASE_API_KEY,
+        authDomain: env.FIREBASE_AUTH_DOMAIN,
+        projectId: env.FIREBASE_PROJECT_ID,
+        storageBucket: env.FIREBASE_STORAGE_BUCKET,
+        messagingSenderId: env.FIREBASE_MESSAGING_SENDER_ID,
+        appId: env.FIREBASE_APP_ID,
+        measurementId: env.FIREBASE_MEASUREMENT_ID
+    };
+
+    console.log("✅ Firebase Config:", firebaseConfig);
+
+    // ✅ Inisialisasi Firebase setelah `firebaseConfig` tersedia
+    const app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app);
+    googleProvider = new GoogleAuthProvider();
+})();
 
 export async function resetPassword(email) {
     if (!email) {
@@ -77,8 +110,13 @@ export async function signInWithGoogle() {
         throw error;
     }
 }
-
+// ✅ Fungsi Logout
 export function logoutUser() {
+    if (!auth) {
+        console.error("❌ Firebase Auth is not initialized yet!");
+        return;
+    }
+
     signOut(auth)
         .then(() => {
             console.log("✅ User logged out");
@@ -90,6 +128,7 @@ export function logoutUser() {
         });
 }
 
+// ✅ Ekspor semua fungsi Firebase
 export { 
     auth, db, sendEmailVerification, updateDoc, getDoc, verifyBeforeUpdateEmail, 
     createUserWithEmailAndPassword, reauthenticateWithCredential, updateEmail, 
