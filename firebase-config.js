@@ -44,8 +44,6 @@ let auth, db, googleProvider, firebaseConfig;
         measurementId: env.FIREBASE_MEASUREMENT_ID
     };
 
-    console.log("✅ Firebase Config:", firebaseConfig);
-
     // ✅ Inisialisasi Firebase setelah `firebaseConfig` tersedia
     const app = initializeApp(firebaseConfig);
     auth = getAuth(app);
