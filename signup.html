@@ -4601,10 +4601,10 @@
 		</div>
 	</section>
 
-
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script type="module">
-        import { auth, db, createUserWithEmailAndPassword, setDoc, doc, Timestamp, sendEmailVerification, onAuthStateChanged } from "./firebase-config.js";
+        import { auth, db, updateDoc, getDoc, createUserWithEmailAndPassword, setDoc, doc, Timestamp, sendEmailVerification, onAuthStateChanged } from "./firebase-config.js";
     
         $(document).ready(function () {
             console.log("📌 jQuery siap digunakan!");
@@ -4686,27 +4686,54 @@
                                 userID: userId
                             });
                         })
-                        .then(() => {
-                            console.log("🚀 Semua data berhasil disimpan, menunggu verifikasi email...");
-                            $('.loading').css('display', 'none');
-    
-                            alert("📧 Email verifikasi telah dikirim! Harap verifikasi sebelum login.");
+						.then(() => {
+    console.log("🚀 Semua data berhasil disimpan, menunggu verifikasi email...");
+    $('.loading').css('display', 'none');
 
-                            const checkVerification = setInterval(() => {
-                                auth.currentUser.reload().then(() => {
-                                    if (auth.currentUser.emailVerified) {
-                                        console.log("✅ Email telah diverifikasi!");
-    
-                                        updateDoc(doc(db, "Users", auth.currentUser.uid), {
-                                            emailVerified: true
-                                        });
-    
-                                        clearInterval(checkVerification);
-                                        window.location.href = "/profile"; 
-                                    }
-                                });
-                            }, 3000); 
-                        })
+    Swal.fire({
+        title: "📧 Email has been sent",
+        text: "Please verify your email before login.",
+        icon: "info",
+        background: "#fffa90", 
+        color: "#000", 
+        confirmButtonColor: "#ffcc00",
+        confirmButtonText: "OK"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            console.log("🔄 Mulai pengecekan email verifikasi setiap 3 detik...");
+
+            const checkVerification = setInterval(async () => {
+                try {
+                    await auth.currentUser.reload(); 
+                    
+                    if (auth.currentUser.emailVerified) {
+                        console.log("✅ Email telah diverifikasi!");
+                        clearInterval(checkVerification); 
+
+                        await updateDoc(doc(db, "Users", auth.currentUser.uid), {
+                            emailVerified: true
+                        });
+
+                        Swal.fire({
+                            title: "✅ Email Verified!",
+                            text: "Your account has been verified, redirecting to profile page.",
+                            icon: "success",
+                            background: "#ccffcc", 
+                            color: "#000",
+                            confirmButtonColor: "#44cc44",
+                            confirmButtonText: "OK"
+                        }).then(() => {
+                            console.log("🔀 Redirecting to /profile...");
+                            window.location.href = "/profile"; 
+                        });
+                    }
+                } catch (error) {
+                    console.error("❌ Error checking email verification:", error);
+                }
+            }, 3000);
+        }
+    });
+})
                         .catch(error => {
                             console.error("🔥 Error selama proses registrasi:", error.message);
                             alert(error.message);

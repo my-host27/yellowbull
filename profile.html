@@ -24,6 +24,22 @@
 
 
 
+.custom-alert {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #fffa90; /* Warna kuning */
+    color: #000; /* Tulisan hitam */
+    padding: 15px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    text-align: center;
+    display: none;
+}
 
 
         .table td {
@@ -51,94 +67,190 @@
             }
         }
     </style>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script type="module">
-    import { auth, db, onAuthStateChanged, doc, getDoc, updateDoc, sendEmailVerification, logoutUser } from "./firebase-config.js";
+import { 
+    auth, db, onAuthStateChanged, doc, getDoc, updateDoc, 
+    sendEmailVerification, updateEmail, reauthenticateWithCredential, EmailAuthProvider, verifyBeforeUpdateEmail, logoutUser 
+} from "./firebase-config.js";
 
-    document.addEventListener("DOMContentLoaded", function () {
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                console.log("✅ User logged in:", user.uid);
-
-                const userRef = doc(db, "Users", user.uid);
-                const docSnap = await getDoc(userRef);
-
-                if (docSnap.exists()) {
-                    const userData = docSnap.data();
-
-                    document.getElementById("username").innerText = userData.userName || "User";
-                    document.getElementById("vehicle_no").innerText = userData.carPlate || "Not Available";
-                    document.getElementById("currentEmail").innerText = userData.email || "Not Available";
-                    document.getElementById("editUsername").value = userData.userName || "";
-                    document.getElementById("editEmail").value = userData.email || "";
-
-                    if (userData.carPlate) {
-                        const carRef = doc(db, "carPlates", userData.carPlate);
-                        const carSnap = await getDoc(carRef);
-
-                        if (carSnap.exists()) {
-                            const carData = carSnap.data();
-                            document.getElementById("car_model").innerText = carData.carModel || "Not Available";
-                            document.getElementById("car_brand").innerText = carData.carBrand || "Not Available";
-                        }
-                    }
-                } else {
-                    console.log("❌ No user data found in Firestore");
-                }
-
-                if (user.emailVerified) {
-                    document.getElementById("editPassword").disabled = false;
-                    document.getElementById("passwordNote").innerText = "Your email is verified. You can update your password now.";
-                    document.getElementById("verifyEmailBtn").style.display = "none";
-                } else {
-                    document.getElementById("verifyEmailBtn").addEventListener("click", async () => {
-                        try {
-                            await sendEmailVerification(auth.currentUser);
-                            alert("📧 Verification email sent! Please check your inbox.");
-                        } catch (error) {
-                            console.error("🔥 Error sending verification email:", error);
-                            alert("❌ Failed to send verification email.");
-                        }
-                    });
-                }
-            } else {
-                console.log("❌ No user logged in. Redirecting...");
-                window.location.href = "/login";
-            }
-        });
-
-        document.getElementById("editProfileForm").addEventListener("submit", async (event) => {
-            event.preventDefault();
-            const user = auth.currentUser;
-            if (!user) return;
-
-            const newUsername = document.getElementById("editUsername").value;
-            const newEmail = document.getElementById("editEmail").value;
-            const newPassword = document.getElementById("editPassword").value;
+document.addEventListener("DOMContentLoaded", function () {
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            console.log("✅ User logged in:", user.uid);
 
             const userRef = doc(db, "Users", user.uid);
+            const docSnap = await getDoc(userRef);
 
-            try {
-                const updateData = { userName: newUsername, email: newEmail };
-                if (user.emailVerified && newPassword.trim() !== "") {
-                    updateData.password = newPassword;
+            if (docSnap.exists()) {
+                const userData = docSnap.data();
+
+                document.getElementById("username").innerText = userData.userName || "User";
+                document.getElementById("vehicle_no").innerText = userData.carPlate || "Not Available";
+                document.getElementById("currentEmail").innerText = user.email || "Not Available"; 
+                document.getElementById("editUsername").value = userData.userName || "";
+                document.getElementById("editEmail").value = user.email || ""; 
+
+                if (userData.carPlate) {
+                    const carRef = doc(db, "carPlates", userData.carPlate);
+                    const carSnap = await getDoc(carRef);
+
+                    if (carSnap.exists()) {
+                        const carData = carSnap.data();
+                        document.getElementById("car_model").innerText = carData.carModel || "Not Available";
+                        document.getElementById("car_brand").innerText = carData.carBrand || "Not Available";
+                    }
                 }
-
-                await updateDoc(userRef, updateData);
-                alert("✅ Profile updated successfully!");
-                $('#editProfileModal').modal('hide');
-            } catch (error) {
-                console.error("🔥 Error updating profile:", error);
-                alert("❌ Failed to update profile.");
+            } else {
+                console.log("❌ No user data found in Firestore");
             }
-        });
 
-        document.getElementById("logoutBtn").addEventListener("click", () => {
-            event.preventDefault();
-            logoutUser();
-        });
+            if (user.emailVerified) {
+                document.getElementById("editPassword").disabled = false;
+                document.getElementById("passwordNote").innerText = "Your email is verified. You can update your password now.";
+                document.getElementById("verifyEmailBtn").style.display = "none";
+            } else {
+                document.getElementById("verifyEmailBtn").style.display = "block";
+                document.getElementById("verifyEmailBtn").addEventListener("click", async () => {
+                    try {
+                        await sendEmailVerification(auth.currentUser);
+                        Swal.fire({
+                            title: "📧 Verification Email Sent!",
+                            text: "Please check your inbox.",
+                            icon: "info",
+                            background: "#fffa90",
+                            color: "#000",
+                            confirmButtonColor: "#ffcc00"
+                        });
+
+                    } catch (error) {
+                        Swal.fire({
+                            title: "❌ Failed to send verification email.",
+                            text: error.message,
+                            icon: "error",
+                            background: "#ffcccc",
+                            color: "#000",
+                            confirmButtonColor: "#ff4444"
+                        });
+                    }
+                });
+            }
+        } else {
+            console.log("❌ No user logged in. Redirecting...");
+            window.location.href = "/login";
+        }
     });
 
+    document.getElementById("editProfileForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const user = auth.currentUser;
+        if (!user) return;
+
+        const newUsername = document.getElementById("editUsername").value;
+        const newEmail = document.getElementById("editEmail").value.trim();
+        const currentEmail = user.email;
+
+        const userRef = doc(db, "Users", user.uid);
+
+        try {
+            const updateData = { userName: newUsername };
+
+            if (newEmail && newEmail !== currentEmail) {
+
+                const password = prompt("🔒 Please enter your password to confirm email update:");
+                if (!password) {
+                    return Swal.fire({
+                        title: "❌ Email update cancelled.",
+                        icon: "error",
+                        background: "#ffcccc",
+                        color: "#000",
+                        confirmButtonColor: "#ff4444"
+                    });
+                }
+
+                const credential = EmailAuthProvider.credential(user.email, password);
+                await reauthenticateWithCredential(user, credential);
+                console.log("✅ User re-authenticated.");
+
+
+                await verifyBeforeUpdateEmail(user, newEmail);
+                Swal.fire({
+                    title: "📧 A verification email has been sent!",
+                    text: "Please verify it before logging in again.",
+                    icon: "info",
+                    background: "#fffa90",
+                    color: "#000",
+                    confirmButtonColor: "#ffcc00"
+                });
+
+                await updateDoc(userRef, { pendingEmail: newEmail });
+
+                logoutUser();
+                return;
+            }
+
+            await updateDoc(userRef, updateData);
+
+            document.getElementById("username").innerText = newUsername || "User";
+            Swal.fire({
+                title: "✅ Profile updated successfully!",
+                icon: "success",
+                background: "#ccffcc",
+                color: "#000",
+                confirmButtonColor: "#44cc44"
+            });
+
+            $('#editProfileModal').modal('hide');
+        } catch (error) {
+            Swal.fire({
+                title: "❌ Failed to update profile.",
+                text: error.message,
+                icon: "error",
+                background: "#ffcccc",
+                color: "#000",
+                confirmButtonColor: "#ff4444"
+            });
+        }
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user && user.emailVerified) {
+            const userRef = doc(db, "Users", user.uid);
+            const docSnap = await getDoc(userRef);
+
+            if (docSnap.exists()) {
+                const userData = docSnap.data();
+
+                if (userData.pendingEmail && userData.pendingEmail === user.email) {
+                    await updateDoc(userRef, { email: user.email, pendingEmail: "" });
+                    console.log("✅ Firestore email updated:", user.email);
+                }
+            }
+        }
+    });
+
+ 
+    document.getElementById("logoutBtn").addEventListener("click", (event) => {
+        event.preventDefault();
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You will be logged out.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#ff4444",
+            cancelButtonColor: "#ccc",
+            confirmButtonText: "Yes, log out"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                logoutUser();
+            }
+        });
+    });
+});
 </script>
+
 </head>
 
 <body>
