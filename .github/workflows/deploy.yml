@@ -1,0 +1,46 @@
+name: Deploy Backend and Generate env.js
+
+on:
+  push:
+    branches: ["master"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Generate env.js (Server-side)
+        run: |
+          mkdir -p server
+          echo "export const config = {" > server/env.js
+          echo "  FIREBASE_API_KEY: '${{ secrets.VITE_FIREBASE_API_KEY }}'," >> server/env.js
+          echo "  FIREBASE_AUTH_DOMAIN: '${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}'," >> server/env.js
+          echo "  FIREBASE_PROJECT_ID: '${{ secrets.VITE_FIREBASE_PROJECT_ID }}'," >> server/env.js
+          echo "  FIREBASE_STORAGE_BUCKET: '${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}'," >> server/env.js
+          echo "  FIREBASE_MESSAGING_SENDER_ID: '${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}'," >> server/env.js
+          echo "  FIREBASE_APP_ID: '${{ secrets.VITE_FIREBASE_APP_ID }}'," >> server/env.js
+          echo "  FIREBASE_MEASUREMENT_ID: '${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}'" >> server/env.js
+          echo "};" >> server/env.js
+          
+      - name: Install Dependencies
+        run: npm install
+        
+      - name: Start Backend (Background)
+        run: nohup npm run start &
+
+      - name: Upload Server Files (Hidden)
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-server
+          path: server/
+
+      - name: Deploy Backend
+        run: echo "Backend Deployed!"

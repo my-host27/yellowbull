@@ -1,4 +1,4 @@
 config.js
 server.js
 .env
-public/env.js
+server/env.js

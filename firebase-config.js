@@ -17,7 +17,7 @@ import {
 async function loadEnv() {
     return new Promise((resolve, reject) => {
         const script = document.createElement("script");
-        script.src = "/public/env.js"; // Pastikan path ini sesuai dengan lokasi env.js
+        script.src = "/server/env.js"; // Pastikan path ini sesuai dengan lokasi env.js
         script.onload = () => {
             console.log("✅ env.js loaded successfully.");
             resolve(window.env);
