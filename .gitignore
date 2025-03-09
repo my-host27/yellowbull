@@ -3,3 +3,9 @@ server.js
 .env
 server/env.js
 secrets.js
+public/secrets.js
+.firebase/
+.wrangler/
+flask-secret-server/
+functions/
+

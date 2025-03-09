@@ -33,8 +33,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
-      - name: Inject SECRET_TOKEN
-        run: echo "FIREBASE_SECRET=${{ secrets.FIREBASE_SECRET }}" > .secret.js
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

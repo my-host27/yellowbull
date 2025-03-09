@@ -2,7 +2,8 @@ import {
     initializeApp 
 } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
 
-import SECRET_TOKEN from "./secrets.js";
+import {getSecretToken} from "./secrets.js";
+
 import { 
     getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, 
     updateEmail, verifyBeforeUpdateEmail, reauthenticateWithCredential, 
@@ -14,14 +15,20 @@ import {
     getFirestore, doc, setDoc, getDoc, updateDoc, Timestamp 
 } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
 
-// ✅ Fungsi untuk memuat `firebaseConfig` dari `env.js`
+
+// ✅ Fungsi untuk memuat `firebaseConfig` dari `env.js`// ✅ Fungsi untuk memuat `firebaseConfig` dari `env.js`
+
 async function loadEnv() {
     try {
+        const SECRET_TOKEN = await getSecretToken(); // 🔥 Ambil token secara dinamis
+        if (!SECRET_TOKEN) throw new Error("❌ SECRET_TOKEN tidak ditemukan!");
+
+        // 🔥 Gunakan SECRET_TOKEN untuk fetch konfigurasi Firebase
         const response = await fetch("https://firebase-worker.zahrinacandrakanti.workers.dev/", {
             method: "GET",
             headers: { 
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${SECRET_TOKEN}` // 🔥 Ganti dengan token yang valid
+                "Authorization": `Bearer ${SECRET_TOKEN}` // 🔥 Sekarang token diambil secara asinkron
             }
         });
 
@@ -31,9 +38,6 @@ async function loadEnv() {
 
         const env = await response.json();
         
-        // Debug: Cek apakah data diterima dengan benar
-        console.log("✅ Firebase Config Loaded Securely:", env);
-
         if (!env.FIREBASE_API_KEY) {
             throw new Error("❌ FIREBASE_API_KEY tidak ditemukan dalam response!");
         }
@@ -45,13 +49,17 @@ async function loadEnv() {
     }
 }
 
-
 // ✅ Variabel global untuk Firebase
 let auth, db, googleProvider, firebaseConfig;
 
 // ✅ Tunggu `firebaseConfig` sebelum inisialisasi Firebase
 (async () => {
+    
     const env = await loadEnv();
+    if (!env) {
+        console.error("❌ Firebase config gagal dimuat. Pastikan API bekerja!");
+        return;
+    }
 
     firebaseConfig = {
         apiKey: env.FIREBASE_API_KEY,
@@ -63,15 +71,14 @@ let auth, db, googleProvider, firebaseConfig;
         measurementId: env.FIREBASE_MEASUREMENT_ID
     };
 
-    console.log("✅ Firebase Config:", firebaseConfig);
-    console.log("✅ Debug - Firebase Config yang digunakan:", firebaseConfig);
 
-    // ✅ Inisialisasi Firebase setelah `firebaseConfig` tersedia
     const app = initializeApp(firebaseConfig);
     auth = getAuth(app);
     db = getFirestore(app);
     googleProvider = new GoogleAuthProvider();
+
 })();
+
 
 // ✅ Fungsi Reset Password
 export async function resetPassword(email) {
@@ -98,7 +105,6 @@ export async function signInUser(email, password) {
             throw new Error("❌ Please verify your email before logging in.");
         }
 
-        console.log("✅ User signed in:", user.uid);
         localStorage.setItem('loggedInUserId', user.uid);
         return user;
     } catch (error) {
@@ -125,7 +131,6 @@ export async function signInWithGoogle() {
             });
         }
 
-        console.log("✅ Google Sign-In Successful:", user.uid);
         localStorage.setItem('loggedInUserId', user.uid);
         return user;
     } catch (error) {
@@ -138,7 +143,7 @@ export async function signInWithGoogle() {
 export function logoutUser() {
     signOut(auth)
         .then(() => {
-            console.log("✅ User logged out");
+
             localStorage.removeItem('loggedInUserId');
             window.location.href = "/login";
         })
