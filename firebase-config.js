@@ -13,15 +13,15 @@ import {
     getFirestore, doc, setDoc, getDoc, updateDoc, Timestamp 
 } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
 
-const API_BASE_URL = "https://my-first-production-e414.up.railway.app"; // Sesuaikan dengan domain deploy
+const API_BASE_URL = "https://my-first-production-e414.up.railway.app"; 
+let SECRET_TOKEN = null;
 
-// ✅ Ambil SECRET_TOKEN dari backend Flask
-async function getSecretToken() {
+async function preloadSecretToken() {
     try {
         const response = await fetch(`${API_BASE_URL}/get-secret`, {
             method: "GET",
             headers: {
-                "Authorization": "Bearer secure-app-key", // Sesuaikan dengan Flask
+                "Authorization": "Bearer secure-app-key", 
             },
         });
 
@@ -30,25 +30,21 @@ async function getSecretToken() {
         }
 
         const data = await response.json();
-        return data.secret;
+        SECRET_TOKEN = data.secret;
     } catch (error) {
-        console.error("Error fetching secret token:", error);
-        return null;
+        console.error("❌ Error fetching secret token:", error);
     }
 }
 
-// ✅ Fungsi untuk memuat `firebaseConfig` dari Cloudflare Worker
 async function loadEnv() {
     try {
-        const SECRET_TOKEN = await getSecretToken(); // 🔥 Ambil token secara dinamis
-        if (!SECRET_TOKEN) throw new Error("❌ SECRET_TOKEN tidak ditemukan!");
+        if (!SECRET_TOKEN) throw new Error("❌ SECRET_TOKEN belum terdefinisi!");
 
-        // 🔥 Gunakan SECRET_TOKEN untuk fetch konfigurasi Firebase
         const response = await fetch("https://firebase-worker.zahrinacandrakanti.workers.dev/", {
             method: "GET",
             headers: { 
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${SECRET_TOKEN}` // 🔥 Sekarang token diambil secara asinkron
+                "Authorization": `Bearer ${SECRET_TOKEN}` 
             }
         });
 
@@ -69,12 +65,11 @@ async function loadEnv() {
     }
 }
 
-// ✅ Variabel global untuk Firebase
 let auth, db, googleProvider, firebaseConfig;
 
-// ✅ Tunggu `firebaseConfig` sebelum inisialisasi Firebase
 (async () => {
-    
+    await preloadSecretToken(); 
+
     const env = await loadEnv();
     if (!env) {
         console.error("❌ Firebase config gagal dimuat. Pastikan API bekerja!");
@@ -91,7 +86,6 @@ let auth, db, googleProvider, firebaseConfig;
         measurementId: env.FIREBASE_MEASUREMENT_ID
     };
 
-
     const app = initializeApp(firebaseConfig);
     auth = getAuth(app);
     db = getFirestore(app);
@@ -100,7 +94,6 @@ let auth, db, googleProvider, firebaseConfig;
 })();
 
 
-// ✅ Fungsi Reset Password
 export async function resetPassword(email) {
     if (!email) {
         return Promise.reject("❌ Please enter a valid email.");
@@ -115,7 +108,6 @@ export async function resetPassword(email) {
     }
 }
 
-// ✅ Fungsi Sign In User
 export async function signInUser(email, password) {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -133,7 +125,7 @@ export async function signInUser(email, password) {
     }
 }
 
-// ✅ Fungsi Sign In dengan Google
+
 export async function signInWithGoogle() {
     try {
         const result = await signInWithPopup(auth, googleProvider);
@@ -159,7 +151,6 @@ export async function signInWithGoogle() {
     }
 }
 
-// ✅ Fungsi Logout
 export function logoutUser() {
     signOut(auth)
         .then(() => {
@@ -172,7 +163,6 @@ export function logoutUser() {
         });
 }
 
-// ✅ Ekspor variabel dan fungsi yang sudah diinisialisasi
 export { 
     auth, db, sendEmailVerification, updateDoc, getDoc, verifyBeforeUpdateEmail, 
     createUserWithEmailAndPassword, reauthenticateWithCredential, updateEmail, 
