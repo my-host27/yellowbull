@@ -1,0 +1,11 @@
+name = "firebase-worker"  # Ganti dengan nama unik
+main = "worker.js"  # Pastikan file ini ada
+compatibility_date = "2025-03-08"  # Ganti dengan tanggal kemarin
+
+
+[vars]
+NODE_ENV = "production"
+
+[[kv_namespaces]]
+binding = "yellowbull"
+id = "e999ef4ba4914ac8911b3388a78b35d9"

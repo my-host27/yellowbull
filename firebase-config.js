@@ -2,6 +2,7 @@ import {
     initializeApp 
 } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
 
+import SECRET_TOKEN from "./secrets.js";
 import { 
     getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, 
     updateEmail, verifyBeforeUpdateEmail, reauthenticateWithCredential, 
@@ -15,17 +16,35 @@ import {
 
 // ✅ Fungsi untuk memuat `firebaseConfig` dari `env.js`
 async function loadEnv() {
-    return new Promise((resolve, reject) => {
-        const script = document.createElement("script");
-        script.src = "/server/env.js"; // Pastikan path ini sesuai dengan lokasi env.js
-        script.onload = () => {
-            console.log("✅ env.js loaded successfully.");
-            resolve(window.env);
-        };
-        script.onerror = () => reject(new Error("❌ Failed to load env.js"));
-        document.head.appendChild(script);
-    });
+    try {
+        const response = await fetch("https://firebase-worker.zahrinacandrakanti.workers.dev/", {
+            method: "GET",
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${SECRET_TOKEN}` // 🔥 Ganti dengan token yang valid
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`❌ HTTP Error! Status: ${response.status}`);
+        }
+
+        const env = await response.json();
+        
+        // Debug: Cek apakah data diterima dengan benar
+        console.log("✅ Firebase Config Loaded Securely:", env);
+
+        if (!env.FIREBASE_API_KEY) {
+            throw new Error("❌ FIREBASE_API_KEY tidak ditemukan dalam response!");
+        }
+
+        return env;
+    } catch (error) {
+        console.error("❌ Failed to load Firebase config from Cloudflare Worker:", error);
+        return null;
+    }
 }
+
 
 // ✅ Variabel global untuk Firebase
 let auth, db, googleProvider, firebaseConfig;
@@ -44,6 +63,9 @@ let auth, db, googleProvider, firebaseConfig;
         measurementId: env.FIREBASE_MEASUREMENT_ID
     };
 
+    console.log("✅ Firebase Config:", firebaseConfig);
+    console.log("✅ Debug - Firebase Config yang digunakan:", firebaseConfig);
+
     // ✅ Inisialisasi Firebase setelah `firebaseConfig` tersedia
     const app = initializeApp(firebaseConfig);
     auth = getAuth(app);
@@ -51,6 +73,7 @@ let auth, db, googleProvider, firebaseConfig;
     googleProvider = new GoogleAuthProvider();
 })();
 
+// ✅ Fungsi Reset Password
 export async function resetPassword(email) {
     if (!email) {
         return Promise.reject("❌ Please enter a valid email.");
@@ -65,6 +88,7 @@ export async function resetPassword(email) {
     }
 }
 
+// ✅ Fungsi Sign In User
 export async function signInUser(email, password) {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -83,6 +107,7 @@ export async function signInUser(email, password) {
     }
 }
 
+// ✅ Fungsi Sign In dengan Google
 export async function signInWithGoogle() {
     try {
         const result = await signInWithPopup(auth, googleProvider);
@@ -108,13 +133,9 @@ export async function signInWithGoogle() {
         throw error;
     }
 }
+
 // ✅ Fungsi Logout
 export function logoutUser() {
-    if (!auth) {
-        console.error("❌ Firebase Auth is not initialized yet!");
-        return;
-    }
-
     signOut(auth)
         .then(() => {
             console.log("✅ User logged out");
@@ -126,7 +147,7 @@ export function logoutUser() {
         });
 }
 
-// ✅ Ekspor semua fungsi Firebase
+// ✅ Ekspor variabel dan fungsi yang sudah diinisialisasi
 export { 
     auth, db, sendEmailVerification, updateDoc, getDoc, verifyBeforeUpdateEmail, 
     createUserWithEmailAndPassword, reauthenticateWithCredential, updateEmail, 
