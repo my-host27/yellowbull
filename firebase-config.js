@@ -15,6 +15,41 @@ import {
 
 const API_BASE_URL = "https://my-first-production-e414.up.railway.app"; 
 let SECRET_TOKEN = null;
+let firebaseReady = false; 
+
+let auth = null;
+let db = null;
+let googleProvider = null;
+
+const firebaseInitPromise = new Promise(async (resolve, reject) => {
+    try {
+        await preloadSecretToken(); 
+
+        const env = await loadEnv();
+        if (!env) throw new Error("❌ Firebase config gagal dimuat!");
+
+        const firebaseConfig = {
+            apiKey: env.FIREBASE_API_KEY,
+            authDomain: env.FIREBASE_AUTH_DOMAIN,
+            projectId: env.FIREBASE_PROJECT_ID,
+            storageBucket: env.FIREBASE_STORAGE_BUCKET,
+            messagingSenderId: env.FIREBASE_MESSAGING_SENDER_ID,
+            appId: env.FIREBASE_APP_ID,
+            measurementId: env.FIREBASE_MEASUREMENT_ID
+        };
+
+        const app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+        googleProvider = new GoogleAuthProvider();
+
+        firebaseReady = true;
+        resolve(); 
+    } catch (error) {
+        console.error("🔥 Error initializing Firebase:", error);
+        reject(error);
+    }
+});
 
 async function preloadSecretToken() {
     try {
@@ -65,35 +100,11 @@ async function loadEnv() {
     }
 }
 
-let auth, db, googleProvider, firebaseConfig;
-
-(async () => {
-    await preloadSecretToken(); 
-
-    const env = await loadEnv();
-    if (!env) {
-        console.error("❌ Firebase config gagal dimuat. Pastikan API bekerja!");
-        return;
+async function waitForFirebaseReady() {
+    if (!firebaseReady) {
+        await firebaseInitPromise;
     }
-
-    firebaseConfig = {
-        apiKey: env.FIREBASE_API_KEY,
-        authDomain: env.FIREBASE_AUTH_DOMAIN,
-        projectId: env.FIREBASE_PROJECT_ID,
-        storageBucket: env.FIREBASE_STORAGE_BUCKET,
-        messagingSenderId: env.FIREBASE_MESSAGING_SENDER_ID,
-        appId: env.FIREBASE_APP_ID,
-        measurementId: env.FIREBASE_MEASUREMENT_ID
-    };
-
-    const app = initializeApp(firebaseConfig);
-    auth = getAuth(app);
-    db = getFirestore(app);
-    googleProvider = new GoogleAuthProvider();
-
-})();
-
-
+}
 export async function resetPassword(email) {
     if (!email) {
         return Promise.reject("❌ Please enter a valid email.");
@@ -107,8 +118,9 @@ export async function resetPassword(email) {
         return Promise.reject(error.message);
     }
 }
-
 export async function signInUser(email, password) {
+    await waitForFirebaseReady(); 
+
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
@@ -125,8 +137,9 @@ export async function signInUser(email, password) {
     }
 }
 
-
 export async function signInWithGoogle() {
+    await waitForFirebaseReady(); 
+
     try {
         const result = await signInWithPopup(auth, googleProvider);
         const user = result.user;
@@ -154,7 +167,6 @@ export async function signInWithGoogle() {
 export function logoutUser() {
     signOut(auth)
         .then(() => {
-
             localStorage.removeItem('loggedInUserId');
             window.location.href = "/login";
         })
