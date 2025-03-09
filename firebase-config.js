@@ -2,8 +2,6 @@ import {
     initializeApp 
 } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
 
-import {getSecretToken} from "./secrets.js";
-
 import { 
     getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, 
     updateEmail, verifyBeforeUpdateEmail, reauthenticateWithCredential, 
@@ -15,9 +13,31 @@ import {
     getFirestore, doc, setDoc, getDoc, updateDoc, Timestamp 
 } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
 
+const API_BASE_URL = "https://my-first-production-e414.up.railway.app"; // Sesuaikan dengan domain deploy
 
-// ✅ Fungsi untuk memuat `firebaseConfig` dari `env.js`// ✅ Fungsi untuk memuat `firebaseConfig` dari `env.js`
+// ✅ Ambil SECRET_TOKEN dari backend Flask
+async function getSecretToken() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/get-secret`, {
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer secure-app-key", // Sesuaikan dengan Flask
+            },
+        });
 
+        if (!response.ok) {
+            throw new Error("Failed to fetch secret token");
+        }
+
+        const data = await response.json();
+        return data.secret;
+    } catch (error) {
+        console.error("Error fetching secret token:", error);
+        return null;
+    }
+}
+
+// ✅ Fungsi untuk memuat `firebaseConfig` dari Cloudflare Worker
 async function loadEnv() {
     try {
         const SECRET_TOKEN = await getSecretToken(); // 🔥 Ambil token secara dinamis
