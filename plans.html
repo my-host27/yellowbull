@@ -1,359 +1,523 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://www.yellowbull.app/assets/css/stylesheet.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>yellowbull membership</title>
-		<style>
-			input.form-control error{border:2px solid red;}
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://www.yellowbull.app/assets/css/stylesheet.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css"
+    integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+    rel="stylesheet">
 
-			label.error { color: red;}
+  <title>yellowbull membership</title>
+  <style>
+    input.form-control error {
+      border: 2px solid red;
+    }
+
+    label.error {
+      color: red;
+    }
 
     .whatsapp-chat {
-    position: fixed;
-    bottom: 30px;
-    right: 10px;
-    z-index: 99;
+      position: fixed;
+      bottom: 30px;
+      right: 10px;
+      z-index: 99;
+    }
+    .discount-label {
+    position: absolute;
+    top: 60px;
+    left: 10px;
+    background: red;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 5px 10px;
+    transform: rotate(0deg);
+    border-radius: 5px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
 }
-		</style>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script type="module">
-    import { 
-        logoutUser, onAuthStateChanged, auth
+
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script type="module">
+    import {
+      logoutUser, onAuthStateChanged, auth
     } from "./firebase-config.js";
-document.addEventListener("DOMContentLoaded", function () {
-    onAuthStateChanged(auth, (user) => {
+    document.addEventListener("DOMContentLoaded", function () {
+      onAuthStateChanged(auth, (user) => {
         if (!user) {
-            // Jika user tidak login, redirect ke halaman login
-            window.location.href = "/login";
+          // Jika user tidak login, redirect ke halaman login
+          window.location.href = "/login";
         }
+      });
     });
-document.getElementById("logoutBtn").addEventListener("click", (event) => {
-    event.preventDefault();
-    Swal.fire({
-        title: "Are you sure?",
-        text: "You will be logged out.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#ff4444",
-        cancelButtonColor: "#ccc",
-        confirmButtonText: "Yes, log out"
-    }).then((result) => {
-        if (result.isConfirmed) {
-            logoutUser();
-        }
+    const checkLogoutBtn = setInterval(() => {
+      const logoutBtn = document.getElementById("logoutBtn");
+
+      if (logoutBtn) {
+        console.log("✅ logoutBtn found. Adding event listener...");
+        clearInterval(checkLogoutBtn);
+
+        logoutBtn.addEventListener("click", (event) => {
+          event.preventDefault();
+          Swal.fire({
+            title: "Are you sure?",
+            text: "You will be logged out.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#ff4444",
+            cancelButtonColor: "#ccc",
+            confirmButtonText: "Yes, log out"
+          }).then((result) => {
+            if (result.isConfirmed) {
+              logoutUser();
+            }
+          });
+        });
+      } else {
+        console.warn("⏳ Waiting for logoutBtn to be available...");
+      }
+    }, 500);
+    document.querySelectorAll(".view-more").forEach(button => {
+    button.addEventListener("click", function() {
+        let card = this.closest(".plan-card"); // Mencari card terdekat
+        let extraItems = card.querySelectorAll(".extra-items");
+        let isHidden = extraItems[0].style.display === "none" || extraItems[0].style.display === "";
+
+        extraItems.forEach(item => {
+            item.style.display = isHidden ? "list-item" : "none";
+        });
+
+        this.textContent = isHidden ? "View Less" : "View More";
     });
-});});
+});
+
+  </script>
+<script>
+  function addToCart(productName, element, price) {
+      // Ambil elemen terdekat dengan class `.col-md-6` untuk memastikan deskripsi diambil dengan benar
+      const productList = element.closest(".col-md-6").querySelectorAll(".collapse-details ul li");
+  
+      // Gabungkan semua deskripsi `li` menjadi satu string
+      let productDescription = [];
+      productList.forEach(li => productDescription.push(li.innerText));
+      productDescription = productDescription.join(", "); // Pisahkan dengan koma
+  
+      // Simpan ke localStorage
+      const cartItem = {
+          name: productName,
+          product: productDescription,
+          price: price
+      };
+  
+      localStorage.setItem("cartItem", JSON.stringify(cartItem));
+  }
 </script>
-  </head>
+
+  
+</head>
 
 
-  <body>
+<body>
   <div class="loading" style="display:none">Loading&#8230;</div>
   <section class="header">
-      <div class="container p-0">
-        <nav class="navbar navbar-expand-lg">
-          <a class="navbar-brand" href="https://www.yellowbull.app/dashboard"><img src="https://www.yellowbull.app/assets/images/logo.png" class="img-fluid"></a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"><i class="fa fa-bars" aria-hidden="true"></i></span>
-          </button>
+    <div class="container p-0">
+      <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand" href="https://www.yellowbull.app/dashboard"><img
+            src="https://www.yellowbull.app/assets/images/logo.png" class="img-fluid"></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"><i class="fa fa-bars" aria-hidden="true"></i></span>
+        </button>
 
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav ml-auto">
-              <!--<li class="nav-item active">-->
-              <!--<a class="nav-link" href="" style="font-size:16px">Dashboard</a>-->
-              <!--</li>-->
-                                                          <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-expanded="false" style="font-size:16px">
-                  My Account
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <a class="dropdown-item" href="/profile" style="font-size:16px">Profile</a>
-                                                   
-                  <a class="dropdown-item" href="/my_cart" style="font-size:16px">My Cart</a>
-                         
-                                
-                  <a class="dropdown-item" href="#" id="logoutBtn" style="font-size:16px">Sign Out</a>
-                </div>
-              </li>
-                          </ul>
-          </div>
-        </nav>
-      </div>
-     
-      
-      <div class="whatsapp-chat">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav ml-auto">
+            <!--<li class="nav-item active">-->
+            <!--<a class="nav-link" href="" style="font-size:16px">Dashboard</a>-->
+            <!--</li>-->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+                aria-expanded="false" style="font-size:16px">
+                My Account
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="/profile" style="font-size:16px">Profile</a>
+
+                <a class="dropdown-item" href="/my_cart" style="font-size:16px">My Cart</a>
+
+
+                <a class="dropdown-item" href="#" id="logoutBtn" style="font-size:16px">Sign Out</a>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+
+
+    <div class="whatsapp-chat">
       <div style="display:flex;justify-content:center;align-items:center; ">
-    <p class="ht-ctc-cta  ht-ctc-cta-hover " style="padding: 0px 16px; background-color: rgb(37, 211, 102); color: rgb(255, 255, 255); border-radius: 10px; margin: 0px 10px; order: 0; display: none;">WhatsApp us</p>
-    <a href="https://wa.me/+6591013232/?text=yellowbull" target="_blank" class="ht_ctc_padding" style="background-color: #25D366; padding: 14px; border-radius: 50%; box-shadow: 0px 0px 11px rgba(0,0,0,.5);">
-        <svg style="pointer-events:none; display:block; height:40px; width:40px;" width="40px" height="40px" viewBox="0 0 1219.547 1225.016">
-        <path fill="#E0E0E0" d="M1041.858 178.02C927.206 63.289 774.753.07 612.325 0 277.617 0 5.232 272.298 5.098 606.991c-.039 106.986 27.915 211.42 81.048 303.476L0 1225.016l321.898-84.406c88.689 48.368 188.547 73.855 290.166 73.896h.258.003c334.654 0 607.08-272.346 607.222-607.023.056-162.208-63.052-314.724-177.689-429.463zm-429.533 933.963h-.197c-90.578-.048-179.402-24.366-256.878-70.339l-18.438-10.93-191.021 50.083 51-186.176-12.013-19.087c-50.525-80.336-77.198-173.175-77.16-268.504.111-278.186 226.507-504.503 504.898-504.503 134.812.056 261.519 52.604 356.814 147.965 95.289 95.36 147.728 222.128 147.688 356.948-.118 278.195-226.522 504.543-504.693 504.543z"></path>
-        <linearGradient id="htwaicona-chat" gradientUnits="userSpaceOnUse" x1="609.77" y1="1190.114" x2="609.77" y2="21.084">
-            <stop offset="0" stop-color="#25D366"></stop>
-            <stop offset="1" stop-color="#25D366"></stop>
-        </linearGradient>
-        <path fill="url(#htwaicona-chat)" d="M27.875 1190.114l82.211-300.18c-50.719-87.852-77.391-187.523-77.359-289.602.133-319.398 260.078-579.25 579.469-579.25 155.016.07 300.508 60.398 409.898 169.891 109.414 109.492 169.633 255.031 169.57 409.812-.133 319.406-260.094 579.281-579.445 579.281-.023 0 .016 0 0 0h-.258c-96.977-.031-192.266-24.375-276.898-70.5l-307.188 80.548z"></path>
-        <image overflow="visible" opacity=".08" width="682" height="639" transform="translate(270.984 291.372)"></image>
-        <path fill-rule="evenodd" clip-rule="evenodd" fill="#FFF" d="M462.273 349.294c-11.234-24.977-23.062-25.477-33.75-25.914-8.742-.375-18.75-.352-28.742-.352-10 0-26.25 3.758-39.992 18.766-13.75 15.008-52.5 51.289-52.5 125.078 0 73.797 53.75 145.102 61.242 155.117 7.5 10 103.758 166.266 256.203 226.383 126.695 49.961 152.477 40.023 179.977 37.523s88.734-36.273 101.234-71.297c12.5-35.016 12.5-65.031 8.75-71.305-3.75-6.25-13.75-10-28.75-17.5s-88.734-43.789-102.484-48.789-23.75-7.5-33.75 7.516c-10 15-38.727 48.773-47.477 58.773-8.75 10.023-17.5 11.273-32.5 3.773-15-7.523-63.305-23.344-120.609-74.438-44.586-39.75-74.688-88.844-83.438-103.859-8.75-15-.938-23.125 6.586-30.602 6.734-6.719 15-17.508 22.5-26.266 7.484-8.758 9.984-15.008 14.984-25.008 5-10.016 2.5-18.773-1.25-26.273s-32.898-81.67-46.234-111.326z"></path>
-        <path fill="#FFF" d="M1036.898 176.091C923.562 62.677 772.859.185 612.297.114 281.43.114 12.172 269.286 12.039 600.137 12 705.896 39.633 809.13 92.156 900.13L7 1211.067l318.203-83.438c87.672 47.812 186.383 73.008 286.836 73.047h.255.003c330.812 0 600.109-269.219 600.25-600.055.055-160.343-62.328-311.108-175.649-424.53zm-424.601 923.242h-.195c-89.539-.047-177.344-24.086-253.93-69.531l-18.227-10.805-188.828 49.508 50.414-184.039-11.875-18.867c-49.945-79.414-76.312-171.188-76.273-265.422.109-274.992 223.906-498.711 499.102-498.711 133.266.055 258.516 52 352.719 146.266 94.195 94.266 146.031 219.578 145.992 352.852-.118 274.999-223.923 498.749-498.899 498.749z"></path>
-    </svg>  
-    </a>
-</div>
-</div>
-    </section>
-
-      <!-- Option 1: jQuery and Bootstrap Bundle (includes Popper) -->
-      <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
-<!--<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>-->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>     
-<style>
-p.renewal button {
-    border-radius: 100%;
-    margin-left: 20px;
-}
-
-.purchase_box{
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    width: 100%;
-}
-.purchase_box .modal-body p {
-   
-    text-align: left !important;
-}
-div#exampleModal1 p {
-    padding: 0;
-}
-</style>
-
-<!-- ***************Plan****************** -->
-<section class="plan-wrap">
-    <div class="container">
-      <div class="row">
-        <div class="plan-box">
-          <h1>Choose your plan</h1>
-          
-        </div>
-      </div>
-      <div class="row purchase_box">
-        <div class="col-md-12">
-            
-        </div>
-        <div class="col-md-4">
-          <div class="basic">
-            <h4>BASIC PLAN</h4>
-            <img src="https://www.yellowbull.app/assets/images/car-basic.png" class="img-fluid">
-            <p> Road side assistance around <b>Singapore</b> only</p>
-            <p class="dollar" style="color:#ffbc13;font-size:20px"><b>$68</b></p>
-            <p class="renewal">Annual Renewal</p>
-            <p class="renewal">Unlimited roadside assistance</p>
-            <p class="renewal">Unlimited towing</p>
-            <p class="renewal">Unlimited pre-trip inspection</p>
-            <p class="renewal" style="color:white">Replacement car</p>
-
-            <div class="joi-now">
-            
-
-            <a href="https://www.yellowbull.app/cart_basic?id=no72tkvwCmU58mSe7e6FdmXBnHH2" class="btn">Purchase Plan</a>
-
-</div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="basic  primium">
-            <h4 class="member-image">PREMIUM PLAN (Promo) </h4>
-            <img src="https://www.yellowbull.app/assets/images/premium.png" class="img-fluid">
-            <p> Road side assistance around <b>Singapore</b> and <b>Malayisa</b></p>
-            <p class="dollar" style="color:#ffbc13;font-size:20px"><b>$138</b></p>
-            <p class="renewal">Annual Renewal</p>
-                        <p class="renewal">Unlimited roadside assistance</p>
-            <p class="renewal">Unlimited towing</p>
-            <p class="renewal">Unlimited pre-trip inspection</p>
-            <!--<p class="renewal">Replacement car</p>-->
-             <p class="renewal">Replacement car<button type="button" class="btn" style="background-color: #ffbc13; color: #fff;" data-toggle="modal" data-target="#exampleModal">
-  ?
-</button>
-
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Replacement car</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-    
-    <p>Replacement car will only be offered to road side assistance at malaysia</p>
-    <p>In the event the break down vehicle requires to tow to our malaysia workshop for repair, we will offer our members a replacement car for maximum 3 days.</p> 
-
-      </div>
-     
-    </div>
-  </div>
-</div>
-</p>
-     <p class="renewal">Free car servicing x 2<button type="button" class="btn" style="background-color: #ffbc13; color: #fff;" data-toggle="modal" data-target="#exampleModal1">
-  ?
-</button>
-
-<!-- Modal -->
-<div class="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Car servicing history</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-    <p>1. Inclusive of engine oil (Bosch), oil filter refilled. </p>
-    <p>2. 21 inspection.
-    <p>1) Check and correct the pressure in all of your tires</p>
-<p>2) Inspect your tires for signs of tread wear</p>
-<p>3) damage (cuts, cracking, nails, etc.)</p>
-<p>4)Visually inspect your brakes</p>
-<p>5) Make sure the brake fluid is in good condition and the reservoir is full</p>
-<p>6) Inspect the components of the suspension</p> 
-<p>7) system, both visually and physically</p>
-<p>8) Inspect steering system components</p>
-<p>9) Check the level and condition of your power </p>
-<p>10) steering fluid and top off if necessary</p>
-<p>11) Inspect the ball joints for play or leaking boots</p>
-<p>12) Inspect the drive axles and CV joints/boots</p>
-<p>13) Look for leaks or damage to the exhaust system</p>
-<p>14) Inspect the fuel lines and brake lines for leaks, damage, and corrosion</p>
-<p>15)Check the level and condition of your engine coolant and top off if necessary</p>
-<p>16) Inspect the coolant hoses for cracks or bulges</p>
-<p>17) Inspect the drive belt(s) for signs of wear or cracking</p>
-<p>18) Check your transmission fluid and top off if necessary</p>
-<p>19) Check all exterior lights for proper operation</p>
-<p> Make sure your battery is not leaking, swollen, or corroded and check its age</p>
-<p>20) Inspect your wiper blades and top off windshield washer fluid</p>
-<p>21) Inspect the engine air filter and cabin air filter</p>
-<p>Visually inspect for any fluid leaks</p>
-<p>Check the engine oil and filter (if oil change service is not being performed)</p>
-<p>Each of these items will be performed whenever you bring your vehicle in for an oil and filter change or other general maintenance procedure.</p>
-
-      </div>
-     
-    </div>
-  </div>
-</div>
-</p>
-            <div class="joi-now">
-
-            <a href="https://www.yellowbull.app/cart_premium?id=no72tkvwCmU58mSe7e6FdmXBnHH2" class="btn">Purchase Plan</a>
-
-</div>
-          </div>
-        </div>
-        <div class="col-md-4">
-            <div class="basic  primium">
-              <h4 class="member-image">PREMIUM PLAN (Promo) </h4>
-              <img src="https://www.yellowbull.app/assets/images/premium.png" class="img-fluid">
-              <p> Road side assistance around <b>Singapore</b> and <b>Malayisa</b></p>
-              <p class="dollar" style="color:#ffbc13;font-size:20px"><b>$138</b></p>
-              <p class="renewal">Annual Renewal</p>
-                          <p class="renewal">Unlimited roadside assistance</p>
-              <p class="renewal">Unlimited towing</p>
-              <p class="renewal">Unlimited pre-trip inspection</p>
-              <!--<p class="renewal">Replacement car</p>-->
-               <p class="renewal">Replacement car<button type="button" class="btn" style="background-color: #ffbc13; color: #fff;" data-toggle="modal" data-target="#exampleModal">
-    ?
-  </button>
-  
-  <!-- Modal -->
-  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Replacement car</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-      
-      <p>Replacement car will only be offered to road side assistance at malaysia</p>
-      <p>In the event the break down vehicle requires to tow to our malaysia workshop for repair, we will offer our members a replacement car for maximum 3 days.</p> 
-  
-        </div>
-       
-      </div>
-    </div>
-  </div>
-  </p>
-       <p class="renewal">Free car servicing x 2<button type="button" class="btn" style="background-color: #ffbc13; color: #fff;" data-toggle="modal" data-target="#exampleModal1">
-    ?
-  </button>
-  
-  <!-- Modal -->
-  <div class="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Car servicing history</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-      <p>1. Inclusive of engine oil (Bosch), oil filter refilled. </p>
-      <p>2. 21 inspection.
-      <p>1) Check and correct the pressure in all of your tires</p>
-  <p>2) Inspect your tires for signs of tread wear</p>
-  <p>3) damage (cuts, cracking, nails, etc.)</p>
-  <p>4)Visually inspect your brakes</p>
-  <p>5) Make sure the brake fluid is in good condition and the reservoir is full</p>
-  <p>6) Inspect the components of the suspension</p> 
-  <p>7) system, both visually and physically</p>
-  <p>8) Inspect steering system components</p>
-  <p>9) Check the level and condition of your power </p>
-  <p>10) steering fluid and top off if necessary</p>
-  <p>11) Inspect the ball joints for play or leaking boots</p>
-  <p>12) Inspect the drive axles and CV joints/boots</p>
-  <p>13) Look for leaks or damage to the exhaust system</p>
-  <p>14) Inspect the fuel lines and brake lines for leaks, damage, and corrosion</p>
-  <p>15)Check the level and condition of your engine coolant and top off if necessary</p>
-  <p>16) Inspect the coolant hoses for cracks or bulges</p>
-  <p>17) Inspect the drive belt(s) for signs of wear or cracking</p>
-  <p>18) Check your transmission fluid and top off if necessary</p>
-  <p>19) Check all exterior lights for proper operation</p>
-  <p> Make sure your battery is not leaking, swollen, or corroded and check its age</p>
-  <p>20) Inspect your wiper blades and top off windshield washer fluid</p>
-  <p>21) Inspect the engine air filter and cabin air filter</p>
-  <p>Visually inspect for any fluid leaks</p>
-  <p>Check the engine oil and filter (if oil change service is not being performed)</p>
-  <p>Each of these items will be performed whenever you bring your vehicle in for an oil and filter change or other general maintenance procedure.</p>
-  
-        </div>
-       
-      </div>
-    </div>
-  </div>
-  </p>
-              <div class="joi-now">
-  
-              <a href="https://www.yellowbull.app/cart_premium?id=no72tkvwCmU58mSe7e6FdmXBnHH2" class="btn">Purchase Plan</a>
-  
-  </div>
-            </div>
-        </div>
+        <p class="ht-ctc-cta  ht-ctc-cta-hover "
+          style="padding: 0px 16px; background-color: rgb(37, 211, 102); color: rgb(255, 255, 255); border-radius: 10px; margin: 0px 10px; order: 0; display: none;">
+          WhatsApp us</p>
+        <a href="https://wa.me/+6591013232/?text=yellowbull" target="_blank" class="ht_ctc_padding"
+          style="background-color: #25D366; padding: 14px; border-radius: 50%; box-shadow: 0px 0px 11px rgba(0,0,0,.5);">
+          <svg style="pointer-events:none; display:block; height:40px; width:40px;" width="40px" height="40px"
+            viewBox="0 0 1219.547 1225.016">
+            <path fill="#E0E0E0"
+              d="M1041.858 178.02C927.206 63.289 774.753.07 612.325 0 277.617 0 5.232 272.298 5.098 606.991c-.039 106.986 27.915 211.42 81.048 303.476L0 1225.016l321.898-84.406c88.689 48.368 188.547 73.855 290.166 73.896h.258.003c334.654 0 607.08-272.346 607.222-607.023.056-162.208-63.052-314.724-177.689-429.463zm-429.533 933.963h-.197c-90.578-.048-179.402-24.366-256.878-70.339l-18.438-10.93-191.021 50.083 51-186.176-12.013-19.087c-50.525-80.336-77.198-173.175-77.16-268.504.111-278.186 226.507-504.503 504.898-504.503 134.812.056 261.519 52.604 356.814 147.965 95.289 95.36 147.728 222.128 147.688 356.948-.118 278.195-226.522 504.543-504.693 504.543z">
+            </path>
+            <linearGradient id="htwaicona-chat" gradientUnits="userSpaceOnUse" x1="609.77" y1="1190.114" x2="609.77"
+              y2="21.084">
+              <stop offset="0" stop-color="#25D366"></stop>
+              <stop offset="1" stop-color="#25D366"></stop>
+            </linearGradient>
+            <path fill="url(#htwaicona-chat)"
+              d="M27.875 1190.114l82.211-300.18c-50.719-87.852-77.391-187.523-77.359-289.602.133-319.398 260.078-579.25 579.469-579.25 155.016.07 300.508 60.398 409.898 169.891 109.414 109.492 169.633 255.031 169.57 409.812-.133 319.406-260.094 579.281-579.445 579.281-.023 0 .016 0 0 0h-.258c-96.977-.031-192.266-24.375-276.898-70.5l-307.188 80.548z">
+            </path>
+            <image overflow="visible" opacity=".08" width="682" height="639" transform="translate(270.984 291.372)">
+            </image>
+            <path fill-rule="evenodd" clip-rule="evenodd" fill="#FFF"
+              d="M462.273 349.294c-11.234-24.977-23.062-25.477-33.75-25.914-8.742-.375-18.75-.352-28.742-.352-10 0-26.25 3.758-39.992 18.766-13.75 15.008-52.5 51.289-52.5 125.078 0 73.797 53.75 145.102 61.242 155.117 7.5 10 103.758 166.266 256.203 226.383 126.695 49.961 152.477 40.023 179.977 37.523s88.734-36.273 101.234-71.297c12.5-35.016 12.5-65.031 8.75-71.305-3.75-6.25-13.75-10-28.75-17.5s-88.734-43.789-102.484-48.789-23.75-7.5-33.75 7.516c-10 15-38.727 48.773-47.477 58.773-8.75 10.023-17.5 11.273-32.5 3.773-15-7.523-63.305-23.344-120.609-74.438-44.586-39.75-74.688-88.844-83.438-103.859-8.75-15-.938-23.125 6.586-30.602 6.734-6.719 15-17.508 22.5-26.266 7.484-8.758 9.984-15.008 14.984-25.008 5-10.016 2.5-18.773-1.25-26.273s-32.898-81.67-46.234-111.326z">
+            </path>
+            <path fill="#FFF"
+              d="M1036.898 176.091C923.562 62.677 772.859.185 612.297.114 281.43.114 12.172 269.286 12.039 600.137 12 705.896 39.633 809.13 92.156 900.13L7 1211.067l318.203-83.438c87.672 47.812 186.383 73.008 286.836 73.047h.255.003c330.812 0 600.109-269.219 600.25-600.055.055-160.343-62.328-311.108-175.649-424.53zm-424.601 923.242h-.195c-89.539-.047-177.344-24.086-253.93-69.531l-18.227-10.805-188.828 49.508 50.414-184.039-11.875-18.867c-49.945-79.414-76.312-171.188-76.273-265.422.109-274.992 223.906-498.711 499.102-498.711 133.266.055 258.516 52 352.719 146.266 94.195 94.266 146.031 219.578 145.992 352.852-.118 274.999-223.923 498.749-498.899 498.749z">
+            </path>
+          </svg>
+        </a>
       </div>
     </div>
   </section>
 
+  <!-- Option 1: jQuery and Bootstrap Bundle (includes Popper) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+    crossorigin="anonymous"></script>
+  <!--<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>-->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF"
+    crossorigin="anonymous"></script>
+
+  <style>
+    p.renewal button {
+      border-radius: 100%;
+      margin-left: 20px;
+    
+    }
+    .tab-conten{
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    .p-3{
+      padding: 5px !important;
+    }
+    .purchase_box {
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      width: 100%;
+    }
+
+    .center{
+      text-align: center !important;
+      align-items: center !important;
+      }
+    .purchase_box .modal-body p {
+
+      text-align: left !important;
+    }
+
+    div#exampleModal1 p {
+      padding: 0;
+    }
+    .plan-card {
+            border: 2px solid #ffbc13;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 500px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            background-color: white;
+            min-height:auto;
+            margin: 2px;
+          margin-bottom: 20px;
+        }
+
+        .btn-purchase {
+            background-color:black;
+            color: white;
+            font-weight: bold;
+            padding: 10px 20px;
+            text-decoration: none;
+            display: inline-block;
+            border-radius: 5px;
+        }
+
+        .btn-purchase:hover {
+            background-color: #ffbc13;
+            color: white;
+        }
+
+        .view-more {
+            color: black;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .view-more:hover {
+            text-decoration: underline;
+        }
+
+        .collapse-details {
+            text-align: left;
+            margin-top: 5px;
+        }
+
+        .collapse-details ul {
+            padding-left: 0;
+            list-style-type: none;
+        }
+
+        .collapse-details li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 5px;
+            font-size: 15px;
+        }
+
+        .collapse-details li::before {
+            content: "✔";
+            color: #ffbc13;
+            position: absolute;
+            left: 0;
+        }
+
+        .extra-items {
+            display: none;
+        }
+
+    .sticky-nav {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            background-color: white;
+            padding: 10px 0;
+        }
+
+        .nav-pills .nav-link {
+            background-color: white;
+            color: black;
+            margin:5px;
+        }
+
+        .nav-pills .nav-link.active {
+            background-color: #ffbc13;
+            color: black;
+            margin:5px;
+            font-weight: bold ;
+        }
+        @media (min-width: 1200px) { 
+    .col-lg-2_4 { 
+        flex: 0 0 19.5%; 
+        max-width: 19.5%; 
+    }
+}
+  </style>
+  
+
+  <!-- ***************Plan****************** -->
+  <section class="plan-wrap">
+    <div class="container">
+      <div class="row">
+        <div class="plan-box">
+          <h1>Choose your plan</h1>
+
+        </div>
+      </div>
+      </div>
+      <div class="container-fluid">
+        <!-- Nav pills -->
+        <ul class="nav nav-pills justify-content-center sticky-nav" role="tablist">
+          <li class="nav-item">
+              <a class="nav-link active" data-bs-toggle="pill" href="#home">Car Rare Package</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="pill" href="#menu1">Towing Package</a>
+          </li>
+      </ul>
+      
+        <!-- Tab panes -->
+        <div class="tab-content">
+          <div id="home" class=" tab-pane active container-fluid"><br>
+              <div class="row justify-content-center align-items-start">
+                <div class="col-12 col-md-6 col-lg-2_4 p-3 plan-card">
+                  <h4 style="background-color: #ffbc13;border-radius: 15px;padding-top: 10px;padding-bottom: 10px;">4 Liters Mega Oil</h4>
+                  <p class="dollar" style="color:black;font-size:20px"><b>$188</b></p>
+                  
+                  <div class="collapse-details">
+                      <ul>
+                          <li>Emergency Roadside Assistance (2 Times Annually)</li>
+                          <li>Malaysia Breakdown Support</li>
+                          <li>FREE Vehicle Pre-Inspection (2 Times Annually)</li>
+                          <li>FREE Towing to Any Workshop (2 Times Annually)</li>
+                          <li>Wax Grooming for $38</li>
+                          <li class="extra-items">DISCOUNT 10% Car Battery (with 1 Year Warranty)</li>
+                      </ul>
+                  </div>
+                  
+                  <a class="view-more" id="toggleView">View More</a>
+                  
+                  <div class="mt-3">
+                    <a href="/my_cart" class="btn btn-purchase" 
+                    onclick="addToCart('4 Liters Mega Oil', this, 188)">
+                     Purchase Plan
+                 </a>
+                  </div>
+              </div>
+              <div class="col-12 col-md-6 col-lg-2_4 p-3 plan-card">
+                <h4 style="background-color: #ffbc13;border-radius: 15px;padding-top: 10px;padding-bottom: 10px;">4 Liters Mega Oil</h4>
+                <p class="dollar" style="color:black;font-size:20px"><b>$208</b></p>
+                
+                <div class="collapse-details">
+                    <ul>
+                      <li>Emergency Roadside Assistance (2 Times Annually)</li>
+                      <li>Malaysia Breakdown Support</li>
+                      <li>FREE Vehicle Pre-Inspection (2 Times Annually)</li>
+                      <li>FREE Towing to Any Workshop (2 Times Annually)</li>
+                      <li>Wax Grooming for $38</li>
+                      <li class="extra-items">DISCOUNT 10% Car Battery (with 1 Year Warranty)</li>
+                      <li class="extra-items">FREE Top-Up AC Gas (1 Time Annually)</li>
+                      <li class="extra-items">DISCOUNT 10% Other Services</li>
+                    </ul>
+                </div>
+                
+                <a class="view-more" id="toggleView">View More</a>
+                
+                <div class="mt-3">
+                    <a href="/my_cart" class="btn btn-purchase" onclick="addToCart('4 Liters Mega Oil', this, 208)">Purchase Plan</a>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-2_4 p-3 plan-card">
+              <h4 style="background-color: #ffbc13;border-radius: 15px;padding-top: 10px;padding-bottom: 10px;">5 Liters Mega Oil</h4>
+              <p class="dollar" style="color:black;font-size:20px"><b>$248</b></p>
+              
+              <div class="collapse-details">
+                  <ul>
+                    <li>Emergency Roadside Assistance (2 Times Annually)</li>
+                    <li>Malaysia Breakdown Support</li>
+                    <li>FREE Vehicle Pre-Inspection (2 Times Annually)</li>
+                    <li>FREE Towing to Any Workshop (2 Times Annually)</li>
+                    <li>Wax Grooming for $38</li>
+                     
+                    <li class="extra-items">DISCOUNT 10% Car Battery (with 1 Year Warranty)</li>
+                    <li class="extra-items">FREE Top-Up AC Gas (1 Time Annually)</li>
+                    <li class="extra-items">DISCOUNT 10% Other Services</li>
+                  </ul>
+              </div>
+              
+              <a class="view-more" id="toggleView">View More</a>
+              
+              <div class="mt-3">
+                  <a href="/my_cart" class="btn btn-purchase"  onclick="addToCart('5 Liters Mega Oil', this, 248)">Purchase Plan</a>
+              </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-2_4 p-3 plan-card">
+            <h4 style="background-color: greenyellow;border-radius: 15px;padding-top: 10px;padding-bottom: 10px;">4 Liters Castrol Oil</h4>
+            <p class="dollar" style="color:black;font-size:20px"><b>$268</b></p>
+            
+            <div class="collapse-details">
+                <ul>
+                  <li>Emergency Roadside Assistance (2 Times Annually)</li>
+                  <li>Malaysia Breakdown Support</li>
+                  <li>FREE Vehicle Pre-Inspection (2 Times Annually)</li>
+                  <li>FREE Towing to Any Workshop (2 Times Annually)</li>
+                  <li>Wax Grooming for $38</li>
+                   
+                  <li class="extra-items">DISCOUNT 10% Car Battery (with 1 Year Warranty)</li>
+                  <li class="extra-items">FREE Top-Up AC Gas (1 Time Annually)</li>
+                  <li class="extra-items">DISCOUNT 10% Other Services</li>
+                </ul>
+            </div>
+            
+            <a class="view-more" id="toggleView">View More</a>
+            
+            <div class="mt-3">
+                <a href="/my_cart" class="btn btn-purchase"  onclick="addToCart('4 Liters Castrol Oil', this, 268)">Purchase Plan</a>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-2_4 p-3 plan-card" style="border: 2px solid #ffbc13;">
+          <div class="discount-label">15% OFF</div>
+          <h4 style="background-color: greenyellow;border-radius: 15px;padding-top: 10px;padding-bottom: 10px;">5 Liters Castrol Oil</h4>
+          <p class="dollar" style="color:black;font-size:20px"><b>$298</b></p>
+          
+          <div class="collapse-details">
+              <ul>
+                <li>Emergency Roadside Assistance (2 Times Annually)</li>
+                <li>Malaysia Breakdown Support</li>
+                <li>FREE Vehicle Pre-Inspection (2 Times Annually)</li>
+                <li>FREE Towing to Any Workshop (2 Times Annually)</li>
+                <li>Wax Grooming for $38</li>
+                 
+                <li class="extra-items">DISCOUNT 10% Car Battery (with 1 Year Warranty)</li>
+                <li class="extra-items">FREE Top-Up AC Gas (1 Time Annually)</li>
+                <li class="extra-items">DISCOUNT 15% Other Services</li>
+              </ul>
+          </div>
+          
+          <a class="view-more" id="toggleView">View More</a>
+          
+          <div class="mt-3">
+              <a href="/my_cart" class="btn btn-purchase" onclick="addToCart('5 Liters Castrol Oil', this, 298)">Purchase Plan</a>
+          </div>
+      </div>
+              </div>
+          </div>
+          <div id="menu1" class="container tab-pane fade"><br>
+          <div class="row justify-content-center align-items-start">
+            <div class="col-md-3" style="margin-bottom: 20px;"> 
+              <img src="images/towingpackage.jpeg" class="img-fluid" alt="Yellow Bull Singapore Emergency Roadside Assistance A father, his daughter and son, all smiling and giving the thumbs up.">
+            </div>
+            <div class="col-md-6">
+
+              <h4 style="background-color: 
+              #ffbc13;border-radius: 15px;padding-top: 10px;padding-bottom: 10px;text-align: center;">Towing Membership Package</h4>
+              <p class="dollar" style="color:black;font-size:20px"><b>$108/year</b></p>
+              
+              <div class="collapse-details">
+                  <ul>
+                    <li>3 FREE Emergency Towing in Singapore</li>
+                    <li>3 FREE Jump Start Service in Singapore</li>
+                    <li>Onsite Breakdown Assistance in selected part of Malaysia</li>
+                    <li>30 Minutes Fast Response Time</li>
+                  </ul>
+              </div>
+
+              
+              <div class="mt-3">
+                  <a href="/my_cart" class="btn btn-purchase" onclick="addToCart('Towing Car Package', this, 108)">Purchase Plan</a>
+              </div>
+            </div>
+          
+          </div>
+          </div>
+          </div>
+      
+        </div>
+      </div>
+
+
+  </section>
