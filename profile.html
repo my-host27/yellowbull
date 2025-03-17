@@ -6,9 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile - Yellow Bull</title>
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
     <!-- Bootstrap & FontAwesome -->
     <link rel="stylesheet" href="https://www.yellowbull.app/assets/css/stylesheet.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
@@ -63,9 +68,58 @@
             padding-inline: 40px;
         }
 
+
+        .carousel-control-prev,
+.carousel-control-next {
+    z-index: 10 !important;
+}
+
+        .carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: rgba(0,0,0,0.5);
+    border-radius: 50%;
+}
+
+
         @media (max-width: 767px) {
             .wallet_wrap {
                 width: 100%;
+            }
+
+            .admin-dashboard h2 {
+                font-size: 20px;
+                /* Ukuran judul lebih kecil di HP */
+            }
+
+            .admin-dashboard p {
+                font-size: 14px;
+                /* Ukuran teks paragraf lebih kecil */
+            }
+
+            .table th,
+            .table td {
+                font-size: 14px;
+                /* Ukuran teks di tabel lebih kecil */
+                padding: 8px;
+                /* Padding lebih kecil */
+            }
+
+            .btn {
+                font-size: 14px;
+                /* Ukuran tombol lebih kecil */
+                padding: 8px 12px;
+                /* Padding tombol lebih kecil */
+            }
+
+            .modal-title {
+                font-size: 18px;
+                /* Ukuran teks modal lebih kecil */
+            }
+
+            .modal-body label,
+            .modal-body select {
+                font-size: 14px;
+                /* Ukuran teks dalam modal lebih kecil */
             }
 
             .alert-warning {
@@ -105,7 +159,7 @@
     <script type="module">
         import {
             auth, db, onAuthStateChanged, doc, getDoc, updateDoc, collection, Timestamp, getDocs, onSnapshot,
-            sendEmailVerification, updateEmail, reauthenticateWithCredential, EmailAuthProvider, verifyBeforeUpdateEmail, logoutUser
+            sendEmailVerification, updateEmail, reauthenticateWithCredential, EmailAuthProvider, verifyBeforeUpdateEmail, logoutUser, storage, ref, uploadBytes, getDownloadURL
         } from "./firebase-config.js";
 
         document.getElementById("loadingScreen").style.display = "flex";
@@ -260,6 +314,39 @@
             </div>
         </section>
 
+        <!-- Modal Preview -->
+<div class="modal fade" id="previewModal" tabindex="-1" role="dialog" aria-labelledby="previewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+  Payment Proof Preview - <span id="previewUserName">User</span>
+</h5>
+
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      <div id="proofCarousel" class="carousel slide" data-ride="carousel">
+  <ol class="carousel-indicators" id="carouselIndicators"></ol>
+  <div class="carousel-inner" id="carouselInner"></div>
+  <a class="carousel-control-prev" href="#proofCarousel" role="button" data-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="sr-only">Previous</span>
+  </a>
+  <a class="carousel-control-next" href="#proofCarousel" role="button" data-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="sr-only">Next</span>
+  </a>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</div>
+
         <!-- Modal untuk pilih membership -->
         <div class="modal fade" id="membershipModal" tabindex="-1" role="dialog" aria-labelledby="membershipModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -273,9 +360,12 @@
                     <div class="modal-body">
                         <label for="membershipSelect">Choose Membership:</label>
                         <select id="membershipSelect" class="form-control">
-                            <option value="Basic">Basic</option>
-                            <option value="Premium">Premium</option>
-                            <option value="VIP">VIP</option>
+                            <option value="4 Liters Mega Oil">4 Liters Mega Oil</option>
+                            <option value="4 Liters Mega Oil">4 Liters Mega Oil</option>
+                            <option value="5 Liters Mega Oil">5 Liters Mega Oil</option>
+                            <option value="4 Liters Castrol">4 Liters Castrol Oil</option>
+                            <option value="5 Liters Castrol">5 Liters Castrol Oil</option>
+                            <option value="Towing Package">Towing Package</option>
                         </select>
                     </div>
                     <div class="modal-footer">
@@ -330,8 +420,19 @@
                         const membership = user.membership || "None";
                         const paymentStatus = user.paymentStatus || "Not Paid";
                         const proofImage = user.proofImage
-                            ? `<img src="${user.proofImage}" alt="Proof" style="width: 50px; height: 50px;">`
-                            : "No Image";
+  ? `<img src="${user.proofImage}" alt="Proof" style="width: 50px; height: 50px;" class="previewProof" data-userid="${docSnap.id}">`
+  : "No Image";
+
+  document.querySelectorAll(".previewProof").forEach(img => {
+  img.addEventListener("click", () => {
+    const userId = img.dataset.userid;
+    const userIndex = proofImages.findIndex(p => p.userId === userId);
+    if (userIndex === -1) return;
+
+    $('#proofCarousel').carousel(userIndex); // Geser ke slide user tsb
+    $("#previewModal").modal("show");
+  });
+});
 
                         userListHTML += `
                 <tr id="user-${docSnap.id}">
@@ -353,6 +454,117 @@
                     });
 
                     document.getElementById("userTableBody").innerHTML = userListHTML;
+                    $('#proofCarousel').carousel({
+    interval: false,
+    wrap: true
+});
+$('#proofCarousel').carousel(0);  // Reset ke slide pertama
+
+                    document.querySelectorAll(".uploadProof").forEach(uploadProofHandler);
+
+                    function uploadProofHandler(input) {
+    input.addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        const userId = e.target.dataset.userid;
+
+        if (!file) return;
+
+        try {
+            const storageRef = ref(storage, `paymentProofs/${userId}_${file.name}`);
+            await uploadBytes(storageRef, file);
+            const downloadURL = await getDownloadURL(storageRef);
+
+            // Simpan URL di Firestore
+            await updateDoc(doc(db, "Users", userId), {
+                proofImage: downloadURL
+            });
+
+            Swal.fire({
+                title: "✅ Upload Successful",
+                text: "Proof of payment has been saved.",
+                icon: "success"
+            });
+
+            // Refresh tampilan data user setelah upload
+            await loadAllUsers();  // <--- Ini wajib agar langsung muncul
+        } catch (err) {
+    console.error("Upload Error:", err);
+    Swal.fire("❌ Error", err?.message || "Unknown error occurred", "error");
+
+        }
+    });
+}
+
+
+
+                    // Tambahkan preview array
+                    let proofImages = [];
+querySnapshot.forEach((docSnap) => {
+    const user = docSnap.data();
+    if (user.role === "admin") return;
+    if (user.proofImage) {
+        proofImages.push({ userId: docSnap.id, userName: user.userName, url: user.proofImage });
+    }
+});
+
+
+document.querySelectorAll("img[alt='Proof']").forEach(img => {
+  img.addEventListener("click", () => {
+    const userRow = img.closest("tr");
+    const userId = userRow.id.split("user-")[1];
+    const userName = userRow.querySelector("td:first-child").innerText;
+
+    const filteredImages = proofImages.filter(p => p.userId === userId);
+    if (filteredImages.length === 0) {
+      Swal.fire("❌ No payment proof available", "", "warning");
+      return;
+    }
+
+    document.getElementById("previewUserName").innerText = userName;
+
+    const carouselInner = document.getElementById("carouselInner");
+carouselInner.innerHTML = proofImages.map((imgObj, index) => `
+  <div class="carousel-item ${index === 0 ? 'active' : ''}">
+    <img class="d-block w-100" src="${imgObj.url}" alt="Proof ${index + 1}">
+    <div class="carousel-caption d-none d-md-block">
+      <h5>${imgObj.userName}</h5>
+    </div>
+  </div>
+`).join("");
+
+const carouselIndicators = document.getElementById("carouselIndicators");
+carouselIndicators.innerHTML = proofImages.map((_, index) => `
+  <li data-target="#proofCarousel" data-slide-to="${index}" ${index === 0 ? 'class="active"' : ''}></li>
+`).join("");
+
+setTimeout(() => {
+  $('#proofCarousel').carousel({
+    interval: false,
+    wrap: true
+  });
+  $('#previewModal').modal('show');
+}, 100);
+
+
+$('#proofCarousel').carousel({
+  interval: false,
+  wrap: true
+});
+$('#proofCarousel').carousel(0);  // Reset ke slide pertama
+$('#proofCarousel').on('slide.bs.carousel', function (e) {
+  console.log('Carousel sliding to index:', e.to);
+});
+
+$('#proofCarousel').on('slide.bs.carousel', function () {
+  console.log('➡️ Carousel sliding...');
+});
+
+
+    $("#previewModal").modal("show");
+
+  });
+});
+
 
                     // Event listener untuk pilih membership
                     document.querySelectorAll(".selectMembership").forEach(button => {
@@ -374,7 +586,7 @@
                     const selectedMembership = document.getElementById("membershipSelect").value;
                     const startDate = new Date();
                     const endDate = new Date();
-                    endDate.setMinutes(startDate.getMinutes() + 5);  // 🔥 Membership berlaku 5 menit
+                    endDate.setFullYear(startDate.getFullYear() + 1);  // 🔥 Membership berlaku selama 1 tahun
 
                     await updateDoc(doc(db, "Users", userId), {
                         membership: selectedMembership,
@@ -385,12 +597,6 @@
 
                     $("#membershipModal").modal("hide");
                     loadAllUsers();
-
-
-                    setInterval(async () => {
-                        await checkMembershipExpiration();
-                    }, 60 * 1000);
-
                 };
             }
 
@@ -427,7 +633,16 @@
                         if (membershipEnd) {
                             const now = new Date();
                             const timeLeft = membershipEnd - now;
-                            if (timeLeft <= 2 * 60 * 1000 && timeLeft > 0) {
+                            const sevenDays = 7 * 24 * 60 * 60 * 1000;  // 7 hari dalam ms
+
+                            if (timeLeft <= 0) {
+                                console.log(`❌ Membership expired for user: ${userId}`);
+                                updateDoc(doc(db, "Users", userId), {
+                                    membership: "Expired",
+                                    paymentStatus: "Not Paid",
+                                });
+                            } else if (timeLeft <= sevenDays) {
+                                console.log(`⚠️ Membership will expire in <7 days for user: ${userId}`);
                                 showRenewButton(userId);
                             }
                         }
@@ -445,7 +660,7 @@
             async function renewMembership(userId) {
                 const startDate = new Date();
                 const endDate = new Date();
-                endDate.setMinutes(startDate.getMinutes() + 5); // Perpanjang membership 5 menit
+                endDate.setFullYear(startDate.getFullYear() + 1);  // 🔥 Renew membership berlaku 1 tahun
 
                 await updateDoc(doc(db, "Users", userId), {
                     membershipEnd: Timestamp.fromDate(endDate),
@@ -454,15 +669,12 @@
 
                 Swal.fire({
                     title: "✅ Membership Renewed!",
-                    text: "Your membership has been extended for another 5 minutes.",
+                    text: "Your membership has been extended for another year.",
                     icon: "success",
                     confirmButtonColor: "#44cc44"
                 });
 
-                // Hapus tombol renew setelah di klik
                 removeRenewButton(userId);
-
-                // Update status pengguna dan cek membership kembali
                 checkMembershipExpiration();
             }
 
@@ -499,25 +711,26 @@
                     if (userData.membershipEnd && userData.membershipEnd.toDate) {
                         const membershipEndDate = userData.membershipEnd.toDate();
                         const timeLeft = membershipEndDate - now;
+                        const oneWeek = 7 * 24 * 60 * 60 * 1000;  // 🔥 1 minggu dalam milidetik
 
-                        console.log(`⏳ User ${userId} - Time Left: ${Math.floor(timeLeft / 1000)} seconds`);
+                        console.log(`⏳ User ${userId} - Time Left: ${Math.floor(timeLeft / 1000 / 60 / 60 / 24)} days`);
 
                         if (timeLeft <= 0) {
                             console.log(`❌ Membership expired for user: ${userId}`);
 
-                            // 🔥 Update status membership di Firestore
                             await updateDoc(doc(db, "Users", userId), {
                                 membership: "Expired",
                                 paymentStatus: "Not Paid",
                             });
 
-                            // 🔥 Langsung refresh UI setelah update tanpa menunggu interval 1 menit
                             listenForMembershipUpdates();
+                        } else if (timeLeft <= oneWeek) {
+                            console.log(`⚠️ Membership for user ${userId} will expire within a week! Showing renew button...`);
+                            showRenewButton(userId);
                         }
                     }
                 });
 
-                // 🔄 Pastikan tetap melakukan pengecekan setiap 1 menit
                 setTimeout(checkMembershipExpiration, 60 * 1000);
             }
 
@@ -529,7 +742,6 @@
                 const membershipActions = userRow.querySelector(".membership-actions");
                 if (!membershipActions) return;
 
-                // Cek apakah tombol sudah ada, kalau sudah, tidak perlu menambahkan lagi
                 if (!membershipActions.querySelector(".renew-btn")) {
                     const renewButton = document.createElement("button");
                     renewButton.classList.add("btn", "btn-warning", "btn-sm", "renew-btn");
@@ -939,9 +1151,19 @@ z-index: 9999;">
 
     </section>
 
-    <!-- Bootstrap & jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+          $('.carousel-control-prev').on('click', () => {
+              console.log('⬅️ Prev clicked');
+          });
+          $('.carousel-control-next').on('click', () => {
+              console.log('➡️ Next clicked');
+          });
+        });
+      </script>
+
+      
+
 </body>
 
 </html>

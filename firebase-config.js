@@ -10,6 +10,9 @@ import {
     sendEmailVerification, signOut, onAuthStateChanged, EmailAuthProvider,
 } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
 
+import {
+    getStorage, ref, uploadBytes, getDownloadURL
+} from "https://www.gstatic.com/firebasejs/11.4.0/firebase-storage.js";
 
 import {
     getFirestore, doc, setDoc, getDoc, updateDoc, Timestamp,collection, getDocs, onSnapshot
@@ -22,6 +25,7 @@ let firebaseReady = false;
 
 
 let auth = null;
+let storage = null;
 let db = null;
 let googleProvider = null;
 
@@ -49,6 +53,7 @@ const firebaseInitPromise = new Promise(async (resolve, reject) => {
         const app = initializeApp(firebaseConfig);
         auth = getAuth(app);
         db = getFirestore(app);
+        storage = getStorage(app);
         googleProvider = new GoogleAuthProvider();
 
 
@@ -207,6 +212,6 @@ export function logoutUser() {
 export {
     auth, db, sendEmailVerification, updateDoc, getDoc, verifyBeforeUpdateEmail,
     createUserWithEmailAndPassword, reauthenticateWithCredential, updateEmail,
-    onAuthStateChanged, setDoc, doc, Timestamp, EmailAuthProvider, collection,getDocs, onSnapshot
+    onAuthStateChanged, setDoc, doc, Timestamp, EmailAuthProvider, collection,getDocs, storage, onSnapshot, ref, uploadBytes, getDownloadURL
 };
 
