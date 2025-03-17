@@ -420,19 +420,8 @@
                         const membership = user.membership || "None";
                         const paymentStatus = user.paymentStatus || "Not Paid";
                         const proofImage = user.proofImage
-  ? `<img src="${user.proofImage}" alt="Proof" style="width: 50px; height: 50px;" class="previewProof" data-userid="${docSnap.id}">`
-  : "No Image";
-
-  document.querySelectorAll(".previewProof").forEach(img => {
-  img.addEventListener("click", () => {
-    const userId = img.dataset.userid;
-    const userIndex = proofImages.findIndex(p => p.userId === userId);
-    if (userIndex === -1) return;
-
-    $('#proofCarousel').carousel(userIndex); // Geser ke slide user tsb
-    $("#previewModal").modal("show");
-  });
-});
+                            ? `<img src="${user.proofImage}" alt="Proof" style="width: 50px; height: 50px;">`
+                            : "No Image";
 
                         userListHTML += `
                 <tr id="user-${docSnap.id}">
@@ -513,19 +502,21 @@ document.querySelectorAll("img[alt='Proof']").forEach(img => {
     const userRow = img.closest("tr");
     const userId = userRow.id.split("user-")[1];
     const userName = userRow.querySelector("td:first-child").innerText;
+    if (proofImages.length === 0) {
+  Swal.fire("❌ No payment proof available", "", "warning");
+  return;
+}
 
-    const filteredImages = proofImages.filter(p => p.userId === userId);
-    if (filteredImages.length === 0) {
-      Swal.fire("❌ No payment proof available", "", "warning");
-      return;
-    }
 
     document.getElementById("previewUserName").innerText = userName;
 
-    const carouselInner = document.getElementById("carouselInner");
+    const clickedImageUrl = img.src;
+    const clickedIndex = proofImages.findIndex(p => p.url === clickedImageUrl);
+
+const carouselInner = document.getElementById("carouselInner");
 carouselInner.innerHTML = proofImages.map((imgObj, index) => `
-  <div class="carousel-item ${index === 0 ? 'active' : ''}">
-    <img class="d-block w-100" src="${imgObj.url}" alt="Proof ${index + 1}">
+  <div class="carousel-item ${index === clickedIndex ? 'active' : ''}">
+    <img class="d-block w-100" src="${imgObj.url}" alt="${imgObj.userName}">
     <div class="carousel-caption d-none d-md-block">
       <h5>${imgObj.userName}</h5>
     </div>
@@ -534,37 +525,22 @@ carouselInner.innerHTML = proofImages.map((imgObj, index) => `
 
 const carouselIndicators = document.getElementById("carouselIndicators");
 carouselIndicators.innerHTML = proofImages.map((_, index) => `
-  <li data-target="#proofCarousel" data-slide-to="${index}" ${index === 0 ? 'class="active"' : ''}></li>
+  <li data-target="#proofCarousel" data-slide-to="${index}" ${index === clickedIndex ? 'class="active"' : ''}></li>
 `).join("");
 
+
+// Aktifkan carousel slide
 setTimeout(() => {
+  $('#previewModal').modal('show');
   $('#proofCarousel').carousel({
     interval: false,
     wrap: true
   });
-  $('#previewModal').modal('show');
+  $('#proofCarousel').carousel(clickedIndex); // Geser ke gambar yg diklik
 }, 100);
-
-
-$('#proofCarousel').carousel({
-  interval: false,
-  wrap: true
-});
-$('#proofCarousel').carousel(0);  // Reset ke slide pertama
-$('#proofCarousel').on('slide.bs.carousel', function (e) {
-  console.log('Carousel sliding to index:', e.to);
-});
-
-$('#proofCarousel').on('slide.bs.carousel', function () {
-  console.log('➡️ Carousel sliding...');
-});
-
-
-    $("#previewModal").modal("show");
 
   });
 });
-
 
                     // Event listener untuk pilih membership
                     document.querySelectorAll(".selectMembership").forEach(button => {
