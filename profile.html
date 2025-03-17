@@ -172,6 +172,16 @@
 
         document.getElementById("loadingScreen").style.display = "flex";
 
+        const membershipPriceMap = {
+                            "4 Liters Mega Oil": "$188",
+                            "4 Liters Mega Oil": "$208",
+                            "5 Liters Mega Oil": "$248",
+                            "5 Liters Castrol Oil": "$298",
+                            "4 Liters Castrol Oil": "$268",
+                            "Towing Package": "$108",
+                            "None": "-"
+                        };
+
         document.addEventListener("DOMContentLoaded", function () {
             console.log("✅ DOM Loaded. Waiting for Firebase...");
             const userTable = document.getElementById("userTableBody");
@@ -213,6 +223,41 @@
                                 }
                             }
 
+                            const purchaseBtn = document.querySelector(".btn-purchase");
+
+// Create or select element to show membership end date
+let membershipStatus = document.getElementById("membershipStatus");
+if (!membershipStatus) {
+    membershipStatus = document.createElement("p");
+    membershipStatus.id = "membershipStatus";
+    membershipStatus.style.fontWeight = "bold";
+    membershipStatus.style.marginTop = "10px";
+    purchaseBtn.parentNode.insertBefore(membershipStatus, purchaseBtn.nextSibling);
+}
+
+if (userData.membership && userData.membership !== "Expired") {
+    purchaseBtn.innerText = userData.membership;
+    purchaseBtn.classList.remove("btn-purchase");
+    purchaseBtn.classList.add("btn-success");
+    purchaseBtn.removeAttribute("href");
+    purchaseBtn.style.cursor = "default";
+
+    // Show membership end date
+    if (userData.membershipEnd && userData.membershipEnd.toDate) {
+        const endDate = userData.membershipEnd.toDate();
+        const formattedDate = endDate.toLocaleDateString();  // Format as MM/DD/YYYY
+        membershipStatus.innerText = `✅ Active until ${formattedDate}`;
+    } else {
+        membershipStatus.innerText = `✅ Membership active`;
+    }
+} else {
+    purchaseBtn.innerText = "Purchase Plan";
+    purchaseBtn.setAttribute("href", "/plans");
+    purchaseBtn.classList.add("btn-purchase");
+    purchaseBtn.classList.remove("btn-success");
+    purchaseBtn.style.cursor = "pointer";
+    membershipStatus.innerText = ""; // Clear any existing message
+}
                             // **Cek Role User**
                             if (userData.role === "admin") {
                                 console.log("🛠️ Admin detected! Switching to admin view...");
@@ -464,15 +509,6 @@
                         const proofImage = user.proofImage
                             ? `<img src="${user.proofImage}" alt="Proof" style="width: 50px; height: 50px; cursor: pointer;">`
                             : "No Image";
-                        const membershipPriceMap = {
-                            "4 Liters Mega Oil": "$188",
-                            "4 Liters Mega Oil": "$208",
-                            "5 Liters Mega Oil": "$248",
-                            "5 Liters Castrol Oil": "$298",
-                            "4 Liters Castrol Oil": "$268",
-                            "Towing Package": "$108",
-                            "None": "-"
-                        };
 
                         const price = membershipPriceMap[membership] || "-";
 
