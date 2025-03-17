@@ -70,15 +70,23 @@
 
 
         .carousel-control-prev,
-.carousel-control-next {
-    z-index: 10 !important;
-}
+        .carousel-control-next {
+            z-index: 10 !important;
+        }
 
         .carousel-control-prev-icon,
-.carousel-control-next-icon {
-    background-color: rgba(0,0,0,0.5);
-    border-radius: 50%;
-}
+        .carousel-control-next-icon {
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+        }
+
+        .carousel-inner img {
+            max-height: 80vh;
+            /* ⬅️ Maksimal 80% dari tinggi layar */
+            object-fit: contain;
+            /* Jaga aspek rasio gambar */
+        }
+
 
 
         @media (max-width: 767px) {
@@ -319,9 +327,12 @@
   <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">
-  Payment Proof Preview - <span id="previewUserName">User</span>
+<h5 class="modal-title d-flex flex-column">
+  <span>Payment Proof Preview</span>
+  <span id="previewMeta" class="text-muted mt-1" style="font-size: 14px;"></span>
 </h5>
+
+
 
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
@@ -406,6 +417,8 @@
                 }, 500);
             }
 
+            let proofImages = [];
+
             // **Fungsi untuk menampilkan semua user (khusus admin)**
             async function loadAllUsers() {
                 try {
@@ -420,8 +433,9 @@
                         const membership = user.membership || "None";
                         const paymentStatus = user.paymentStatus || "Not Paid";
                         const proofImage = user.proofImage
-                            ? `<img src="${user.proofImage}" alt="Proof" style="width: 50px; height: 50px;">`
-                            : "No Image";
+  ? `<img src="${user.proofImage}" alt="Proof" style="width: 50px; height: 50px; cursor: pointer;">`
+  : "No Image";
+
 
                         userListHTML += `
                 <tr id="user-${docSnap.id}">
@@ -444,103 +458,130 @@
 
                     document.getElementById("userTableBody").innerHTML = userListHTML;
                     $('#proofCarousel').carousel({
-    interval: false,
-    wrap: true
-});
-$('#proofCarousel').carousel(0);  // Reset ke slide pertama
+                        interval: false,
+                        wrap: true
+                    });
+                    $('#proofCarousel').carousel(0);  // Reset ke slide pertama
 
                     document.querySelectorAll(".uploadProof").forEach(uploadProofHandler);
 
                     function uploadProofHandler(input) {
-    input.addEventListener("change", async (e) => {
-        const file = e.target.files[0];
-        const userId = e.target.dataset.userid;
+                        input.addEventListener("change", async (e) => {
+                            const file = e.target.files[0];
+                            const userId = e.target.dataset.userid;
 
-        if (!file) return;
+                            if (!file) return;
 
-        try {
-            const storageRef = ref(storage, `paymentProofs/${userId}_${file.name}`);
-            await uploadBytes(storageRef, file);
-            const downloadURL = await getDownloadURL(storageRef);
+                            try {
+                                const storageRef = ref(storage, `paymentProofs/${userId}_${file.name}`);
+                                await uploadBytes(storageRef, file);
 
-            // Simpan URL di Firestore
-            await updateDoc(doc(db, "Users", userId), {
-                proofImage: downloadURL
-            });
+                                const downloadURL = await getDownloadURL(storageRef);
 
-            Swal.fire({
-                title: "✅ Upload Successful",
-                text: "Proof of payment has been saved.",
-                icon: "success"
-            });
+                                const uploadedAt = new Date().toISOString();  // Simpan waktu upload (ISO format)
 
-            // Refresh tampilan data user setelah upload
-            await loadAllUsers();  // <--- Ini wajib agar langsung muncul
-        } catch (err) {
-    console.error("Upload Error:", err);
-    Swal.fire("❌ Error", err?.message || "Unknown error occurred", "error");
+                                await updateDoc(doc(db, "Users", userId), {
+                                    proofImage: downloadURL,
+                                    proofUploadedAt: uploadedAt   // ⬅️ Tambahkan ini ke Firestore
+                                });
 
-        }
-    });
-}
+                                Swal.fire({
+                                    title: "✅ Upload Successful",
+                                    text: "Proof of payment has been saved.",
+                                    icon: "success"
+                                });
 
-
+                                await loadAllUsers();  // Refresh
+                            } catch (err) {
+                                console.error("Upload Error:", err);
+                                Swal.fire("❌ Error", err?.message || "Unknown error occurred", "error");
+                            }
+                        });
+                    }
 
                     // Tambahkan preview array
-                    let proofImages = [];
-querySnapshot.forEach((docSnap) => {
-    const user = docSnap.data();
-    if (user.role === "admin") return;
-    if (user.proofImage) {
-        proofImages.push({ userId: docSnap.id, userName: user.userName, url: user.proofImage });
-    }
-});
+                    querySnapshot.forEach((docSnap) => {
+                        const user = docSnap.data();
+                        if (user.role === "admin") return;
+                        if (user.proofImage) {
+                            proofImages.push({
+                                userId: docSnap.id,
+                                userName: user.userName,
+                                url: user.proofImage,
+                                uploadedAt: user.proofUploadedAt || null  // Ambil waktu upload
+                            });
+                        }
+
+                    });
+
+                    
+
+                    document.querySelectorAll("img[alt='Proof']").forEach(img => {
+                        img.addEventListener("click", () => {
+                            const userRow = img.closest("tr");
+                            const userId = userRow.id.split("user-")[1];
+                            const userName = userRow.querySelector("td:first-child").innerText;
+                            if (proofImages.length === 0) {
+                                Swal.fire("❌ No payment proof available", "", "warning");
+                                return;
+                            }
 
 
-document.querySelectorAll("img[alt='Proof']").forEach(img => {
-  img.addEventListener("click", () => {
-    const userRow = img.closest("tr");
-    const userId = userRow.id.split("user-")[1];
-    const userName = userRow.querySelector("td:first-child").innerText;
-    if (proofImages.length === 0) {
-  Swal.fire("❌ No payment proof available", "", "warning");
-  return;
-}
+                            document.getElementById("previewUserName").innerText = userName;
+
+                            const clickedImageUrl = img.src;
+                            const clickedIndex = proofImages.findIndex(p => p.url === clickedImageUrl);
+
+                            const carouselInner = document.getElementById("carouselInner");
+                            carouselInner.innerHTML = proofImages.map((imgObj, index) => {
+                                const uploadTime = imgObj.uploadedAt
+                                    ? new Date(imgObj.uploadedAt).toLocaleString()
+                                    : "Unknown time";
+
+                                return `
+        <div class="carousel-item ${index === clickedIndex ? 'active' : ''}">
+            <img class="d-block w-100" src="${imgObj.url}" alt="${imgObj.userName}">
+
+        </div>
+    `;
+                            }).join("");
 
 
-    document.getElementById("previewUserName").innerText = userName;
-
-    const clickedImageUrl = img.src;
-    const clickedIndex = proofImages.findIndex(p => p.url === clickedImageUrl);
-
-const carouselInner = document.getElementById("carouselInner");
-carouselInner.innerHTML = proofImages.map((imgObj, index) => `
-  <div class="carousel-item ${index === clickedIndex ? 'active' : ''}">
-    <img class="d-block w-100" src="${imgObj.url}" alt="${imgObj.userName}">
-    <div class="carousel-caption d-none d-md-block">
-      <h5>${imgObj.userName}</h5>
-    </div>
-  </div>
-`).join("");
-
-const carouselIndicators = document.getElementById("carouselIndicators");
-carouselIndicators.innerHTML = proofImages.map((_, index) => `
+                            const carouselIndicators = document.getElementById("carouselIndicators");
+                            carouselIndicators.innerHTML = proofImages.map((_, index) => `
   <li data-target="#proofCarousel" data-slide-to="${index}" ${index === clickedIndex ? 'class="active"' : ''}></li>
 `).join("");
 
 
-// Aktifkan carousel slide
-setTimeout(() => {
-  $('#previewModal').modal('show');
-  $('#proofCarousel').carousel({
-    interval: false,
-    wrap: true
-  });
-  $('#proofCarousel').carousel(clickedIndex); // Geser ke gambar yg diklik
-}, 100);
+                            // Aktifkan carousel slide
+                            setTimeout(() => {
+                                $('#previewModal').modal('show');
+                                $('#proofCarousel').carousel({
+                                    interval: false,
+                                    wrap: true
+                                });
+                                $('#proofCarousel').carousel(clickedIndex); // Geser ke gambar yg diklik
+                            }, 100);
+                            // Update info pertama kali
+                            const updatePreviewMeta = (index) => {
+                                const imgData = proofImages[index];
+                                const uploadTime = imgData.uploadedAt
+                                    ? new Date(imgData.uploadedAt).toLocaleString()
+                                    : "Unknown time";
+                                document.getElementById("previewMeta").innerText = `${imgData.userName} - ${uploadTime}`;
+                            };
 
-  });
-});
+                            updatePreviewMeta(clickedIndex);
+
+                            // Update info setiap slide berpindah
+                            $('#proofCarousel').on('slide.bs.carousel', function (e) {
+                                const nextIndex = $(e.relatedTarget).index();
+                                updatePreviewMeta(nextIndex);
+                            });
+
+
+                        });
+                    });
 
                     // Event listener untuk pilih membership
                     document.querySelectorAll(".selectMembership").forEach(button => {
@@ -554,6 +595,63 @@ setTimeout(() => {
                     console.error("❌ Error loading users:", error);
                 }
             }
+
+            $(document).on("click", "#infoIcon", function () {
+  Swal.fire({
+    title: "ℹ️ Payment Proof Info",
+    text: "This image was uploaded as proof of payment. Please ensure it's clear and valid.",
+    icon: "info",
+    confirmButtonColor: "#007bff",
+    background: "#e0f7ff",
+    color: "#000"
+  });
+});
+
+$(document).on("click", "img[alt='Proof']", function () {
+    const imgSrc = $(this).attr("src");
+    const userRow = $(this).closest("tr");
+    const userId = userRow.attr("id").replace("user-", "");
+    const userName = userRow.find("td:first-child").text();
+
+    const clickedIndex = proofImages.findIndex(p => p.url === imgSrc);
+
+    if (clickedIndex === -1) {
+        Swal.fire("❌ Image not found in preview list", "", "error");
+        return;
+    }
+
+    const carouselInner = $("#carouselInner");
+    const carouselIndicators = $("#carouselIndicators");
+
+    carouselInner.html(proofImages.map((imgObj, index) => `
+        <div class="carousel-item ${index === clickedIndex ? 'active' : ''}">
+            <img class="d-block w-100" src="${imgObj.url}" alt="${imgObj.userName}">
+        </div>
+    `).join(""));
+
+    carouselIndicators.html(proofImages.map((_, index) => `
+        <li data-target="#proofCarousel" data-slide-to="${index}" ${index === clickedIndex ? 'class="active"' : ''}></li>
+    `).join(""));
+
+    $('#previewModal').modal('show');
+    $('#proofCarousel').carousel(clickedIndex);
+
+    const updatePreviewMeta = (index) => {
+        const imgData = proofImages[index];
+        const uploadTime = imgData.uploadedAt
+            ? new Date(imgData.uploadedAt).toLocaleString()
+            : "Unknown time";
+        $("#previewMeta").text(`${imgData.userName} - ${uploadTime}`);
+    };
+
+    updatePreviewMeta(clickedIndex);
+
+    $('#proofCarousel').on('slide.bs.carousel', function (e) {
+        const nextIndex = $(e.relatedTarget).index();
+        updatePreviewMeta(nextIndex);
+    });
+});
+
 
             function openMembershipModal(userId) {
                 $("#membershipModal").modal("show");
@@ -1128,17 +1226,17 @@ z-index: 9999;">
     </section>
 
     <script>
-        $(document).ready(function() {
-          $('.carousel-control-prev').on('click', () => {
-              console.log('⬅️ Prev clicked');
-          });
-          $('.carousel-control-next').on('click', () => {
-              console.log('➡️ Next clicked');
-          });
+        $(document).ready(function () {
+            $('.carousel-control-prev').on('click', () => {
+                console.log('⬅️ Prev clicked');
+            });
+            $('.carousel-control-next').on('click', () => {
+                console.log('➡️ Next clicked');
+            });
         });
-      </script>
+    </script>
 
-      
+
 
 </body>
 

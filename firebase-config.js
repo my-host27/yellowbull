@@ -11,7 +11,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
 
 import {
-    getStorage, ref, uploadBytes, getDownloadURL
+    getStorage, ref, uploadBytes, getDownloadURL, getMetadata
 } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-storage.js";
 
 import {
@@ -64,8 +64,6 @@ const firebaseInitPromise = new Promise(async (resolve, reject) => {
         reject(error);
     }
 });
-
-
 async function preloadSecretToken() {
     try {
         const response = await fetch(`${API_BASE_URL}/get-secret`, {
