@@ -634,6 +634,8 @@
     const now = new Date();
     const sevenDays = 7 * 24 * 60 * 60 * 1000;  // 7 hari dalam ms
 
+    assignMembershipListeners();
+
     rows.forEach(row => {
         const name = row.querySelector("td:nth-child(1)").innerText.toLowerCase();
         const email = row.querySelector("td:nth-child(2)").innerText.toLowerCase();
@@ -870,6 +872,16 @@
                     loadAllUsers();
                 };
             }
+            // Fungsi untuk assign ulang listener setiap kali tombol membership di-reload
+function assignMembershipListeners() {
+    document.querySelectorAll(".selectMembership").forEach(button => {
+        button.onclick = (event) => {
+            const userId = event.target.dataset.userid;
+            openMembershipModal(userId);
+        };
+    });
+}
+
 
             function listenForMembershipUpdates() {
                 const usersRef = collection(db, "Users");
@@ -892,7 +904,13 @@
                         if (!membershipActions) return;
 
                         if (membershipStatus === "Expired") {
-                            membershipActions.innerHTML = `<button class="btn btn-danger btn-sm">Expired</button>`;
+                            membershipActions.innerHTML = `
+    <button class="btn btn-${membershipStatus === "Expired" ? "danger" : "info"} btn-sm selectMembership" data-userid="${userId}">
+        ${membershipStatus}
+    </button>
+`;
+assignMembershipListeners();
+
                         } else {
                             membershipActions.innerHTML = `
                     <button class="btn btn-info btn-sm selectMembership" data-userid="${userId}">
