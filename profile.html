@@ -51,13 +51,13 @@
         }
 
 
+        .table th,
+.table td {
+    font-size: 15px;
+    font-weight: 600;
+    padding: 8px;
+}
 
-
-        .table td {
-            font-size: 18px;
-            font-weight: 600;
-            padding: 10px;
-        }
 
         .btn-purchase {
             background-color: #ffbc13;
@@ -303,8 +303,36 @@
                 const adminDashboardHTML = `
         <section class="admin-dashboard">
             <div class="container">
-                <h2>Admin Dashboard</h2>
+                    <h2>Admin Dashboard</h2>
                 <p>Welcome, Admin!</p>
+                  <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+  <div class="form-group mb-2 mb-md-0">
+    <label for="membershipFilter">Filter Membership:</label>
+    <select id="membershipFilter" class="form-control">
+      <option value="All">All</option>
+      <option value="4 Liters Mega Oil">4 Liters Mega Oil</option>
+      <option value="5 Liters Mega Oil">5 Liters Mega Oil</option>
+      <option value="4 Liters Castrol Oil">4 Liters Castrol Oil</option>
+      <option value="5 Liters Castrol Oil">5 Liters Castrol Oil</option>
+      <option value="Towing Package">Towing Package</option>
+      <option value="Expired">Expired</option>
+    </select>
+  </div>
+
+  <div class="form-group mb-2 mb-md-0">
+    <label for="searchInput">Search:</label>
+    <input type="text" id="searchInput" class="form-control" placeholder="Search name or email...">
+  </div>
+
+  <button id="deleteExpiredBtn" class="btn btn-danger mt-3 mt-md-0">Delete Expired Members</button>
+</div>
+
+<!-- New summary bar for count and total -->
+<div class="mb-3">
+  <span id="userCount">Total Users: 0</span> |
+  <span id="totalPrice">Total Price: $0</span>
+</div>
+            
                 <div class="table-responsive">
                     <table class="table table-bordered">
                         <thead class="thead-dark">
@@ -312,6 +340,7 @@
                                 <th style="width: 20%;">Name</th>
                                 <th style="width: 25%;">Email</th>
                                 <th style="width: 15%;">Membership</th>
+                                <th style="width: 10%;">Price</th>
                                 <th style="width: 15%;">Payment Status</th>
                                 <th style="width: 25%;">Upload Payment Proof</th>
                             </tr>
@@ -433,35 +462,55 @@
                         const membership = user.membership || "None";
                         const paymentStatus = user.paymentStatus || "Not Paid";
                         const proofImage = user.proofImage
-  ? `<img src="${user.proofImage}" alt="Proof" style="width: 50px; height: 50px; cursor: pointer;">`
-  : "No Image";
+                            ? `<img src="${user.proofImage}" alt="Proof" style="width: 50px; height: 50px; cursor: pointer;">`
+                            : "No Image";
+                        const membershipPriceMap = {
+                            "4 Liters Mega Oil": "$188",
+                            "4 Liters Mega Oil": "$208",
+                            "5 Liters Mega Oil": "$248",
+                            "5 Liters Castrol Oil": "$298",
+                            "4 Liters Castrol Oil": "$268",
+                            "Towing Package": "$108",
+                            "None": "-"
+                        };
 
+                        const price = membershipPriceMap[membership] || "-";
 
                         userListHTML += `
-                <tr id="user-${docSnap.id}">
-                    <td>${user.userName || "Unknown"}</td>
-                    <td>${user.email || "No Email"}</td>
-                <td class="membership-actions">
+ <tr id="user-${docSnap.id}" data-price="${price.replace(/[^\d]/g, '')}">
+  <td>${user.userName || "Unknown"}</td>
+  <td>${user.email || "No Email"}</td>
+  <td class="membership-actions">
     <button class="btn btn-${membership === "Expired" ? "danger" : "info"} btn-sm selectMembership" data-userid="${docSnap.id}">
-        ${membership}
+      ${membership}
     </button>
-</td>
+  </td>
+  <td>${price}</td>
+  <td id="paymentStatus-${docSnap.id}">${paymentStatus}</td>
+  <td>
+    ${proofImage}
+    <input type="file" class="form-control-file uploadProof" data-userid="${docSnap.id}">
+  </td>
+</tr>
+`;
 
-                    <td id="paymentStatus-${docSnap.id}">${paymentStatus}</td>
-                    <td>
-                        ${proofImage}
-                        <input type="file" class="form-control-file uploadProof" data-userid="${docSnap.id}">
-                    </td>
-                </tr>
-            `;
                     });
+
+                    const currentFilter = document.getElementById("membershipFilter").value;
+    const currentSearch = document.getElementById("searchInput").value;
 
                     document.getElementById("userTableBody").innerHTML = userListHTML;
                     $('#proofCarousel').carousel({
                         interval: false,
                         wrap: true
                     });
+                    document.getElementById("membershipFilter").value = currentFilter;
+                    document.getElementById("searchInput").value = currentSearch;
+                    filterTable(); 
                     $('#proofCarousel').carousel(0);  // Reset ke slide pertama
+                    document.getElementById("membershipFilter").addEventListener("change", () => {
+  filterTable();  // Panggil langsung, tidak simpan apapun
+});
 
                     document.querySelectorAll(".uploadProof").forEach(uploadProofHandler);
 
@@ -514,7 +563,75 @@
 
                     });
 
-                    
+                    document.getElementById("membershipFilter").addEventListener("change", filterTable);
+                    document.getElementById("searchInput").addEventListener("input", filterTable);
+                    document.getElementById("deleteExpiredBtn").addEventListener("click", deleteExpiredMembers);
+
+                    function filterTable() {
+  const filterValue = document.getElementById("membershipFilter").value.toLowerCase();
+  const searchValue = document.getElementById("searchInput").value.toLowerCase();
+  const rows = document.querySelectorAll("#userTableBody tr");
+
+  let visibleCount = 0;
+  let totalPrice = 0;
+
+  rows.forEach(row => {
+    const name = row.querySelector("td:nth-child(1)").innerText.toLowerCase();
+    const email = row.querySelector("td:nth-child(2)").innerText.toLowerCase();
+    const membership = row.querySelector("td:nth-child(3) button").innerText.toLowerCase();
+
+    const matchMembership = filterValue === "all" || membership === filterValue;
+    const matchSearch = name.includes(searchValue) || email.includes(searchValue);
+
+    if (matchMembership && matchSearch) {
+      row.style.display = "";
+      visibleCount++;
+
+      const priceStr = row.getAttribute("data-price");
+      const priceNum = parseFloat(priceStr);
+      if (!isNaN(priceNum)) {
+        totalPrice += priceNum;
+      }
+    } else {
+      row.style.display = "none";
+    }
+  });
+
+  document.getElementById("userCount").innerText = `Total Users: ${visibleCount}`;
+  document.getElementById("totalPrice").innerText = `Total Price: $${totalPrice}`;
+}
+
+document.getElementById("membershipFilter").addEventListener("change", async () => {
+  await loadAllUsers();  // Fetch ulang data
+});
+
+                    async function deleteExpiredMembers() {
+                        const confirm = await Swal.fire({
+                            title: "Delete All Expired?",
+                            text: "Are you sure you want to delete all expired members?",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#d33",
+                            confirmButtonText: "Yes, delete all",
+                            cancelButtonText: "Cancel"
+                        });
+
+                        if (!confirm.isConfirmed) return;
+
+                        const rows = document.querySelectorAll("#userTableBody tr");
+
+                        for (let row of rows) {
+                            const membership = row.querySelector("td:nth-child(3) button").innerText;
+                            if (membership === "Expired") {
+                                const userId = row.id.replace("user-", "");
+                                await deleteDoc(doc(db, "Users", userId));
+                            }
+                        }
+
+                        Swal.fire("Deleted!", "All expired members have been deleted.", "success");
+                        loadAllUsers();
+                    }
+
 
                     document.querySelectorAll("img[alt='Proof']").forEach(img => {
                         img.addEventListener("click", () => {
@@ -597,60 +714,60 @@
             }
 
             $(document).on("click", "#infoIcon", function () {
-  Swal.fire({
-    title: "ℹ️ Payment Proof Info",
-    text: "This image was uploaded as proof of payment. Please ensure it's clear and valid.",
-    icon: "info",
-    confirmButtonColor: "#007bff",
-    background: "#e0f7ff",
-    color: "#000"
-  });
-});
+                Swal.fire({
+                    title: "ℹ️ Payment Proof Info",
+                    text: "This image was uploaded as proof of payment. Please ensure it's clear and valid.",
+                    icon: "info",
+                    confirmButtonColor: "#007bff",
+                    background: "#e0f7ff",
+                    color: "#000"
+                });
+            });
 
-$(document).on("click", "img[alt='Proof']", function () {
-    const imgSrc = $(this).attr("src");
-    const userRow = $(this).closest("tr");
-    const userId = userRow.attr("id").replace("user-", "");
-    const userName = userRow.find("td:first-child").text();
+            $(document).on("click", "img[alt='Proof']", function () {
+                const imgSrc = $(this).attr("src");
+                const userRow = $(this).closest("tr");
+                const userId = userRow.attr("id").replace("user-", "");
+                const userName = userRow.find("td:first-child").text();
 
-    const clickedIndex = proofImages.findIndex(p => p.url === imgSrc);
+                const clickedIndex = proofImages.findIndex(p => p.url === imgSrc);
 
-    if (clickedIndex === -1) {
-        Swal.fire("❌ Image not found in preview list", "", "error");
-        return;
-    }
+                if (clickedIndex === -1) {
+                    Swal.fire("❌ Image not found in preview list", "", "error");
+                    return;
+                }
 
-    const carouselInner = $("#carouselInner");
-    const carouselIndicators = $("#carouselIndicators");
+                const carouselInner = $("#carouselInner");
+                const carouselIndicators = $("#carouselIndicators");
 
-    carouselInner.html(proofImages.map((imgObj, index) => `
+                carouselInner.html(proofImages.map((imgObj, index) => `
         <div class="carousel-item ${index === clickedIndex ? 'active' : ''}">
             <img class="d-block w-100" src="${imgObj.url}" alt="${imgObj.userName}">
         </div>
     `).join(""));
 
-    carouselIndicators.html(proofImages.map((_, index) => `
+                carouselIndicators.html(proofImages.map((_, index) => `
         <li data-target="#proofCarousel" data-slide-to="${index}" ${index === clickedIndex ? 'class="active"' : ''}></li>
     `).join(""));
 
-    $('#previewModal').modal('show');
-    $('#proofCarousel').carousel(clickedIndex);
+                $('#previewModal').modal('show');
+                $('#proofCarousel').carousel(clickedIndex);
 
-    const updatePreviewMeta = (index) => {
-        const imgData = proofImages[index];
-        const uploadTime = imgData.uploadedAt
-            ? new Date(imgData.uploadedAt).toLocaleString()
-            : "Unknown time";
-        $("#previewMeta").text(`${imgData.userName} - ${uploadTime}`);
-    };
+                const updatePreviewMeta = (index) => {
+                    const imgData = proofImages[index];
+                    const uploadTime = imgData.uploadedAt
+                        ? new Date(imgData.uploadedAt).toLocaleString()
+                        : "Unknown time";
+                    $("#previewMeta").text(`${imgData.userName} - ${uploadTime}`);
+                };
 
-    updatePreviewMeta(clickedIndex);
+                updatePreviewMeta(clickedIndex);
 
-    $('#proofCarousel').on('slide.bs.carousel', function (e) {
-        const nextIndex = $(e.relatedTarget).index();
-        updatePreviewMeta(nextIndex);
-    });
-});
+                $('#proofCarousel').on('slide.bs.carousel', function (e) {
+                    const nextIndex = $(e.relatedTarget).index();
+                    updatePreviewMeta(nextIndex);
+                });
+            });
 
 
             function openMembershipModal(userId) {
@@ -662,9 +779,12 @@ $(document).on("click", "img[alt='Proof']", function () {
                     const endDate = new Date();
                     endDate.setFullYear(startDate.getFullYear() + 1);  // 🔥 Membership berlaku selama 1 tahun
 
+                    const selectedPrice = membershipPriceMap[selectedMembership];
+
                     await updateDoc(doc(db, "Users", userId), {
                         membership: selectedMembership,
                         paymentStatus: "Done",
+                        membershipPrice: selectedPrice,
                         membershipStart: Timestamp.fromDate(startDate),
                         membershipEnd: Timestamp.fromDate(endDate),
                     });
