@@ -173,7 +173,7 @@
         document.getElementById("loadingScreen").style.display = "flex";
 
         const membershipPriceMap = {
-                            "4 Liters Mega Oil": "$188",
+                            "4 Liters Mega Oil basic": "$188",
                             "4 Liters Mega Oil": "$208",
                             "5 Liters Mega Oil": "$248",
                             "5 Liters Castrol Oil": "$298",
@@ -225,39 +225,12 @@
 
                             const purchaseBtn = document.querySelector(".btn-purchase");
 
-// Create or select element to show membership end date
-let membershipStatus = document.getElementById("membershipStatus");
-if (!membershipStatus) {
-    membershipStatus = document.createElement("p");
-    membershipStatus.id = "membershipStatus";
-    membershipStatus.style.fontWeight = "bold";
-    membershipStatus.style.marginTop = "10px";
-    purchaseBtn.parentNode.insertBefore(membershipStatus, purchaseBtn.nextSibling);
-}
+                            onSnapshot(userRef, (docSnap) => {
+    const userData = docSnap.data();
+    updateMembershipUI(userData);  // Call UI update function with live data
+});
 
-if (userData.membership && userData.membership !== "Expired") {
-    purchaseBtn.innerText = userData.membership;
-    purchaseBtn.classList.remove("btn-purchase");
-    purchaseBtn.classList.add("btn-success");
-    purchaseBtn.removeAttribute("href");
-    purchaseBtn.style.cursor = "default";
 
-    // Show membership end date
-    if (userData.membershipEnd && userData.membershipEnd.toDate) {
-        const endDate = userData.membershipEnd.toDate();
-        const formattedDate = endDate.toLocaleDateString();  // Format as MM/DD/YYYY
-        membershipStatus.innerText = `✅ Active until ${formattedDate}`;
-    } else {
-        membershipStatus.innerText = `✅ Membership active`;
-    }
-} else {
-    purchaseBtn.innerText = "Purchase Plan";
-    purchaseBtn.setAttribute("href", "/plans");
-    purchaseBtn.classList.add("btn-purchase");
-    purchaseBtn.classList.remove("btn-success");
-    purchaseBtn.style.cursor = "pointer";
-    membershipStatus.innerText = ""; // Clear any existing message
-}
                             // **Cek Role User**
                             if (userData.role === "admin") {
                                 console.log("🛠️ Admin detected! Switching to admin view...");
@@ -308,6 +281,42 @@ if (userData.membership && userData.membership !== "Expired") {
                     }
                 });
             }
+            function updateMembershipUI(userData) {
+    const purchaseBtn = document.querySelector(".btn-purchase, .btn-success");
+    if (!purchaseBtn) return;  // ✅ Jika tombol tidak ditemukan, stop fungsi
+
+    let membershipStatus = document.getElementById("membershipStatus");
+    if (!membershipStatus) {
+        membershipStatus = document.createElement("p");
+        membershipStatus.id = "membershipStatus";
+        membershipStatus.style.fontWeight = "bold";
+        membershipStatus.style.marginTop = "10px";
+        purchaseBtn.parentNode.insertBefore(membershipStatus, purchaseBtn.nextSibling);
+    }
+
+    if (userData.membership && userData.membership !== "Expired") {
+        purchaseBtn.innerText = userData.membership;
+        purchaseBtn.classList.remove("btn-purchase");
+        purchaseBtn.classList.add("btn-success");
+        purchaseBtn.removeAttribute("href");
+        purchaseBtn.style.cursor = "default";
+
+        if (userData.membershipEnd && userData.membershipEnd.toDate) {
+            const endDate = userData.membershipEnd.toDate();
+            const formattedDate = endDate.toLocaleDateString();
+            membershipStatus.innerText = `✅ Active until ${formattedDate}`;
+        } else {
+            membershipStatus.innerText = `✅ Membership active`;
+        }
+    } else {
+        purchaseBtn.innerText = "Purchase Plan";
+        purchaseBtn.setAttribute("href", "/plans");
+        purchaseBtn.classList.add("btn-purchase");
+        purchaseBtn.classList.remove("btn-success");
+        purchaseBtn.style.cursor = "pointer";
+        membershipStatus.innerText = "";
+    }
+}
 
             function loadAdminDashboard() {
                 let header = document.getElementById("header");
@@ -355,7 +364,9 @@ if (userData.membership && userData.membership !== "Expired") {
     <label for="membershipFilter">Filter Membership:</label>
     <select id="membershipFilter" class="form-control">
       <option value="All">All</option>
+      <option value="4 Liters Mega Oil basic">4 Liters Mega Oil basic</option>
       <option value="4 Liters Mega Oil">4 Liters Mega Oil</option>
+
       <option value="5 Liters Mega Oil">5 Liters Mega Oil</option>
       <option value="4 Liters Castrol Oil">4 Liters Castrol Oil</option>
       <option value="5 Liters Castrol Oil">5 Liters Castrol Oil</option>
@@ -445,11 +456,11 @@ if (userData.membership && userData.membership !== "Expired") {
                     <div class="modal-body">
                         <label for="membershipSelect">Choose Membership:</label>
                         <select id="membershipSelect" class="form-control">
-                            <option value="4 Liters Mega Oil">4 Liters Mega Oil</option>
+                            <option value="4 Liters Mega Oil basic">4 Liters Mega Oil basic</option>
                             <option value="4 Liters Mega Oil">4 Liters Mega Oil</option>
                             <option value="5 Liters Mega Oil">5 Liters Mega Oil</option>
-                            <option value="4 Liters Castrol">4 Liters Castrol Oil</option>
-                            <option value="5 Liters Castrol">5 Liters Castrol Oil</option>
+                            <option value="4 Liters Castrol Oil">4 Liters Castrol Oil</option>
+                            <option value="5 Liters Castrol Oil">5 Liters Castrol Oil</option>
                             <option value="Towing Package">Towing Package</option>
                         </select>
                     </div>
