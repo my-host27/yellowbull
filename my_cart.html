@@ -45,7 +45,6 @@
             const logoutBtn = document.getElementById("logoutBtn");
 
             if (logoutBtn) {
-                console.log("✅ logoutBtn found. Adding event listener...");
                 clearInterval(checkLogoutBtn);
 
                 logoutBtn.addEventListener("click", (event) => {
@@ -67,7 +66,6 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const cartData = localStorage.getItem("cartItem");
-        console.log("Cart Data:", cartData); // Debugging
     
         if (cartData) {
             const item = JSON.parse(cartData);

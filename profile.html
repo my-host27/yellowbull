@@ -30,9 +30,9 @@
         }
 
         .table th {
-    text-align: center !important;
-    vertical-align: middle !important;
-}
+            text-align: center !important;
+            vertical-align: middle !important;
+        }
 
 
 
@@ -57,11 +57,11 @@
 
 
         .table th,
-.table td {
-    font-size: 15px;
-    font-weight: 600;
-    padding: 8px;
-}
+        .table td {
+            font-size: 15px;
+            font-weight: 600;
+            padding: 8px;
+        }
 
 
         .btn-purchase {
@@ -178,23 +178,21 @@
         document.getElementById("loadingScreen").style.display = "flex";
 
         const membershipPriceMap = {
-                            "4 Liters Mega Oil basic": "$188",
-                            "4 Liters Mega Oil": "$208",
-                            "5 Liters Mega Oil": "$248",
-                            "5 Liters Castrol Oil": "$298",
-                            "4 Liters Castrol Oil": "$268",
-                            "Towing Package": "$108",
-                            "None": "-"
-                        };
+            "4 Liters Mega Oil basic": "$188",
+            "4 Liters Mega Oil": "$208",
+            "5 Liters Mega Oil": "$248",
+            "5 Liters Castrol Oil": "$298",
+            "4 Liters Castrol Oil": "$268",
+            "Towing Package": "$108",
+            "None": "-"
+        };
 
         document.addEventListener("DOMContentLoaded", function () {
-            console.log("✅ DOM Loaded. Waiting for Firebase...");
             const userTable = document.getElementById("userTableBody");
 
             // ✅ Pastikan `auth` sudah terinisialisasi sebelum menjalankan listener
             const checkAuth = setInterval(() => {
                 if (auth) {
-                    console.log("✅ Firebase is ready.");
                     clearInterval(checkAuth);
                     setupAuthListener();
                 }
@@ -203,7 +201,6 @@
             function setupAuthListener() {
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
-                        console.log("✅ User logged in:", user.uid);
 
                         const userRef = doc(db, "Users", user.uid);
                         const docSnap = await getDoc(userRef);
@@ -231,23 +228,21 @@
                             const purchaseBtn = document.querySelector(".btn-purchase");
 
                             onSnapshot(userRef, (docSnap) => {
-    const userData = docSnap.data();
-    updateMembershipUI(userData);  // Call UI update function with live data
-});
+                                const userData = docSnap.data();
+                                updateMembershipUI(userData);  // Call UI update function with live data
+                            });
 
 
                             // **Cek Role User**
                             if (userData.role === "admin") {
-                                console.log("🛠️ Admin detected! Switching to admin view...");
-                                console.log("✅ userTableBody found. Loading users...");
+
                                 loadAdminDashboard();
                                 document.getElementById("loadingScreen").style.display = "none";
                             } else {
-                                console.log("👤 Regular user detected.");
                                 document.getElementById("loadingScreen").style.display = "none";
                             }
                         } else {
-                            console.log("❌ No user data found in Firestore");
+
                         }
 
                         // **Cek Email Verified**
@@ -281,51 +276,50 @@
                             });
                         }
                     } else {
-                        console.log("❌ No user logged in. Redirecting...");
                         window.location.href = "/login";
                     }
                 });
             }
             function updateMembershipUI(userData) {
-    const purchaseBtn = document.querySelector(".btn-purchase, .btn-success");
-    if (!purchaseBtn) return;  // ✅ Jika tombol tidak ditemukan, stop fungsi
+                const purchaseBtn = document.querySelector(".btn-purchase, .btn-success");
+                if (!purchaseBtn) return;  // ✅ Jika tombol tidak ditemukan, stop fungsi
 
-    let membershipStatus = document.getElementById("membershipStatus");
-    if (!membershipStatus) {
-        membershipStatus = document.createElement("p");
-        membershipStatus.id = "membershipStatus";
-        membershipStatus.style.fontWeight = "bold";
-        membershipStatus.style.marginTop = "10px";
-        purchaseBtn.parentNode.insertBefore(membershipStatus, purchaseBtn.nextSibling);
-    }
+                let membershipStatus = document.getElementById("membershipStatus");
+                if (!membershipStatus) {
+                    membershipStatus = document.createElement("p");
+                    membershipStatus.id = "membershipStatus";
+                    membershipStatus.style.fontWeight = "bold";
+                    membershipStatus.style.marginTop = "10px";
+                    purchaseBtn.parentNode.insertBefore(membershipStatus, purchaseBtn.nextSibling);
+                }
 
-    if (userData.membership && userData.membership !== "Expired") {
-        purchaseBtn.innerText = userData.membership;
-        purchaseBtn.classList.remove("btn-purchase");
-        purchaseBtn.classList.add("btn-success");
-        purchaseBtn.removeAttribute("href");
-        purchaseBtn.style.cursor = "default";
+                if (userData.membership && userData.membership !== "Expired") {
+                    purchaseBtn.innerText = userData.membership;
+                    purchaseBtn.classList.remove("btn-purchase");
+                    purchaseBtn.classList.add("btn-success");
+                    purchaseBtn.removeAttribute("href");
+                    purchaseBtn.style.cursor = "default";
 
-        if (userData.membershipEnd && userData.membershipEnd.toDate) {
-            const endDate = userData.membershipEnd.toDate();
-    const formattedDate = endDate.toLocaleDateString("en-US", {
-        day: "numeric",
-        month: "long",
-        year: "numeric"
-    });
-            membershipStatus.innerText = `✅ Active until ${formattedDate}`;
-        } else {
-            membershipStatus.innerText = `✅ Membership active`;
-        }
-    } else {
-        purchaseBtn.innerText = "Purchase Plan";
-        purchaseBtn.setAttribute("href", "/plans");
-        purchaseBtn.classList.add("btn-purchase");
-        purchaseBtn.classList.remove("btn-success");
-        purchaseBtn.style.cursor = "pointer";
-        membershipStatus.innerText = "";
-    }
-}
+                    if (userData.membershipEnd && userData.membershipEnd.toDate) {
+                        const endDate = userData.membershipEnd.toDate();
+                        const formattedDate = endDate.toLocaleDateString("en-US", {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric"
+                        });
+                        membershipStatus.innerText = `✅ Active until ${formattedDate}`;
+                    } else {
+                        membershipStatus.innerText = `✅ Membership active`;
+                    }
+                } else {
+                    purchaseBtn.innerText = "Purchase Plan";
+                    purchaseBtn.setAttribute("href", "/plans");
+                    purchaseBtn.classList.add("btn-purchase");
+                    purchaseBtn.classList.remove("btn-success");
+                    purchaseBtn.style.cursor = "pointer";
+                    membershipStatus.innerText = "";
+                }
+            }
 
             function loadAdminDashboard() {
                 let header = document.getElementById("header");
@@ -380,6 +374,7 @@
       <option value="4 Liters Castrol Oil">4 Liters Castrol Oil</option>
       <option value="5 Liters Castrol Oil">5 Liters Castrol Oil</option>
       <option value="Towing Package">Towing Package</option>
+      <option value="Renew">Renew</option>
       <option value="Expired">Expired</option>
     </select>
   </div>
@@ -487,6 +482,9 @@
                 document.body.insertAdjacentHTML("beforeend", adminDashboardHTML);
 
                 loadAllUsers();
+                setTimeout(() => {
+    checkMembershipExpiration();  // Cek lagi setelah load
+}, 1000);
 
                 setTimeout(() => {
                     const logoutBtn = document.getElementById("logoutbtn");
@@ -524,6 +522,10 @@
                         const user = docSnap.data();
                         if (user.role === "admin") return;
 
+                        localStorage.setItem(`userData-${docSnap.id}`, JSON.stringify({
+    membershipEnd: user.membershipEnd ? user.membershipEnd.toDate() : null,
+    membership: user.membership ? user.membership.toLowerCase() : null
+}));
                         const membership = user.membership || "None";
                         const paymentStatus = user.paymentStatus || "Not Paid";
                         const proofImage = user.proofImage
@@ -553,7 +555,7 @@
                     });
 
                     const currentFilter = document.getElementById("membershipFilter").value;
-    const currentSearch = document.getElementById("searchInput").value;
+                    const currentSearch = document.getElementById("searchInput").value;
 
                     document.getElementById("userTableBody").innerHTML = userListHTML;
                     $('#proofCarousel').carousel({
@@ -562,11 +564,11 @@
                     });
                     document.getElementById("membershipFilter").value = currentFilter;
                     document.getElementById("searchInput").value = currentSearch;
-                    filterTable(); 
+                    filterTable();
                     $('#proofCarousel').carousel(0);  // Reset ke slide pertama
                     document.getElementById("membershipFilter").addEventListener("change", () => {
-  filterTable();  // Panggil langsung, tidak simpan apapun
-});
+                        filterTable();  // Panggil langsung, tidak simpan apapun
+                    });
 
                     document.querySelectorAll(".uploadProof").forEach(uploadProofHandler);
 
@@ -598,7 +600,6 @@
 
                                 await loadAllUsers();  // Refresh
                             } catch (err) {
-                                console.error("Upload Error:", err);
                                 Swal.fire("❌ Error", err?.message || "Unknown error occurred", "error");
                             }
                         });
@@ -624,42 +625,62 @@
                     document.getElementById("deleteExpiredBtn").addEventListener("click", deleteExpiredMembers);
 
                     function filterTable() {
-  const filterValue = document.getElementById("membershipFilter").value.toLowerCase();
-  const searchValue = document.getElementById("searchInput").value.toLowerCase();
-  const rows = document.querySelectorAll("#userTableBody tr");
+    const filterValue = document.getElementById("membershipFilter").value.toLowerCase();
+    const searchValue = document.getElementById("searchInput").value.toLowerCase();
+    const rows = document.querySelectorAll("#userTableBody tr");
+    checkMembershipExpiration();
+    let visibleCount = 0;
+    let totalPrice = 0;
+    const now = new Date();
+    const sevenDays = 7 * 24 * 60 * 60 * 1000;  // 7 hari dalam ms
 
-  let visibleCount = 0;
-  let totalPrice = 0;
+    rows.forEach(row => {
+        const name = row.querySelector("td:nth-child(1)").innerText.toLowerCase();
+        const email = row.querySelector("td:nth-child(2)").innerText.toLowerCase();
+        const membershipButton = row.querySelector("td:nth-child(3) button");
+        const membership = membershipButton.innerText.toLowerCase();
 
-  rows.forEach(row => {
-    const name = row.querySelector("td:nth-child(1)").innerText.toLowerCase();
-    const email = row.querySelector("td:nth-child(2)").innerText.toLowerCase();
-    const membership = row.querySelector("td:nth-child(3) button").innerText.toLowerCase();
+        let showRow = false;
 
-    const matchMembership = filterValue === "all" || membership === filterValue;
-    const matchSearch = name.includes(searchValue) || email.includes(searchValue);
+        if (filterValue === "all") {
+            showRow = true;
+        } else if (filterValue === "renew") {
+            const userId = row.id.replace("user-", "");
+            const userData = JSON.parse(localStorage.getItem(`userData-${userId}`));  // ⬅️ Simpan userData saat loadAllUsers
+            if (userData && userData.membershipEnd && userData.membership !== "expired") {
+                const endDate = new Date(userData.membershipEnd);
+                const timeLeft = endDate - now;
+                if (timeLeft > 0 && timeLeft <= sevenDays) {
+                    showRow = true;
+                }
+            }
+        } else {
+            showRow = membership === filterValue;
+        }
 
-    if (matchMembership && matchSearch) {
-      row.style.display = "";
-      visibleCount++;
+        const matchSearch = name.includes(searchValue) || email.includes(searchValue);
 
-      const priceStr = row.getAttribute("data-price");
-      const priceNum = parseFloat(priceStr);
-      if (!isNaN(priceNum)) {
-        totalPrice += priceNum;
-      }
-    } else {
-      row.style.display = "none";
-    }
-  });
+        if (showRow && matchSearch) {
+            row.style.display = "";
+            visibleCount++;
 
-  document.getElementById("userCount").innerText = `Total Users: ${visibleCount}`;
-  document.getElementById("totalPrice").innerText = `Total Price: $${totalPrice}`;
+            const priceStr = row.getAttribute("data-price");
+            const priceNum = parseFloat(priceStr);
+            if (!isNaN(priceNum)) {
+                totalPrice += priceNum;
+            }
+        } else {
+            row.style.display = "none";
+        }
+    });
+
+    document.getElementById("userCount").innerText = `Total Users: ${visibleCount}`;
+    document.getElementById("totalPrice").innerText = `Total Price: $${totalPrice}`;
 }
 
-document.getElementById("membershipFilter").addEventListener("change", async () => {
-  await loadAllUsers();  // Fetch ulang data
-});
+                    document.getElementById("membershipFilter").addEventListener("change", async () => {
+                        await loadAllUsers();  // Fetch ulang data
+                    });
 
                     async function deleteExpiredMembers() {
                         const confirm = await Swal.fire({
@@ -765,7 +786,7 @@ document.getElementById("membershipFilter").addEventListener("change", async () 
                     });
 
                 } catch (error) {
-                    console.error("❌ Error loading users:", error);
+
                 }
             }
 
@@ -861,7 +882,8 @@ document.getElementById("membershipFilter").addEventListener("change", async () 
                         const membershipStatus = userData.membership || "None";
                         const membershipEnd = userData.membershipEnd ? userData.membershipEnd.toDate() : null;
 
-                        console.log(`🔄 Update detected for user: ${userId}, membership: ${membershipStatus}`);
+                       
+
 
                         const userRow = document.getElementById(`user-${userId}`);
                         if (!userRow) return;
@@ -886,13 +908,12 @@ document.getElementById("membershipFilter").addEventListener("change", async () 
                             const sevenDays = 7 * 24 * 60 * 60 * 1000;  // 7 hari dalam ms
 
                             if (timeLeft <= 0) {
-                                console.log(`❌ Membership expired for user: ${userId}`);
                                 updateDoc(doc(db, "Users", userId), {
                                     membership: "Expired",
                                     paymentStatus: "Not Paid",
                                 });
                             } else if (timeLeft <= sevenDays) {
-                                console.log(`⚠️ Membership will expire in <7 days for user: ${userId}`);
+
                                 showRenewButton(userId);
                             }
                         }
@@ -939,7 +960,6 @@ document.getElementById("membershipFilter").addEventListener("change", async () 
                 const renewButton = membershipActions.querySelector(".renew-btn");
                 if (renewButton) {
                     renewButton.remove();
-                    console.log(`✅ Removed renew button for user: ${userId}`);
                 }
             }
 
@@ -948,7 +968,6 @@ document.getElementById("membershipFilter").addEventListener("change", async () 
                 await checkMembershipExpiration();
             }, 60 * 1000);
             async function checkMembershipExpiration() {
-                console.log("🔄 Checking for expired memberships...");
 
                 const usersRef = collection(db, "Users");
                 const querySnapshot = await getDocs(usersRef);
@@ -962,11 +981,7 @@ document.getElementById("membershipFilter").addEventListener("change", async () 
                         const membershipEndDate = userData.membershipEnd.toDate();
                         const timeLeft = membershipEndDate - now;
                         const oneWeek = 7 * 24 * 60 * 60 * 1000;  // 🔥 1 minggu dalam milidetik
-
-                        console.log(`⏳ User ${userId} - Time Left: ${Math.floor(timeLeft / 1000 / 60 / 60 / 24)} days`);
-
                         if (timeLeft <= 0) {
-                            console.log(`❌ Membership expired for user: ${userId}`);
 
                             await updateDoc(doc(db, "Users", userId), {
                                 membership: "Expired",
@@ -975,7 +990,6 @@ document.getElementById("membershipFilter").addEventListener("change", async () 
 
                             listenForMembershipUpdates();
                         } else if (timeLeft <= oneWeek) {
-                            console.log(`⚠️ Membership for user ${userId} will expire within a week! Showing renew button...`);
                             showRenewButton(userId);
                         }
                     }
@@ -1019,7 +1033,6 @@ document.getElementById("membershipFilter").addEventListener("change", async () 
                 const editForm = document.getElementById("editProfileForm");
 
                 if (editForm) {
-                    console.log("✅ editProfileForm found. Adding event listener...");
                     clearInterval(checkEditForm);
 
                     editForm.addEventListener("submit", async (event) => {
@@ -1050,8 +1063,6 @@ document.getElementById("membershipFilter").addEventListener("change", async () 
 
                                 const credential = EmailAuthProvider.credential(user.email, password);
                                 await reauthenticateWithCredential(user, credential);
-                                console.log("✅ User re-authenticated.");
-
                                 await verifyBeforeUpdateEmail(user, newEmail);
                                 Swal.fire({
                                     title: "📧 A verification email has been sent!",
@@ -1092,7 +1103,7 @@ document.getElementById("membershipFilter").addEventListener("change", async () 
                         }
                     });
                 } else {
-                    console.warn("⏳ Waiting for editProfileForm to be available...");
+
                 }
             }, 500);
 
@@ -1101,7 +1112,6 @@ document.getElementById("membershipFilter").addEventListener("change", async () 
                 const logoutBtn = document.getElementById("logoutbtn");
 
                 if (logoutBtn) {
-                    console.log("✅ logoutBtn found. Adding event listener...");
                     clearInterval(checkLogoutBtn);
 
                     logoutBtn.addEventListener("click", (event) => {
@@ -1121,7 +1131,6 @@ document.getElementById("membershipFilter").addEventListener("change", async () 
                         });
                     });
                 } else {
-                    console.warn("⏳ Waiting for logoutBtn to be available...");
                 }
             }, 500);
 
@@ -1129,7 +1138,6 @@ document.getElementById("membershipFilter").addEventListener("change", async () 
                 const logoutBtn = document.getElementById("logoutBtn");
 
                 if (logoutBtn) {
-                    console.log("✅ logoutBtn found. Adding event listener...");
                     clearInterval(checkLogoutBtn);
 
                     logoutBtn.addEventListener("click", (event) => {
@@ -1149,7 +1157,7 @@ document.getElementById("membershipFilter").addEventListener("change", async () 
                         });
                     });
                 } else {
-                    console.warn("⏳ Waiting for logoutBtn to be available...");
+
                 }
             }, 500);
 
@@ -1372,10 +1380,8 @@ z-index: 9999;">
     <script>
         $(document).ready(function () {
             $('.carousel-control-prev').on('click', () => {
-                console.log('⬅️ Prev clicked');
             });
             $('.carousel-control-next').on('click', () => {
-                console.log('➡️ Next clicked');
             });
         });
     </script>

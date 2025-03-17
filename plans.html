@@ -67,7 +67,6 @@
       const logoutBtn = document.getElementById("logoutBtn");
 
       if (logoutBtn) {
-        console.log("✅ logoutBtn found. Adding event listener...");
         clearInterval(checkLogoutBtn);
 
         logoutBtn.addEventListener("click", (event) => {
@@ -87,7 +86,6 @@
           });
         });
       } else {
-        console.warn("⏳ Waiting for logoutBtn to be available...");
       }
     }, 500);
     document.querySelectorAll(".view-more").forEach(button => {
