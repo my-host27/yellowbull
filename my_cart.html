@@ -57,7 +57,11 @@
                         confirmButtonColor: "#ff4444",
                         cancelButtonColor: "#ccc",
                         confirmButtonText: "Yes, log out"
-        });
+        }).then((result) => {
+            if (result.isConfirmed) {
+                logoutUser();
+            }
+        })
                     });
                 }
             }, 500);
