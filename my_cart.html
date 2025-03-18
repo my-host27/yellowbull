@@ -64,26 +64,25 @@
         
 </script>
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const cartData = localStorage.getItem("cartItem");
-    
-        if (cartData) {
-            const item = JSON.parse(cartData);
-            document.querySelector(".cart-premium").innerText = item.name;
-            document.querySelector(".prise_total h3 b").innerText = `$${item.price}`;
-            document.querySelector(".cart-border").innerText = `TOTAL: ${item.price}.00`;
-    
-            // Tambahkan deskripsi produk
-            const descriptionContainer = document.querySelector(".cart-description");
-            descriptionContainer.innerHTML = ""; // Kosongkan dulu
-    
-            item.product.split(", ").forEach(desc => {
-                let p = document.createElement("p");
-                p.innerText = desc;
-                descriptionContainer.appendChild(p);
-            });
-        }
-    });
+  document.addEventListener("DOMContentLoaded", function () {
+    const cartData = localStorage.getItem("cartItem");
+
+    if (cartData) {
+        const item = JSON.parse(cartData);
+        document.querySelector(".cart-premium").innerText = item.name;
+        document.querySelector(".prise_total h3 b").innerText = `$${item.price}`;
+        document.querySelector(".cart-border").innerText = `TOTAL: ${item.price}.00`;
+
+        // Add product description dynamically
+        const descriptionContainer = document.querySelector(".cart-description");
+        descriptionContainer.innerHTML = ""; // Clear existing content
+        item.product.split(", ").forEach(desc => {
+            let p = document.createElement("p");
+            p.innerText = desc;
+            descriptionContainer.appendChild(p);
+        });
+    }
+});
     document.addEventListener("DOMContentLoaded", function () {
     const cartData = localStorage.getItem("cartItem");
 
