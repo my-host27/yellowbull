@@ -1123,25 +1123,50 @@ assignMembershipListeners();
 
 
             async function renewMembership(userId) {
-                const startDate = new Date();
-                const endDate = new Date();
-                endDate.setFullYear(startDate.getFullYear() + 1);  // 🔥 Renew membership berlaku 1 tahun
+    const confirm = await Swal.fire({
+        title: "Are you sure?",
+        text: "You are about to renew the membership for another year.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#44cc44",
+        cancelButtonColor: "#ccc",
+        confirmButtonText: "Yes, renew membership",
+        cancelButtonText: "Cancel"
+    });
 
-                await updateDoc(doc(db, "Users", userId), {
-                    membershipEnd: Timestamp.fromDate(endDate),
-                    paymentStatus: "Done",
-                });
+    if (!confirm.isConfirmed) {
+        return;  // If the user cancels, do nothing
+    }
 
-                Swal.fire({
-                    title: "✅ Membership Renewed!",
-                    text: "Your membership has been extended for another year.",
-                    icon: "success",
-                    confirmButtonColor: "#44cc44"
-                });
+    // Proceed with renewal if confirmed
+    const startDate = new Date();
+    const endDate = new Date();
+    endDate.setFullYear(startDate.getFullYear() + 1);  // 🔥 Membership berlaku selama 1 tahun
 
-                removeRenewButton(userId);
-                checkMembershipExpiration();
-            }
+    try {
+        await updateDoc(doc(db, "Users", userId), {
+            membershipEnd: Timestamp.fromDate(endDate),
+            paymentStatus: "Done",
+        });
+
+        Swal.fire({
+            title: "✅ Membership Renewed!",
+            text: "Your membership has been extended for another year.",
+            icon: "success",
+            confirmButtonColor: "#44cc44"
+        });
+
+        removeRenewButton(userId);
+        checkMembershipExpiration();
+    } catch (error) {
+        Swal.fire({
+            title: "❌ Error",
+            text: "There was an issue renewing the membership. Please try again.",
+            icon: "error",
+            confirmButtonColor: "#ff4444"
+        });
+    }
+}
 
             // 🔹 Function to remove the "Renew" button after clicking it
             function removeRenewButton(userId) {
