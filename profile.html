@@ -207,8 +207,6 @@
 
                         if (docSnap.exists()) {
                             const userData = docSnap.data();
-
-                            // Menampilkan data ke halaman
                             document.getElementById("username").innerText = userData.userName || "User";
                             document.getElementById("vehicle_no").innerText = userData.carPlate || "Not Available";
                             document.getElementById("currentEmail").innerText = user.email || "Not Available";
@@ -397,12 +395,13 @@
                     <table class="table table-bordered">
                         <thead class="thead-dark">
                             <tr>
-                                <th style="width: 20%;">Name</th>
-                                <th style="width: 25%;">Email</th>
-                                <th style="width: 15%;">Membership</th>
-                                <th style="width: 10%;">Price</th>
-                                <th style="width: 15%;">Payment Status</th>
-                                <th style="width: 25%;">Upload Payment Proof</th>
+                           <th style="width: 20%;">Name</th>
+                        <th style="width: 25%;">Email</th>
+                        <th style="width: 15%;">Membership</th>
+                        <th style="width: 10%;">Price</th>
+                        <th style="width: 15%;">Payment Status</th>
+                        <th style="width: 10%;">Payment Method</th> <!-- New column -->
+                        <th style="width: 25%;">Upload Payment Proof</th>
                             </tr>
                         </thead>
                         <tbody id="userTableBody"></tbody>
@@ -427,6 +426,10 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
+
+      <!-- Modal for selecting Payment Method -->
+
+
       <div class="modal-body">
       <div id="proofCarousel" class="carousel slide" data-ride="carousel">
   <ol class="carousel-indicators" id="carouselIndicators"></ol>
@@ -475,6 +478,32 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="paymentMethodModal" tabindex="-1" role="dialog" aria-labelledby="paymentMethodModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="paymentMethodModalLabel">Select Payment Method</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label for="paymentMethodSelect">Choose Payment Method:</label>
+                <select id="paymentMethodSelect" class="form-control">
+                    <option value="PayNow">PayNow</option>
+                    <option value="Cash">Cash</option>
+                    <option value="Other">Other</option>
+                </select>
+                <input type="text" id="paymentDescriptionInput" class="form-control payment-description" placeholder="Describe Other payment method..." style="display:none;">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="savePaymentMethodBtn">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
     `;
 
                 document.body.innerHTML = "";
@@ -521,6 +550,9 @@
                     querySnapshot.forEach((docSnap) => {
                         const user = docSnap.data();
                         if (user.role === "admin") return;
+                        const userId = docSnap.id;
+        const paymentMethod = docSnap.data().paymentMethod || "Not Selected";
+        
 
                         localStorage.setItem(`userData-${docSnap.id}`, JSON.stringify({
     membershipEnd: user.membershipEnd ? user.membershipEnd.toDate() : null,
@@ -528,12 +560,13 @@
 }));
                         const membership = user.membership || "None";
                         const paymentStatus = user.paymentStatus || "Not Paid";
+                        const paymentDescription = user.paymentDescription
                         const proofImage = user.proofImage
                             ? `<img src="${user.proofImage}" alt="Proof" style="width: 50px; height: 50px; cursor: pointer;">`
                             : "No Image";
 
                         const price = membershipPriceMap[membership] || "-";
-
+                        updatePaymentMethodUI(userId, paymentMethod, paymentDescription);
                         userListHTML += `
  <tr id="user-${docSnap.id}" data-price="${price.replace(/[^\d]/g, '')}">
   <td>${user.userName || "Unknown"}</td>
@@ -544,7 +577,17 @@
     </button>
   </td>
   <td>${price}</td>
-  <td id="paymentStatus-${docSnap.id}">${paymentStatus}</td>
+   <td>${user.paymentStatus || "Not Paid"}</td>
+   <td>
+    <button class="btn btn-info btn-sm selectPaymentMethod" data-userid="${docSnap.id}">
+        ${paymentMethod === "Not Selected" ? "Select Payment Method" : paymentMethod}
+    </button>
+    <!-- Add description below payment method if it exists and payment method is "Other" -->
+    ${paymentMethod === "Other" && paymentDescription && paymentDescription.trim() !== "" 
+        ? `<p style="font-size: 12px; color: #555; margin-top: 5px;">${paymentDescription}</p>` 
+        : ''}
+</td>
+
   <td>
     ${proofImage}
     <input type="file" class="form-control-file uploadProof" data-userid="${docSnap.id}">
@@ -562,6 +605,7 @@
                         interval: false,
                         wrap: true
                     });
+                  
                     document.getElementById("membershipFilter").value = currentFilter;
                     document.getElementById("searchInput").value = currentSearch;
                     filterTable();
@@ -571,6 +615,124 @@
                     });
 
                     document.querySelectorAll(".uploadProof").forEach(uploadProofHandler);
+       // Listen for the modal to open and set default values
+       document.querySelectorAll('.selectPaymentMethod').forEach(button => {
+    button.addEventListener('click', async (event) => {
+        const userId = event.target.dataset.userid;
+
+        // Open the modal to select a payment method
+        $('#paymentMethodModal').modal('show');
+
+        const paymentMethodSelect = document.getElementById("paymentMethodSelect");
+        const paymentDescriptionInput = document.getElementById("paymentDescriptionInput");
+
+        // Get current payment method data from Firestore
+        const userRef = doc(db, "Users", userId);
+        const userSnap = await getDoc(userRef);
+        const userData = userSnap.data();
+        const paymentMethod = userData.paymentMethod || "PayNow";
+        const paymentDescription = userData.paymentDescription || "";
+
+        // Set the default values
+        paymentMethodSelect.value = paymentMethod;
+        paymentDescriptionInput.value = paymentDescription;
+
+        // Show or hide the description input based on the payment method
+        if (paymentMethod === "Other") {
+            paymentDescriptionInput.style.display = "block";
+        } else {
+            paymentDescriptionInput.style.display = "none";
+        }
+
+        // Handle save button click
+        document.getElementById('savePaymentMethodBtn').onclick = async () => {
+            const selectedPaymentMethod = paymentMethodSelect.value;
+            const description = selectedPaymentMethod === "Other" ? paymentDescriptionInput.value : "";
+
+            // Save the payment method to Firestore
+            await savePaymentMethodToFirestore(userId, selectedPaymentMethod, description);
+
+            // Close the modal
+            $('#paymentMethodModal').modal('hide');
+        };
+    });
+});
+
+async function savePaymentMethodToFirestore(userId, paymentMethod, description) {
+    const userRef = doc(db, "Users", userId);
+    const paymentData = {
+        paymentMethod: paymentMethod,
+        paymentDescription: paymentMethod === "Other" ? description : "",  // Save description only if "Other" is selected
+    };
+
+    try {
+        // Save the payment method to Firestore
+        await updateDoc(userRef, paymentData);
+
+        // After saving, immediately update the UI
+        updatePaymentMethodUI(userId, paymentMethod, description);  // This updates the button text and description dynamically
+
+        // Optionally, you can show a success alert
+        Swal.fire({
+            title: "✅ Payment Method Updated",
+            text: "The payment method and description have been updated.",
+            icon: "success",
+            confirmButtonColor: "#44cc44"
+        });
+        
+    } catch (error) {
+        console.error("Error updating payment method:", error);
+        Swal.fire({
+            title: "❌ Error",
+            text: error.message,
+            icon: "error",
+            confirmButtonColor: "#ff4444"
+        });
+    }
+}
+
+async function updatePaymentMethodUI(userId, paymentMethod, paymentDescription) {
+    const paymentButton = document.querySelector(`#user-${userId} .selectPaymentMethod`);
+
+    if (paymentButton) {
+        // Update the payment method displayed on the button
+        paymentButton.innerText = paymentMethod === "Other" ? `Other` : paymentMethod;
+        
+        // Find the existing description paragraph
+        let descriptionParagraph = document.querySelector(`#user-${userId} .payment-description`);
+
+        // Remove any existing description
+        if (descriptionParagraph) {
+            descriptionParagraph.remove();
+        }
+
+        // If payment method is "Other" and there is a description, display it
+        if (paymentMethod === "Other" && paymentDescription && paymentDescription.trim() !== "") {
+            // Create a new description paragraph
+            descriptionParagraph = document.createElement("p");
+            descriptionParagraph.classList.add("payment-description");
+            descriptionParagraph.style.fontSize = "12px";
+            descriptionParagraph.style.color = "#555";
+            descriptionParagraph.style.marginTop = "5px";
+            descriptionParagraph.innerText = paymentDescription;
+
+            // Insert the new description after the payment method button
+            paymentButton.insertAdjacentElement('afterend', descriptionParagraph);
+        }
+    }
+}
+
+
+// Ensure description input visibility is dynamically controlled based on selection
+document.getElementById("paymentMethodSelect").addEventListener("change", function() {
+    const paymentDescriptionInput = document.getElementById("paymentDescriptionInput");
+    if (this.value === "Other") {
+        paymentDescriptionInput.style.display = "block";
+    } else {
+        paymentDescriptionInput.style.display = "none";
+    }
+});
+
 
                     function uploadProofHandler(input) {
                         input.addEventListener("change", async (e) => {
@@ -894,8 +1056,22 @@ function assignMembershipListeners() {
                         const membershipStatus = userData.membership || "None";
                         const membershipEnd = userData.membershipEnd ? userData.membershipEnd.toDate() : null;
 
-                       
+                      
 
+
+                        const paymentMethod = user.paymentMethod || "PayNow";
+    const paymentDescription = user.paymentDescription || "";
+    updatePaymentMethodUI(userId, paymentMethod, paymentDescription);
+    const paymentMethodSelect = document.querySelector(`.payment-method[data-userid="${userId}"]`);
+    const paymentDescriptionInput = document.querySelector(`.payment-description[data-userid="${userId}"]`);
+
+    if (paymentMethodSelect) {
+        paymentMethodSelect.value = paymentMethod;
+    }
+
+    if (paymentMethod === "Other" && paymentDescriptionInput) {
+        paymentDescriptionInput.value = paymentDescription;
+    }
 
                         const userRow = document.getElementById(`user-${userId}`);
                         if (!userRow) return;
