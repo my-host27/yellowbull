@@ -63,6 +63,9 @@
             padding: 8px;
         }
 
+        .deleteMembershipBtn{
+            margin-top: 5px;
+        }
 
         .btn-purchase {
             background-color: #ffbc13;
@@ -84,13 +87,18 @@
             background-color: rgba(0, 0, 0, 0.5);
             border-radius: 50%;
         }
-
         .carousel-inner img {
             max-height: 80vh;
             /* ⬅️ Maksimal 80% dari tinggi layar */
             object-fit: contain;
             /* Jaga aspek rasio gambar */
         }
+
+
+
+.renew-btn {
+    margin-top: 5px;
+}
 
 
 
@@ -134,6 +142,7 @@
                 font-size: 14px;
                 /* Ukuran teks dalam modal lebih kecil */
             }
+
 
             .alert-warning {
                 display: flex;
@@ -395,13 +404,13 @@
                     <table class="table table-bordered">
                         <thead class="thead-dark">
                             <tr>
-                           <th style="width: 20%;">Name</th>
+                           <th style="width: 15%;">Name</th>
                         <th style="width: 25%;">Email</th>
                         <th style="width: 15%;">Membership</th>
                         <th style="width: 10%;">Price</th>
-                        <th style="width: 15%;">Payment Status</th>
+                        <th style="width: 10%;">Payment Status</th>
                         <th style="width: 10%;">Payment Method</th> <!-- New column -->
-                        <th style="width: 25%;">Upload Payment Proof</th>
+                        <th style="width: 30%;">Upload Payment Proof</th>
                             </tr>
                         </thead>
                         <tbody id="userTableBody"></tbody>
@@ -571,11 +580,16 @@
  <tr id="user-${docSnap.id}" data-price="${price.replace(/[^\d]/g, '')}">
   <td>${user.userName || "Unknown"}</td>
   <td>${user.email || "No Email"}</td>
-  <td class="membership-actions">
-    <button class="btn btn-${membership === "Expired" ? "danger" : "info"} btn-sm selectMembership" data-userid="${docSnap.id}">
-      ${membership}
-    </button>
-  </td>
+ <td class="membership-actions">
+        <button class="btn btn-${membership === "Expired" ? "danger" : "info"} btn-sm selectMembership" data-userid="${docSnap.id}">
+            ${membership}
+        </button>
+ <!-- Show delete button only if membership is not expired -->
+      ${membership !== "Expired" ? `
+      <button class="btn btn-danger btn-sm deleteMembershipBtn" data-userid="${docSnap.id}" title="Delete Membership">
+        Delete
+      </button>` : ''}
+    </td>
   <td>${price}</td>
    <td>${user.paymentStatus || "Not Paid"}</td>
    <td>
@@ -600,6 +614,7 @@
                     const currentFilter = document.getElementById("membershipFilter").value;
                     const currentSearch = document.getElementById("searchInput").value;
 
+               
                     document.getElementById("userTableBody").innerHTML = userListHTML;
                     $('#proofCarousel').carousel({
                         interval: false,
@@ -690,6 +705,66 @@ async function savePaymentMethodToFirestore(userId, paymentMethod, description) 
         });
     }
 }
+
+document.querySelectorAll('.deleteMembershipBtn').forEach(button => {
+    button.addEventListener('click', async (event) => {
+        const userId = event.target.dataset.userid;
+
+        const confirm = await Swal.fire({
+            title: "Are you sure?",
+            text: "You are about to delete this membership. This action cannot be undone.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#ccc",
+            confirmButtonText: "Yes, delete membership",
+            cancelButtonText: "Cancel"
+        });
+
+        if (!confirm.isConfirmed) {
+            return;  // If the user cancels, do nothing
+        }
+
+        // Proceed with deleting the membership if confirmed
+        try {
+            // Update membership data in Firestore
+            await updateDoc(doc(db, "Users", userId), {
+                membership: "None",  // Remove membership information
+                paymentStatus: "Not Paid",  // Update payment status
+                membershipStart: null,  // Clear start date
+                membershipEnd: null,  // Clear end date
+            });
+
+            // Update UI without removing the row
+            const userRow = document.getElementById(`user-${userId}`);
+            const membershipButton = userRow.querySelector('.selectMembership');
+            const deleteButton = userRow.querySelector('.deleteMembershipBtn');
+
+            // Update the membership button
+            membershipButton.innerText = "None";
+            membershipButton.classList.remove('btn-info');
+            membershipButton.classList.add('btn-secondary');
+
+            // Hide the delete button
+            deleteButton.style.display = 'none';  // Hide the delete button
+            
+            Swal.fire({
+                title: "✅ Membership Deleted!",
+                text: "The membership has been successfully deleted.",
+                icon: "success",
+                confirmButtonColor: "#44cc44"
+            });
+
+        } catch (error) {
+            Swal.fire({
+                title: "❌ Error",
+                text: "There was an issue deleting the membership. Please try again.",
+                icon: "error",
+                confirmButtonColor: "#ff4444"
+            });
+        }
+    });
+});
 
 async function updatePaymentMethodUI(userId, paymentMethod, paymentDescription) {
     const paymentButton = document.querySelector(`#user-${userId} .selectPaymentMethod`);
