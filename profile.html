@@ -35,6 +35,10 @@
             vertical-align: middle !important;
         }
 
+        .selectMembership{
+            margin-bottom: 5px;
+        }
+
 
 
         .custom-alert {
@@ -63,9 +67,6 @@
             font-weight: 600;
         }
 
-        .deleteMembershipBtn{
-            margin-top: 5px;
-        }
 
         .btn-purchase {
             background-color: #ffbc13;
@@ -96,13 +97,14 @@
 
 
 
-.renew-btn {
-    margin-top: 5px;
-}
+
 
 
 
         @media (max-width: 767px) {
+            .d-flex {
+    justify-content: space-between;
+  }
             .wallet_wrap {
                 width: 100%;
             }
@@ -374,14 +376,14 @@
             <div class="container">
                     <h2>Admin Dashboard</h2>
                 <p>Welcome, Admin!</p>
-                  <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+             <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+  <!-- Filter Membership Dropdown -->
   <div class="form-group mb-2 mb-md-0">
     <label for="membershipFilter">Filter Membership:</label>
     <select id="membershipFilter" class="form-control">
       <option value="All">All</option>
       <option value="4 Liters Mega Oil basic">4 Liters Mega Oil basic</option>
       <option value="4 Liters Mega Oil">4 Liters Mega Oil</option>
-
       <option value="5 Liters Mega Oil">5 Liters Mega Oil</option>
       <option value="4 Liters Castrol Oil">4 Liters Castrol Oil</option>
       <option value="5 Liters Castrol Oil">5 Liters Castrol Oil</option>
@@ -391,15 +393,20 @@
     </select>
   </div>
 
+  <!-- Search Bar -->
   <div class="form-group mb-2 mb-md-0">
     <label for="searchInput">Search:</label>
     <input type="text" id="searchInput" class="form-control" placeholder="Search name or email...">
   </div>
 
-  <button id="deleteExpiredBtn" class="btn btn-danger mt-3 mt-md-0">Delete Expired Members</button>/
-  <button id="downloadCSV" class="btn btn-primary mt-3">Download CSV</button>
+  <!-- Buttons for Delete and Download CSV -->
+  <div class="d-flex flex-column flex-md-row ">
+    <!-- Delete Expired Members Button -->
+    <button id="deleteExpiredBtn" class="btn btn-danger mt-3 mt-md-0 mr-md-2">Delete Expired Members</button>
 
-
+    <!-- Download CSV Button -->
+    <button id="downloadCSV" class="btn btn-primary mt-3 mt-md-0">Download Excel</button>
+  </div>
 </div>
 
 <!-- New summary bar for count and total -->
