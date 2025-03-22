@@ -372,7 +372,13 @@
 
 																						<option value="Volvo">Volvo</option>
 
+																						<option value="Other">Other</option>
+
+
+
 																			</select>
+
+																			<textarea id="otherCarCompany" class="form-control" name="other_car_company" style="display: none;" placeholder="Describe your car make"></textarea>
 								</div>
 							</div>
 							<div class="col-md-6">
@@ -4496,8 +4502,9 @@
 
 																							<option class="Volvo carmodelnew" value="XC90 V8" style="display:none">XC90 V8</option>
 
-
+																							<option value="Other">Other</option>
 																			</select>
+																			<textarea id="otherCarModel" class="form-control" name="other_car_model" style="display: none;" placeholder="Describe your car model"></textarea>
 
 								</div>
 							</div>
@@ -4606,150 +4613,172 @@
     <script type="module">
         import { auth, db, updateDoc, getDoc, createUserWithEmailAndPassword, setDoc, doc, Timestamp, sendEmailVerification, onAuthStateChanged } from "./firebase-config.js";
     
-        $(document).ready(function () {
-            console.log("📌 jQuery siap digunakan!");
+       // Show description text area for "Other" selection in Car Make
+function showOtherCarDescription() {
+    const carCompanySelect = document.getElementById("car_company");
+    const otherCarCompany = document.getElementById("otherCarCompany");
+
+    if (carCompanySelect.value === "Other") {
+        otherCarCompany.style.display = "block"; // Show the text area for description
+    } else {
+        otherCarCompany.style.display = "none"; // Hide it if not selected
+    }
+}
+
+// Show description text area for "Other" selection in Car Model
+function showOtherModelDescription() {
+    const carModelSelect = document.getElementById("car_model");
+    const otherCarModel = document.getElementById("otherCarModel");
+
+    if (carModelSelect.value === "Other") {
+        otherCarModel.style.display = "block"; // Show the text area for description
+    } else {
+        otherCarModel.style.display = "none"; // Hide it if not selected
+    }
+}
+
+// Initialize when the page is loaded
+$(document).ready(function () {
+    console.log("📌 jQuery is ready!");
+
+    // Bind onchange events to the dropdowns for "Other"
+    $('#car_company').change(showOtherCarDescription);
+    $('#car_model').change(showOtherModelDescription);
+
+    // Initial check to see if the "Other" option is selected
+    showOtherCarDescription();
+    showOtherModelDescription();
     
-            $("#signup").validate({
-                rules: {
-                    username: { required: true },
-                    useremail: { required: true, email: true },
-                    vehicle_no: { required: true },
-                    car_model: { required: true },
-                    car_company: { required: true },
-                    dob: { required: true },
-                    handnumber: { required: true, digits: true, minlength: 10 },
-                    insaurance: { required: true },
-                    password: { required: true, minlength: 6 },
-                    confirm_password: { required: true, equalTo: "#password" }
-                },
-                messages: {
-                    username: "Nama wajib diisi",
-                    useremail: "Masukkan email yang valid",
-                    vehicle_no: "Masukkan nomor kendaraan",
-                    car_model: "Masukkan model mobil",
-                    car_company: "Masukkan perusahaan mobil",
-                    dob: "Pilih tanggal lahir",
-                    handnumber: "Masukkan nomor handphone yang valid",
-                    insaurance: "Masukkan informasi asuransi",
-                    password: "Minimal 6 karakter",
-                    confirm_password: "Password tidak cocok"
-                },
-                submitHandler: function (form, event) {
-                    event.preventDefault(); 
-                    $('.loading').css('display', 'block'); 
- 
-                    const email = $('#useremail').val();
-                    const password = $('#password').val();
-                    const username = $('#username').val();
-                    const vehicle_no = $('#vehicle_no').val();
-                    const car_model = $('#car_model').val();
-                    const insaurance = $('#insaurance').val();
-                    const car_company = $('#car_company').val();
-                    const dob = $('#dob').val();
-                    const handnumber = $('#handnumber').val();
-                    const myTimestamp = Timestamp.fromDate(new Date());
-    
-                    console.log("📌 Mulai proses registrasi...");
+    // Registration form validation
+    $("#signup").validate({
+        submitHandler: function (form, event) {
+            event.preventDefault(); 
+            $('.loading').css('display', 'block'); 
 
-                    createUserWithEmailAndPassword(auth, email, password)
-                        .then(cred => {
-                            console.log("✅ User berhasil dibuat dengan UID:", cred.user.uid);
-                            const userId = cred.user.uid;
-    
-                            return sendEmailVerification(cred.user).then(() => userId);
-                        })
-                        .then((userId) => {
-                            console.log("📧 Email verifikasi telah dikirim!");
-    
+            const email = $('#useremail').val();
+            const password = $('#password').val();
+            const username = $('#username').val();
+            const vehicle_no = $('#vehicle_no').val();
+            const car_model = $('#car_model').val();
+            const insaurance = $('#insaurance').val();
+            const car_company = $('#car_company').val();
+            const dob = $('#dob').val();
+            const handnumber = $('#handnumber').val();
+            const myTimestamp = Timestamp.fromDate(new Date());
 
-                            return setDoc(doc(db, "Users", userId), {
-                                userName: username,
-                                email: email,
-                                userID: userId,
-                                dob: dob,
-                                createdAt: myTimestamp,
-                                carPlate: vehicle_no,
-                                InsExpMonth: insaurance,
-                                userContact: handnumber,
-                                emailVerified: false 
-                            }).then(() => userId);
-                        })
-                        .then((userId) => {
-                            console.log("✅ Data user berhasil disimpan");
-    
+            let carCompanyDescription = '';
+            let carModelDescription = '';
 
-                            return setDoc(doc(db, "carPlates", vehicle_no), {
-                                carModel: car_model,
-                                carBrand: car_company,
-                                carPlate: vehicle_no,
-                                InsExpMonth: insaurance,
-                                userID: userId
-                            });
-                        })
-						.then(() => {
-    console.log("🚀 Semua data berhasil disimpan, menunggu verifikasi email...");
-    $('.loading').css('display', 'none');
+            // If "Other" is selected, capture the description text
+            if (car_company === "Other") {
+                carCompanyDescription = $('#otherCarCompany').val();
+            }
 
-    Swal.fire({
-        title: "📧 Email has been sent",
-        text: "Please verify your email before login.",
-        icon: "info",
-        background: "#fffa90", 
-        color: "#000", 
-        confirmButtonColor: "#ffcc00",
-        confirmButtonText: "OK"
-    }).then((result) => {
-        if (result.isConfirmed) {
-            console.log("🔄 Mulai pengecekan email verifikasi setiap 3 detik...");
+            if (car_model === "Other") {
+                carModelDescription = $('#otherCarModel').val();
+            }
 
-            const checkVerification = setInterval(async () => {
-                try {
-                    await auth.currentUser.reload(); 
-                    
-                    if (auth.currentUser.emailVerified) {
-                        console.log("✅ Email telah diverifikasi!");
-                        clearInterval(checkVerification); 
+            console.log("📌 Starting registration process...");
 
-                        await updateDoc(doc(db, "Users", auth.currentUser.uid), {
-                            emailVerified: true
-                        });
+            createUserWithEmailAndPassword(auth, email, password)
+                .then(cred => {
+                    console.log("✅ User created with UID:", cred.user.uid);
+                    const userId = cred.user.uid;
 
-                        Swal.fire({
-                            title: "✅ Email Verified!",
-                            text: "Your account has been verified, redirecting to profile page.",
-                            icon: "success",
-                            background: "#ccffcc", 
-                            color: "#000",
-                            confirmButtonColor: "#44cc44",
-                            confirmButtonText: "OK"
-                        }).then(() => {
-                            console.log("🔀 Redirecting to /profile...");
-                            window.location.href = "/profile"; 
-                        });
-                    }
-                } catch (error) {
-                    console.error("❌ Error checking email verification:", error);
-                }
-            }, 3000);
+                    return sendEmailVerification(cred.user).then(() => userId);
+                })
+                .then((userId) => {
+                    console.log("📧 Verification email sent!");
+
+                    return setDoc(doc(db, "Users", userId), {
+                        userName: username,
+                        email: email,
+                        userID: userId,
+                        dob: dob,
+                        createdAt: myTimestamp,
+                        carPlate: vehicle_no,
+                        InsExpMonth: insaurance,
+                        userContact: handnumber,
+                        emailVerified: false
+                    }).then(() => userId);
+                })
+                .then((userId) => {
+                    console.log("✅ User data saved");
+
+                    // Save car make and model data, including the descriptions if "Other" is selected
+                    return setDoc(doc(db, "carPlates", vehicle_no), {
+                        carModel: car_model,
+                        carBrand: car_company,
+                        carPlate: vehicle_no,
+                        InsExpMonth: insaurance,
+                        userID: userId,
+                        carCompanyDescription: carCompanyDescription,  // Save the description for 'Other'
+                        carModelDescription: carModelDescription       // Save the description for 'Other'
+                    });
+                })
+                .then(() => {
+                    console.log("🚀 All data saved, waiting for email verification...");
+                    $('.loading').css('display', 'none');
+
+                    Swal.fire({
+                        title: "📧 Email has been sent",
+                        text: "Please verify your email before login.",
+                        icon: "info",
+                        background: "#fffa90", 
+                        color: "#000", 
+                        confirmButtonColor: "#ffcc00",
+                        confirmButtonText: "OK"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            console.log("🔄 Checking email verification every 3 seconds...");
+
+                            const checkVerification = setInterval(async () => {
+                                try {
+                                    await auth.currentUser.reload(); 
+                                    
+                                    if (auth.currentUser.emailVerified) {
+                                        console.log("✅ Email verified!");
+                                        clearInterval(checkVerification); 
+
+                                        await updateDoc(doc(db, "Users", auth.currentUser.uid), {
+                                            emailVerified: true
+                                        });
+
+                                        Swal.fire({
+                                            title: "✅ Email Verified!",
+                                            text: "Your account has been verified, redirecting to profile page.",
+                                            icon: "success",
+                                            background: "#ccffcc", 
+                                            color: "#000",
+                                            confirmButtonColor: "#44cc44",
+                                            confirmButtonText: "OK"
+                                        }).then(() => {
+                                            console.log("🔀 Redirecting to /profile...");
+                                            window.location.href = "/profile"; 
+                                        });
+                                    }
+                                } catch (error) {
+                                    console.error("❌ Error checking email verification:", error);
+                                }
+                            }, 3000);
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error("🔥 Error during registration process:", error.message);
+                    alert(error.message);
+                    $('.loading').css('display', 'none');
+                });
+
+            return false;
         }
     });
-})
-                        .catch(error => {
-                            console.error("🔥 Error selama proses registrasi:", error.message);
-                            alert(error.message);
-                            $('.loading').css('display', 'none');
-                        });
-    
-                    return false; 
-                }
-            });
-        });
+});
+
     </script>
     
-
-
-
 	<script>
+
 		function get_model() {
 			var car_make = $('#car_company').val();
 			var remove_space = car_make.replace(/ /g, '')
