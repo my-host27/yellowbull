@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile - Yellow Bull</title>
 
+   
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 
@@ -60,7 +61,6 @@
         .table td {
             font-size: 15px;
             font-weight: 600;
-            padding: 8px;
         }
 
         .deleteMembershipBtn{
@@ -121,8 +121,6 @@
             .table td {
                 font-size: 14px;
                 /* Ukuran teks di tabel lebih kecil */
-                padding: 8px;
-                /* Padding lebih kecil */
             }
 
             .btn {
@@ -177,13 +175,13 @@
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+   
     <script type="module">
         import {
             auth, db, onAuthStateChanged, doc, getDoc, updateDoc, collection, Timestamp, getDocs, onSnapshot,
             sendEmailVerification, updateEmail, reauthenticateWithCredential, EmailAuthProvider, verifyBeforeUpdateEmail, logoutUser, storage, ref, uploadBytes, getDownloadURL
         } from "./firebase-config.js";
-
+    
         document.getElementById("loadingScreen").style.display = "flex";
 
         const membershipPriceMap = {
@@ -299,6 +297,7 @@
                     membershipStatus.style.marginTop = "10px";
                     purchaseBtn.parentNode.insertBefore(membershipStatus, purchaseBtn.nextSibling);
                 }
+                const deleteButton = document.querySelector(".deleteMembershipBtn");
 
                 if (userData.membership && userData.membership !== "Expired") {
                     purchaseBtn.innerText = userData.membership;
@@ -318,6 +317,7 @@
                     } else {
                         membershipStatus.innerText = `✅ Membership active`;
                     }
+                    if (deleteButton) deleteButton.style.display = "block";
                 } else {
                     purchaseBtn.innerText = "Purchase Plan";
                     purchaseBtn.setAttribute("href", "/plans");
@@ -325,7 +325,9 @@
                     purchaseBtn.classList.remove("btn-success");
                     purchaseBtn.style.cursor = "pointer";
                     membershipStatus.innerText = "";
+                    if (deleteButton) deleteButton.style.display = "none";
                 }
+                
             }
 
             function loadAdminDashboard() {
@@ -392,6 +394,8 @@
   </div>
 
   <button id="deleteExpiredBtn" class="btn btn-danger mt-3 mt-md-0">Delete Expired Members</button>
+
+
 </div>
 
 <!-- New summary bar for count and total -->
@@ -405,12 +409,12 @@
                         <thead class="thead-dark">
                             <tr>
                            <th style="width: 15%;">Name</th>
-                        <th style="width: 25%;">Email</th>
+                        <th style="width: 20%;">Email</th>
                         <th style="width: 15%;">Membership</th>
                         <th style="width: 10%;">Price</th>
                         <th style="width: 10%;">Payment Status</th>
                         <th style="width: 10%;">Payment Method</th> <!-- New column -->
-                        <th style="width: 30%;">Upload Payment Proof</th>
+                        <th style="width: 15%;">Upload Payment Proof</th>
                             </tr>
                         </thead>
                         <tbody id="userTableBody"></tbody>
@@ -524,6 +528,8 @@
     checkMembershipExpiration();  // Cek lagi setelah load
 }, 1000);
 
+
+
                 setTimeout(() => {
                     const logoutBtn = document.getElementById("logoutbtn");
                     if (logoutBtn) {
@@ -568,6 +574,8 @@
     membership: user.membership ? user.membership.toLowerCase() : null
 }));
                         const membership = user.membership || "None";
+
+
                         const paymentStatus = user.paymentStatus || "Not Paid";
                         const paymentDescription = user.paymentDescription
                         const proofImage = user.proofImage
@@ -577,39 +585,36 @@
                         const price = membershipPriceMap[membership] || "-";
                         updatePaymentMethodUI(userId, paymentMethod, paymentDescription);
                         userListHTML += `
- <tr id="user-${docSnap.id}" data-price="${price.replace(/[^\d]/g, '')}">
-  <td>${user.userName || "Unknown"}</td>
-  <td>${user.email || "No Email"}</td>
- <td class="membership-actions">
-        <button class="btn btn-${membership === "Expired" ? "danger" : "info"} btn-sm selectMembership" data-userid="${docSnap.id}">
-            ${membership}
-        </button>
- <!-- Show delete button only if membership is not expired -->
-      ${membership !== "Expired" ? `
-      <button class="btn btn-danger btn-sm deleteMembershipBtn" data-userid="${docSnap.id}" title="Delete Membership">
-        Delete
-      </button>` : ''}
-    </td>
-  <td>${price}</td>
-   <td>${user.paymentStatus || "Not Paid"}</td>
-   <td>
-    <button class="btn btn-info btn-sm selectPaymentMethod" data-userid="${docSnap.id}">
-        ${paymentMethod === "Not Selected" ? "Select Payment Method" : paymentMethod}
-    </button>
-    <!-- Add description below payment method if it exists and payment method is "Other" -->
-    ${paymentMethod === "Other" && paymentDescription && paymentDescription.trim() !== "" 
-        ? `<p style="font-size: 12px; color: #555; margin-top: 5px;">${paymentDescription}</p>` 
-        : ''}
-</td>
-
-  <td>
-    ${proofImage}
-    <input type="file" class="form-control-file uploadProof" data-userid="${docSnap.id}">
-  </td>
-</tr>
-`;
-
-                    });
+                <tr id="user-${docSnap.id}" data-price="${price.replace(/[^\d]/g, '')}">
+                    <td>${user.userName || "Unknown"}</td>
+                    <td>${user.email || "No Email"}</td>
+                    <td class="membership-actions">
+                        <button class="btn btn-${membership === "Expired" ? "danger" : "info"} btn-sm selectMembership" data-userid="${docSnap.id}">
+                            ${membership}
+                        </button>
+                        <!-- Show delete button only if membership is not expired or none -->
+                        ${membership !== "Expired" && membership !== "None" ? `
+                            <button class="btn btn-danger btn-sm deleteMembershipBtn" data-userid="${docSnap.id}" title="Delete Membership">
+                                Delete
+                            </button>` : ''}
+                    </td>
+                    <td>${price}</td>
+                    <td>${user.paymentStatus || "Not Paid"}</td>
+                    <td>
+                        <button class="btn btn-info btn-sm selectPaymentMethod" data-userid="${docSnap.id}">
+                            ${paymentMethod === "Not Selected" ? "Select Payment Method" : paymentMethod}
+                        </button>
+                        ${paymentMethod === "Other" && paymentDescription && paymentDescription.trim() !== "" 
+                            ? `<p style="font-size: 12px; color: #555; margin-top: 5px;">${paymentDescription}</p>` 
+                            : ''}
+                    </td>
+                    <td>
+                        ${proofImage}
+                        <input type="file" class="form-control-file uploadProof" data-userid="${docSnap.id}">
+                    </td>
+                </tr>
+            `;
+        });
 
                     const currentFilter = document.getElementById("membershipFilter").value;
                     const currentSearch = document.getElementById("searchInput").value;
@@ -672,6 +677,8 @@
         };
     });
 });
+
+
 
 async function savePaymentMethodToFirestore(userId, paymentMethod, description) {
     const userRef = doc(db, "Users", userId);
@@ -745,9 +752,11 @@ document.querySelectorAll('.deleteMembershipBtn').forEach(button => {
             membershipButton.classList.remove('btn-info');
             membershipButton.classList.add('btn-secondary');
 
-            // Hide the delete button
-            deleteButton.style.display = 'none';  // Hide the delete button
-            
+            // Remove the delete button entirely from the DOM
+            if (deleteButton) {
+                deleteButton.remove();  // Remove the delete button from the DOM
+            }
+
             Swal.fire({
                 title: "✅ Membership Deleted!",
                 text: "The membership has been successfully deleted.",
