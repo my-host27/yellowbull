@@ -175,12 +175,15 @@
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.2.0/exceljs.min.js"></script>
+
    
     <script type="module">
         import {
             auth, db, onAuthStateChanged, doc, getDoc, updateDoc, collection, Timestamp, getDocs, onSnapshot,
             sendEmailVerification, updateEmail, reauthenticateWithCredential, EmailAuthProvider, verifyBeforeUpdateEmail, logoutUser, storage, ref, uploadBytes, getDownloadURL
         } from "./firebase-config.js";
+
     
         document.getElementById("loadingScreen").style.display = "flex";
 
@@ -393,7 +396,8 @@
     <input type="text" id="searchInput" class="form-control" placeholder="Search name or email...">
   </div>
 
-  <button id="deleteExpiredBtn" class="btn btn-danger mt-3 mt-md-0">Delete Expired Members</button>
+  <button id="deleteExpiredBtn" class="btn btn-danger mt-3 mt-md-0">Delete Expired Members</button>/
+  <button id="downloadCSV" class="btn btn-primary mt-3">Download CSV</button>
 
 
 </div>
@@ -806,8 +810,136 @@ async function updatePaymentMethodUI(userId, paymentMethod, paymentDescription) 
     }
 }
 
+document.getElementById('downloadCSV').addEventListener('click', async function() {
+    try {
+        // Start loading screen (optional)
 
-// Ensure description input visibility is dynamically controlled based on selection
+        // Get all users from Firestore
+        const usersRef = collection(db, "Users");
+        const querySnapshot = await getDocs(usersRef);
+
+        let data = [];
+        const headers = [
+            'No.', 'Name', 'Handphone', 'Car Plate', 'Email', 'Birthday Month',
+            'Insurance Expiry Month', 'Car Make', 'Car Model'
+        ];
+
+        // Add headers to data array
+        data.push(headers);
+
+        // Loop through each document (user data) and collect necessary information
+        let rowNumber = 1; // Start numbering from 1
+        for (const docSnap of querySnapshot.docs) {
+            const user = docSnap.data();
+
+            // Exclude users with role 'admin'
+            if (user.role && user.role === "admin") {
+                continue; // Skip the current iteration if the role is 'admin'
+            }
+
+            // Add a check to ensure `carPlate` exists before querying carPlates
+            let carData = {};
+            if (user.carPlate) {
+                const carPlateRef = doc(db, "carPlates", user.carPlate);
+                const carSnap = await getDoc(carPlateRef);
+                carData = carSnap.exists() ? carSnap.data() : {};
+            }
+
+            const userData = [
+                rowNumber++, // Increment row number for each user
+                user.userName || "Unknown", // Name
+                user.userContact || "Not Available", // Handphone
+                user.carPlate || "Not Available", // Car Plate
+                user.email || "Not Available", // Email
+                user.dob || "Not Available", // Birthday Month
+                user.InsExpMonth || "Not Available", // Insurance Expiry Month
+                carData.carBrand || "Not Available", // Car Make
+                carData.carModel || "Not Available" // Car Model
+            ];
+
+            // Add row data to the data array
+            data.push(userData);
+        }
+
+        // Create a new Excel workbook
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('User Data');
+
+        // Add columns to the worksheet with auto width for "No."
+        worksheet.columns = headers.map((header, index) => ({
+            header: header,
+            key: header,
+            width: index === 0 ? 10 : 20  // Set a smaller width for 'No.' and larger for others
+        }));
+
+        // Add rows to the worksheet
+        data.slice(1).forEach(row => {
+            worksheet.addRow(row);
+        });
+
+        // Style headers (set background color, bold, center text, etc.)
+        worksheet.getRow(1).eachCell((cell) => {
+            cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true }; // Center the text and wrap text
+            cell.font = { bold: true, size: 12 }; // Make the font bold and larger
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'BEBEBE' } // Light gray background color
+            };
+        });
+
+        // Apply border around the table and wrap text for all cells
+        worksheet.eachRow((row) => {
+            row.eachCell((cell) => {
+                cell.border = {
+                    top: { style: 'thin' },
+                    left: { style: 'thin' },
+                    bottom: { style: 'thin' },
+                    right: { style: 'thin' }
+                };
+                cell.alignment = { wrapText: true, horizontal: 'center', vertical: 'middle' }; // Enable text wrapping and center alignment for each cell
+            });
+        });
+
+        // Get the current date and time to use in the filename (local time)
+        const now = new Date();
+        const dateStr = now.toLocaleString('en-US', {
+            weekday: 'short',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        }).replace(/[^\w\s]/g, '_'); // Format as: Weekday_YYYY_MM_DD_HH_MM_SS
+
+        // Set up the response and filename
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+        // Create a link element to trigger the download
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `yellowbull_data_${dateStr}.xlsx`; // Filename includes date and time
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+    } catch (error) {
+        console.error("Error exporting data:", error);
+        Swal.fire({
+            title: "❌ Error",
+            text: "An error occurred while exporting data.",
+            icon: "error",
+            confirmButtonColor: "#ff4444"
+        });
+
+        // Hide loading screen (optional)
+        document.getElementById("loadingScreen").style.display = "none";
+    }
+});
+
 document.getElementById("paymentMethodSelect").addEventListener("change", function() {
     const paymentDescriptionInput = document.getElementById("paymentDescriptionInput");
     if (this.value === "Other") {
