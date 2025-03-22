@@ -573,6 +573,8 @@
                     const querySnapshot = await getDocs(usersRef);
                     let userListHTML = "";
 
+                      proofImages = [];
+
                     querySnapshot.forEach((docSnap) => {
                         const user = docSnap.data();
                         if (user.role === "admin") return;
@@ -1194,50 +1196,65 @@ document.getElementById("paymentMethodSelect").addEventListener("change", functi
             });
 
             $(document).on("click", "img[alt='Proof']", function () {
-                const imgSrc = $(this).attr("src");
-                const userRow = $(this).closest("tr");
-                const userId = userRow.attr("id").replace("user-", "");
-                const userName = userRow.find("td:first-child").text();
+    const imgSrc = $(this).attr("src");
+    const userRow = $(this).closest("tr");
+    const userId = userRow.attr("id").replace("user-", "");
+    const userName = userRow.find("td:first-child").text();
 
-                const clickedIndex = proofImages.findIndex(p => p.url === imgSrc);
+    // Filter to get the latest proof image for each user
+    const latestProofImagesMap = {};
 
-                if (clickedIndex === -1) {
-                    Swal.fire("❌ Image not found in preview list", "", "error");
-                    return;
-                }
+    proofImages.forEach((imgObj) => {
+        // Update map with the latest image for each user
+        if (!latestProofImagesMap[imgObj.userId] || imgObj.uploadedAt > latestProofImagesMap[imgObj.userId].uploadedAt) {
+            latestProofImagesMap[imgObj.userId] = imgObj;
+        }
+    });
 
-                const carouselInner = $("#carouselInner");
-                const carouselIndicators = $("#carouselIndicators");
+    // Get an array of the latest proof images
+    const latestProofImages = Object.values(latestProofImagesMap);
 
-                carouselInner.html(proofImages.map((imgObj, index) => `
+    // Find the index of the clicked image
+    const clickedIndex = latestProofImages.findIndex(p => p.url === imgSrc);
+
+    if (clickedIndex === -1) {
+        Swal.fire("❌ Image not found in preview list", "", "error");
+        return;
+    }
+
+    const carouselInner = $("#carouselInner");
+    const carouselIndicators = $("#carouselIndicators");
+
+    // Update carousel items and indicators with the latest proof images
+    carouselInner.html(latestProofImages.map((imgObj, index) => `
         <div class="carousel-item ${index === clickedIndex ? 'active' : ''}">
             <img class="d-block w-100" src="${imgObj.url}" alt="${imgObj.userName}">
         </div>
     `).join(""));
 
-                carouselIndicators.html(proofImages.map((_, index) => `
+    carouselIndicators.html(latestProofImages.map((_, index) => `
         <li data-target="#proofCarousel" data-slide-to="${index}" ${index === clickedIndex ? 'class="active"' : ''}></li>
     `).join(""));
 
-                $('#previewModal').modal('show');
-                $('#proofCarousel').carousel(clickedIndex);
+    $('#previewModal').modal('show');
+    $('#proofCarousel').carousel(clickedIndex);
 
-                const updatePreviewMeta = (index) => {
-                    const imgData = proofImages[index];
-                    const uploadTime = imgData.uploadedAt
-                        ? new Date(imgData.uploadedAt).toLocaleString()
-                        : "Unknown time";
-                    $("#previewMeta").text(`${imgData.userName} - ${uploadTime}`);
-                };
+    // Update preview metadata
+    const updatePreviewMeta = (index) => {
+        const imgData = latestProofImages[index];
+        const uploadTime = imgData.uploadedAt
+            ? new Date(imgData.uploadedAt).toLocaleString()
+            : "Unknown time";
+        $("#previewMeta").text(`${imgData.userName} - ${uploadTime}`);
+    };
 
-                updatePreviewMeta(clickedIndex);
+    updatePreviewMeta(clickedIndex);
 
-                $('#proofCarousel').on('slide.bs.carousel', function (e) {
-                    const nextIndex = $(e.relatedTarget).index();
-                    updatePreviewMeta(nextIndex);
-                });
-            });
-
+    $('#proofCarousel').on('slide.bs.carousel', function (e) {
+        const nextIndex = $(e.relatedTarget).index();
+        updatePreviewMeta(nextIndex);
+    });
+});
 
             function openMembershipModal(userId) {
                 $("#membershipModal").modal("show");
