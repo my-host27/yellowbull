@@ -183,7 +183,7 @@
     <script type="module">
         import {
             auth, db, onAuthStateChanged, doc, getDoc, updateDoc, collection, Timestamp, getDocs, onSnapshot,
-            sendEmailVerification, updateEmail, reauthenticateWithCredential, EmailAuthProvider, verifyBeforeUpdateEmail, logoutUser, storage, ref, uploadBytes, getDownloadURL
+            sendEmailVerification, updateEmail, reauthenticateWithCredential, EmailAuthProvider, verifyBeforeUpdateEmail, logoutUser, storage, ref, uploadBytes, getDownloadURL, resetPassword
         } from "./firebase-config.js";
 
     
@@ -1492,6 +1492,47 @@ assignMembershipListeners();
                 }
             });
 
+            const resetPasswordBtn = document.getElementById("resetPasswordBtn");
+
+resetPasswordBtn.addEventListener("click", async () => {
+    const user = auth.currentUser;  // Get the currently logged in user
+
+    if (user) {
+        try {
+            // Send a password reset email to the user
+            await resetPassword(user.email);
+            
+            // Show success message
+            Swal.fire({
+                title: "✅ Reset Password Email Sent!",
+                text: "Please check your inbox to reset your password.",
+                icon: "info",
+                background: "#fffa90",
+                color: "#000",
+                confirmButtonColor: "#ffcc00"
+            });
+        } catch (error) {
+            // Handle errors
+            Swal.fire({
+                title: "❌ Failed to Send Reset Password Email",
+                text: error.message,
+                icon: "error",
+                background: "#ffcccc",
+                color: "#000",
+                confirmButtonColor: "#ff4444"
+            });
+        }
+    } else {
+        // User not logged in
+        Swal.fire({
+            title: "❌ Not Logged In",
+            text: "Please log in to reset your password.",
+            icon: "warning",
+            confirmButtonColor: "#ff4444"
+        });
+    }
+});
+
             // ✅ Pastikan `editProfileForm` sudah ada sebelum menambahkan event listener
             const checkEditForm = setInterval(() => {
                 const editForm = document.getElementById("editProfileForm");
@@ -1802,43 +1843,42 @@ z-index: 9999;">
         </div>
 
         <div class="modal fade" id="editProfileModal" tabindex="-1" role="dialog"
-            aria-labelledby="editProfileModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editProfileModalLabel">Edit Personal Information</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="editProfileForm">
-                            <div class="form-group">
-                                <label for="editUsername">Full Name</label>
-                                <input type="text" id="editUsername" class="form-control">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="editEmail">Email</label>
-                                <input type="email" id="editEmail" class="form-control">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="editPassword">New Password (Requires Verification)</label>
-                                <input type="password" id="editPassword" class="form-control" disabled>
-                                <small id="passwordNote" class="form-text text-muted">To update password, verify your
-                                    email first.</small>
-                            </div>
-
-                            <button type="button" id="verifyEmailBtn" class="btn btn-warning">Send Verification
-                                Email</button>
+        aria-labelledby="editProfileModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProfileModalLabel">Edit Personal Information</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editProfileForm">
+                        <div class="form-group">
+                            <label for="editUsername">Full Name</label>
+                            <input type="text" id="editUsername" class="form-control">
+                        </div>
+    
+                        <div class="form-group">
+                            <label for="editEmail">Email</label>
+                            <input type="email" id="editEmail" class="form-control">
+                        </div>
+    
+                        <!-- Removed New Password Section -->
+    
+                        <div class="form-group d-flex justify-content-start">
+                            <!-- Reset Password Button -->
+                            <button type="button" id="resetPasswordBtn" class="btn btn-danger" style="margin-right:10px;">Reset Password</button>
+                
+                            <!-- Update Profile Button -->
                             <button type="submit" class="btn btn-primary">Update Profile</button>
-                        </form>
-                    </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-
+    </div>
+    
     </section>
 
     <script>
