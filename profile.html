@@ -712,7 +712,11 @@ async function savePaymentMethodToFirestore(userId, paymentMethod, description) 
             icon: "success",
             confirmButtonColor: "#44cc44"
         });
-        
+
+        // Clear the description input field
+        document.getElementById("paymentDescriptionInput").value = "";
+        document.getElementById("paymentDescriptionInput").style.display = "none"; // Hide the input field
+
     } catch (error) {
         console.error("Error updating payment method:", error);
         Swal.fire({
@@ -723,7 +727,6 @@ async function savePaymentMethodToFirestore(userId, paymentMethod, description) 
         });
     }
 }
-
 document.querySelectorAll('.deleteMembershipBtn').forEach(button => {
     button.addEventListener('click', async (event) => {
         const userId = event.target.dataset.userid;
@@ -949,13 +952,15 @@ document.getElementById('downloadCSV').addEventListener('click', async function(
 
 document.getElementById("paymentMethodSelect").addEventListener("change", function() {
     const paymentDescriptionInput = document.getElementById("paymentDescriptionInput");
-    if (this.value === "Other") {
-        paymentDescriptionInput.style.display = "block";
+
+    // Clear any previously entered description when switching payment method
+    if (this.value !== "Other") {
+        paymentDescriptionInput.style.display = "none"; // Hide the description input if it's not "Other"
+        paymentDescriptionInput.value = "";  // Clear the previous description
     } else {
-        paymentDescriptionInput.style.display = "none";
+        paymentDescriptionInput.style.display = "block"; // Show the description input for "Other"
     }
 });
-
 
                     function uploadProofHandler(input) {
                         input.addEventListener("change", async (e) => {
