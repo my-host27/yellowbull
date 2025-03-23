@@ -203,8 +203,6 @@
 
         document.addEventListener("DOMContentLoaded", function () {
             const userTable = document.getElementById("userTableBody");
-            
-            loadAllUsers();
 
             // ✅ Pastikan `auth` sudah terinisialisasi sebelum menjalankan listener
             const checkAuth = setInterval(() => {
@@ -214,6 +212,29 @@
                 }
             }, 500);
 
+            const logoutBtn = document.getElementById("logoutBtn");
+
+// Check if the logout button exists
+if (logoutBtn) {
+    logoutBtn.addEventListener("click", function (event) {
+        event.preventDefault();  // Prevent default behavior of the button
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You will be logged out.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#ff4444",
+            cancelButtonColor: "#ccc",
+            confirmButtonText: "Yes, log out"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                logoutUser();  // Perform logout action
+            }
+        });
+    });
+} else {
+    console.log("Logout button not found");
+}
             function setupAuthListener() {
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
