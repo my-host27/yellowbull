@@ -203,6 +203,8 @@
 
         document.addEventListener("DOMContentLoaded", function () {
             const userTable = document.getElementById("userTableBody");
+            
+            loadAllUsers();
 
             // ✅ Pastikan `auth` sudah terinisialisasi sebelum menjalankan listener
             const checkAuth = setInterval(() => {
@@ -645,9 +647,7 @@
             `;
                     });
 
-                    const currentFilter = document.getElementById("membershipFilter").value;
-                    const currentSearch = document.getElementById("searchInput").value;
-
+                  
 
                     document.getElementById("userTableBody").innerHTML = userListHTML;
                     $('#proofCarousel').carousel({
@@ -655,8 +655,7 @@
                         wrap: true
                     });
 
-                    document.getElementById("membershipFilter").value = currentFilter;
-                    document.getElementById("searchInput").value = currentSearch;
+                  
                     filterTable();
                     $('#proofCarousel').carousel(0);  // Reset ke slide pertama
                     document.getElementById("membershipFilter").addEventListener("change", () => {
@@ -1028,70 +1027,10 @@
 
                     });
 
-                    document.getElementById("membershipFilter").addEventListener("change", filterTable);
-                    document.getElementById("searchInput").addEventListener("input", filterTable);
+              
+                    
                     document.getElementById("deleteExpiredBtn").addEventListener("click", deleteExpiredMembers);
-
-                    function filterTable() {
-                        const filterValue = document.getElementById("membershipFilter").value.toLowerCase();
-                        const searchValue = document.getElementById("searchInput").value.toLowerCase();
-                        const rows = document.querySelectorAll("#userTableBody tr");
-                        checkMembershipExpiration();
-                        let visibleCount = 0;
-                        let totalPrice = 0;
-                        const now = new Date();
-                        const sevenDays = 7 * 24 * 60 * 60 * 1000;  // 7 hari dalam ms
-
-                        assignMembershipListeners();
-
-                        rows.forEach(row => {
-                            const name = row.querySelector("td:nth-child(1)").innerText.toLowerCase();
-                            const email = row.querySelector("td:nth-child(2)").innerText.toLowerCase();
-                            const membershipButton = row.querySelector("td:nth-child(3) button");
-                            const membership = membershipButton.innerText.toLowerCase();
-
-                            let showRow = false;
-
-                            if (filterValue === "all") {
-                                showRow = true;
-                            } else if (filterValue === "renew") {
-                                const userId = row.id.replace("user-", "");
-                                const userData = JSON.parse(localStorage.getItem(`userData-${userId}`));  // ⬅️ Simpan userData saat loadAllUsers
-                                if (userData && userData.membershipEnd && userData.membership !== "expired") {
-                                    const endDate = new Date(userData.membershipEnd);
-                                    const timeLeft = endDate - now;
-                                    if (timeLeft > 0 && timeLeft <= sevenDays) {
-                                        showRow = true;
-                                    }
-                                }
-                            } else {
-                                showRow = membership === filterValue;
-                            }
-
-                            const matchSearch = name.includes(searchValue) || email.includes(searchValue);
-
-                            if (showRow && matchSearch) {
-                                row.style.display = "";
-                                visibleCount++;
-
-                                const priceStr = row.getAttribute("data-price");
-                                const priceNum = parseFloat(priceStr);
-                                if (!isNaN(priceNum)) {
-                                    totalPrice += priceNum;
-                                }
-                            } else {
-                                row.style.display = "none";
-                            }
-                        });
-
-                        document.getElementById("userCount").innerText = `Total Users: ${visibleCount}`;
-                        document.getElementById("totalPrice").innerText = `Total Price: $${totalPrice}`;
-                    }
-
-                    document.getElementById("membershipFilter").addEventListener("change", async () => {
-                        await loadAllUsers();  // Fetch ulang data
-                    });
-
+                  
                     async function deleteExpiredMembers() {
                         const confirm = await Swal.fire({
                             title: "Delete All Expired?",
@@ -1118,7 +1057,6 @@
                         Swal.fire("Deleted!", "All expired members have been deleted.", "success");
                         loadAllUsers();
                     }
-
 
                     document.querySelectorAll("img[alt='Proof']").forEach(img => {
                         img.addEventListener("click", () => {
@@ -1271,6 +1209,94 @@
                     updatePreviewMeta(nextIndex);
                 });
             });
+
+
+            const currentFilter = document.getElementById("membershipFilter").value;
+                    const currentSearch = document.getElementById("searchInput").value;
+
+            document.getElementById("membershipFilter")
+                    document.getElementById("searchInput")
+
+                    membershipFilter.addEventListener("change", filterTable);  // Trigger when the filter selection changes
+                    searchInput.addEventListener("input", filterTable);      
+
+                    function filterTable() {
+    loadAllUsers(); // Load the users when the filter is applied
+
+    const filterValue = document.getElementById("membershipFilter").value.toLowerCase();  // Get the selected membership filter value
+    const searchValue = document.getElementById("searchInput").value.toLowerCase();        // Get the current search input value
+    const rows = document.querySelectorAll("#userTableBody tr");  // Get all rows in the table body
+
+    let visibleCount = 0;  // Track how many rows are visible after applying the filter
+    let totalPrice = 0;    // Track total price of visible rows (if applicable)
+
+    rows.forEach(row => {
+        const name = row.querySelector("td:nth-child(1)").innerText.toLowerCase();  // Name of the user
+        const email = row.querySelector("td:nth-child(2)").innerText.toLowerCase(); // Email of the user
+        const membershipButton = row.querySelector("td:nth-child(3) button"); // The membership button
+        const membership = membershipButton.innerText.toLowerCase();  // Get the membership type (e.g., "Active", "Expired")
+        const price = row.getAttribute("data-price");  // Get the price of the user (set as data attribute in loadAllUsers)
+        let showRow = false;
+
+        // Apply membership filter (check if the row matches the selected filter value)
+        if (filterValue === "all" || membership === filterValue) {
+            showRow = true;
+            const userId = row.id.split('user-')[1];
+            const userData = JSON.parse(localStorage.getItem(`userData-${userId}`));
+            if (userData && userData.membershipEnd && userData.membership !== "Expired") {
+                const endDate = new Date(userData.membershipEnd);
+                const timeLeft = endDate - new Date();
+                const sevenDays = 7 * 24 * 60 * 60 * 1000;  // 7 days in ms
+
+                // Show Renew button if the membership is about to expire (within 7 days)
+                if (timeLeft <= sevenDays && timeLeft > 0) {
+                    showRow = true;
+                    showRenewButton(userId);  // Add renew button dynamically
+                }
+            }
+        } else if (filterValue === "renew") {
+            // Additional check for Renew membership status
+            const userId = row.id.split('user-')[1];
+            const userData = JSON.parse(localStorage.getItem(`userData-${userId}`));
+            if (userData && userData.membershipEnd && userData.membership !== "Expired") {
+                const endDate = new Date(userData.membershipEnd);
+                const timeLeft = endDate - new Date();
+                const sevenDays = 7 * 24 * 60 * 60 * 1000;  // 7 days in ms
+
+                // Show Renew button if the membership is about to expire (within 7 days)
+                if (timeLeft <= sevenDays && timeLeft > 0) {
+                    showRow = true;
+                    showRenewButton(userId);  // Add renew button dynamically
+                }
+            }
+        }
+
+        // Apply search filter (check if the row matches the search term in name or email)
+        const matchSearch = name.includes(searchValue) || email.includes(searchValue);
+
+        // If both filters match (membership filter and search term), show the row
+        if (showRow && matchSearch) {
+            row.style.display = "";  // Make the row visible
+            visibleCount++;
+
+            // Calculate the total price for the visible rows (if there's a price column or data attribute)
+            const priceNum = parseFloat(price);
+            if (!isNaN(priceNum)) {
+                totalPrice += priceNum;
+            }
+        } else {
+            row.style.display = "none";  // Hide the row if it doesn't match the filter or search
+        }
+    });
+
+    // Update the count of visible users and the total price in the UI
+    document.getElementById("userCount").innerText = `Total Users: ${visibleCount}`;
+    document.getElementById("totalPrice").innerText = `Total Price: $${totalPrice}`;
+}
+
+                    document.getElementById("membershipFilter").addEventListener("change", async () => {
+                        await loadAllUsers();  // Fetch ulang data
+                    });
 
             function openMembershipModal(userId) {
                 $("#membershipModal").modal("show");
