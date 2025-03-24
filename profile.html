@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile - Yellow Bull</title>
 
-   
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 
@@ -35,11 +35,19 @@
             vertical-align: middle !important;
         }
 
-        .selectMembership{
+        .selectMembership {
             margin-bottom: 5px;
         }
 
 
+        .table th:nth-child(2),
+            .table td:nth-child(2) {
+                max-width: 150px;
+                /* Batasi lebar kolom email */
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                white-space: normal;
+            }
 
         .custom-alert {
             position: fixed;
@@ -88,6 +96,7 @@
             background-color: rgba(0, 0, 0, 0.5);
             border-radius: 50%;
         }
+
         .carousel-inner img {
             max-height: 80vh;
             /* ⬅️ Maksimal 80% dari tinggi layar */
@@ -103,8 +112,9 @@
 
         @media (max-width: 767px) {
             .d-flex {
-    justify-content: space-between;
-  }
+                justify-content: space-between;
+            }
+
             .wallet_wrap {
                 width: 100%;
             }
@@ -179,14 +189,14 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.2.0/exceljs.min.js"></script>
 
-   
+
     <script type="module">
         import {
             auth, db, onAuthStateChanged, doc, getDoc, updateDoc, collection, Timestamp, getDocs, onSnapshot,
             sendEmailVerification, updateEmail, reauthenticateWithCredential, EmailAuthProvider, verifyBeforeUpdateEmail, logoutUser, storage, ref, uploadBytes, getDownloadURL, resetPassword
         } from "./firebase-config.js";
 
-    
+
         document.getElementById("loadingScreen").style.display = "flex";
 
         const membershipPriceMap = {
@@ -210,6 +220,29 @@
                 }
             }, 500);
 
+            const logoutBtn = document.getElementById("logoutBtn");
+
+// Check if the logout button exists
+if (logoutBtn) {
+    logoutBtn.addEventListener("click", function (event) {
+        event.preventDefault();  // Prevent default behavior of the button
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You will be logged out.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#ff4444",
+            cancelButtonColor: "#ccc",
+            confirmButtonText: "Yes, log out"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                logoutUser();  // Perform logout action
+            }
+        });
+    });
+} else {
+    console.log("Logout button not found");
+}
             function setupAuthListener() {
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
@@ -230,8 +263,10 @@
 
                                 if (carSnap.exists()) {
                                     const carData = carSnap.data();
-                                    document.getElementById("car_model").innerText = carData.carModel || "Not Available";
-                                    document.getElementById("car_brand").innerText = carData.carBrand || "Not Available";
+                                    document.getElementById("car_model").innerText = 
+    carData.carModel + (carData.carModelDescription ? " (" + carData.carModelDescription + ")" : "") || "Not Available";
+
+                                    document.getElementById("car_brand").innerText = carData.carBrand + (carData.carCompanyDescription ? " (" + carData.carCompanyDescription + ")" : "") || "Not Available";
                                 }
                             }
 
@@ -332,7 +367,7 @@
                     membershipStatus.innerText = "";
                     if (deleteButton) deleteButton.style.display = "none";
                 }
-                
+
             }
 
             function loadAdminDashboard() {
@@ -402,7 +437,7 @@
   <!-- Buttons for Delete and Download CSV -->
   <div class="d-flex flex-column flex-md-row ">
     <!-- Delete Expired Members Button -->
-    <button id="deleteExpiredBtn" class="btn btn-danger mt-3 mt-md-0 mr-md-2">Delete Expired Members</button>
+    <!-- <button id="deleteExpiredBtn" class="btn btn-danger mt-3 mt-md-0 mr-md-2">Delete Expired Members</button> -->
 
     <!-- Download CSV Button -->
     <button id="downloadCSV" class="btn btn-primary mt-3 mt-md-0">Download Excel</button>
@@ -419,12 +454,15 @@
                     <table class="table table-bordered">
                         <thead class="thead-dark">
                             <tr>
-                           <th style="width: 15%;">Name</th>
-                        <th style="width: 20%;">Email</th>
+                           <th style="width: 10%;">Name</th>
+                        <th style="width: 17%;">Email</th>
                         <th style="width: 15%;">Membership</th>
                         <th style="width: 10%;">Price</th>
-                        <th style="width: 10%;">Payment Status</th>
+                        <th style="width: 8%;">Payment Status</th>
+                        <th style="width: 10%;">Date Active</th>
+                        <th style="width: 10%;">Date Inactive</th>
                         <th style="width: 10%;">Payment Method</th> <!-- New column -->
+                        <th style="width: 20%;">About Car</th>
                         <th style="width: 15%;">Upload Payment Proof</th>
                             </tr>
                         </thead>
@@ -474,34 +512,39 @@
   </div>
 </div>
 
-        <!-- Modal untuk pilih membership -->
-        <div class="modal fade" id="membershipModal" tabindex="-1" role="dialog" aria-labelledby="membershipModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Select Membership</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <label for="membershipSelect">Choose Membership:</label>
-                        <select id="membershipSelect" class="form-control">
-                            <option value="4 Liters Mega Oil basic">4 Liters Mega Oil basic</option>
-                            <option value="4 Liters Mega Oil">4 Liters Mega Oil</option>
-                            <option value="5 Liters Mega Oil">5 Liters Mega Oil</option>
-                            <option value="4 Liters Castrol Oil">4 Liters Castrol Oil</option>
-                            <option value="5 Liters Castrol Oil">5 Liters Castrol Oil</option>
-                            <option value="Towing Package">Towing Package</option>
-                        </select>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" id="saveMembership">Save</button>
-                    </div>
-                </div>
+      <!-- Modal untuk pilih membership -->
+<div class="modal fade" id="membershipModal" tabindex="-1" role="dialog" aria-labelledby="membershipModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Select Membership</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label for="membershipSelect">Choose Membership:</label>
+                <select id="membershipSelect" class="form-control">
+                    <option value="4 Liters Mega Oil basic">4 Liters Mega Oil basic</option>
+                    <option value="4 Liters Mega Oil">4 Liters Mega Oil</option>
+                    <option value="5 Liters Mega Oil">5 Liters Mega Oil</option>
+                    <option value="4 Liters Castrol Oil">4 Liters Castrol Oil</option>
+                    <option value="5 Liters Castrol Oil">5 Liters Castrol Oil</option>
+                    <option value="Towing Package">Towing Package</option>
+                </select>
+
+                <!-- New input field for selecting the start date of the membership -->
+                <label for="membershipStartDate" class="mt-2">Select Start Date:</label>
+                <input type="date" id="membershipStartDate" class="form-control">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveMembership">Save</button>
             </div>
         </div>
+    </div>
+</div>
+
 
         <div class="modal fade" id="paymentMethodModal" tabindex="-1" role="dialog" aria-labelledby="paymentMethodModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -528,6 +571,63 @@
         </div>
     </div>
 </div>
+
+<!-- Edit Car Modal -->
+<div class="modal fade" id="editCarModal" tabindex="-1" role="dialog" aria-labelledby="editCarModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCarModalLabel">Edit Car Details & DOB</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Car Plate -->
+                <div class="form-group">
+                    <label for="editCarPlate">Car Plate</label>
+                    <input type="text" class="form-control" id="editCarPlate">
+                </div>
+                <!-- Car Brand -->
+                <div class="form-group">
+                    <label for="editCarBrand">Car Brand</label>
+                    <input type="text" class="form-control" id="editCarBrand">
+                </div>
+                <!-- Car Model -->
+                <div class="form-group">
+                    <label for="editCarModel">Car Model</label>
+                    <input type="text" class="form-control" id="editCarModel">
+                </div>
+                <!-- Car Description -->
+                <div class="form-group">
+                    <label for="editCarDescription">Car Description</label>
+                    <input type="text" class="form-control" id="editCarDescription">
+                </div>
+                <!-- Car Company -->
+                <div class="form-group">
+                    <label for="editCarCompany">Car Company</label>
+                    <input type="text" class="form-control" id="editCarCompany">
+                </div>
+                <!-- Insurance Expiry Month -->
+                <div class="form-group">
+                    <label for="editInsMonth">Insurance Expiry Month</label>
+                    <input type="text" class="form-control" id="editInsMonth">
+                </div>
+                <!-- DOB -->
+                <div class="form-group">
+                    <label for="editDOB">Date of Birth</label>
+                    <input type="text" class="form-control" id="editDOB">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveCarDetails">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
     `;
 
                 document.body.innerHTML = "";
@@ -535,9 +635,18 @@
                 document.body.insertAdjacentHTML("beforeend", adminDashboardHTML);
 
                 loadAllUsers();
+                
+                document.getElementById("membershipFilter").addEventListener("change", () => {
+    loadAllUsers(true); // fetch ulang + filter
+});
+
+document.getElementById("searchInput").addEventListener("input", () => {
+    loadAllUsers(true); // fetch ulang + filter
+});
                 setTimeout(() => {
-    checkMembershipExpiration();  // Cek lagi setelah load
-}, 1000);
+                    checkMembershipExpiration();  // Cek lagi setelah load
+                }, 1000);
+
 
 
 
@@ -567,37 +676,76 @@
             let proofImages = [];
 
             // **Fungsi untuk menampilkan semua user (khusus admin)**
-            async function loadAllUsers() {
+            async function loadAllUsers(applyFilter = false) {
                 try {
                     const usersRef = collection(db, "Users");
                     const querySnapshot = await getDocs(usersRef);
                     let userListHTML = "";
 
-                      proofImages = [];
+                    proofImages = [];
 
-                    querySnapshot.forEach((docSnap) => {
-                        const user = docSnap.data();
-                        if (user.role === "admin") return;
-                        const userId = docSnap.id;
-        const paymentMethod = docSnap.data().paymentMethod || "Not Selected";
-        
+                    for (const docSnap of querySnapshot.docs) {
+            const user = docSnap.data();
+            let carData = {};  // Initialize carData
 
-                        localStorage.setItem(`userData-${docSnap.id}`, JSON.stringify({
-    membershipEnd: user.membershipEnd ? user.membershipEnd.toDate() : null,
-    membership: user.membership ? user.membership.toLowerCase() : null
-}));
-                        const membership = user.membership || "None";
+            // Fetch car data if the carPlate exists
+            if (user.carPlate) {
+                const carRef = doc(db, "carPlates", user.carPlate);
+                const carSnap = await getDoc(carRef);
+                if (carSnap.exists()) {
+                    carData = carSnap.data();
+                }
+            }
 
+            // Skip admin users
+            if (user.role === "admin") continue;
 
-                        const paymentStatus = user.paymentStatus || "Not Paid";
-                        const paymentDescription = user.paymentDescription
-                        const proofImage = user.proofImage
-                            ? `<img src="${user.proofImage}" alt="Proof" style="width: 50px; height: 50px; cursor: pointer;">`
-                            : "No Image";
+            const userId = docSnap.id;
+            const paymentMethod = user.paymentMethod || "Not Selected";
+            const membershipStart = user.membershipStart 
+                ? user.membershipStart.toDate().toLocaleDateString('en-GB', {
+                    day: 'numeric', 
+                    month: 'long', 
+                    year: 'numeric'
+                })
+                : "Not Available";
 
-                        const price = membershipPriceMap[membership] || "-";
-                        updatePaymentMethodUI(userId, paymentMethod, paymentDescription);
-                        userListHTML += `
+            const membershipEnd = user.membershipEnd 
+                ? user.membershipEnd.toDate().toLocaleDateString('en-GB', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                })
+                : "Not Available";
+
+            const aboutCar = `
+                Plate: ${user.carPlate || "N/A"}<br>
+                Brand: ${carData.carBrand || "Other"}<br>
+                Model: ${carData.carModel || "Other"}<br>
+                Description: ${carData.carModelDescription || "Other"}<br>
+                Company: ${carData.carCompanyDescription || "Other"}<br>
+                Insurance Expiry: ${carData.InsExpMonth || "N/A"}<br>
+                DOB: ${user.dob || "N/A"}
+            `;
+
+            // Store user data in local storage
+            localStorage.setItem(`userData-${docSnap.id}`, JSON.stringify({
+                membershipEnd: user.membershipEnd ? user.membershipEnd.toDate() : null,
+                membership: user.membership ? user.membership.toLowerCase() : null
+            }));
+
+            const membership = user.membership || "None";
+            const paymentStatus = user.paymentStatus || "Not Paid";
+            const paymentDescription = user.paymentDescription;
+            const proofImage = user.proofImage
+                ? `<img src="${user.proofImage}" alt="Proof" style="width: 50px; height: 50px; cursor: pointer;">`
+                : "No Image";
+
+            const price = membershipPriceMap[membership] || "-";
+            updatePaymentMethodUI(userId, paymentMethod, paymentDescription);
+
+            // Add user data to the table
+            userListHTML += `
                 <tr id="user-${docSnap.id}" data-price="${price.replace(/[^\d]/g, '')}">
                     <td>${user.userName || "Unknown"}</td>
                     <td>${user.email || "No Email"}</td>
@@ -613,356 +761,423 @@
                     </td>
                     <td>${price}</td>
                     <td>${user.paymentStatus || "Not Paid"}</td>
+                    <td>${membershipStart}</td>
+                    <td>${membershipEnd}</td>
                     <td>
                         <button class="btn btn-info btn-sm selectPaymentMethod" data-userid="${docSnap.id}">
                             ${paymentMethod === "Not Selected" ? "Select Payment Method" : paymentMethod}
                         </button>
-                        ${paymentMethod === "Other" && paymentDescription && paymentDescription.trim() !== "" 
-                            ? `<p style="font-size: 12px; color: #555; margin-top: 5px;">${paymentDescription}</p>` 
+                        ${paymentMethod === "Other" && paymentDescription && paymentDescription.trim() !== ""
+                            ? `<p style="font-size: 12px; color: #555; margin-top: 5px;">${paymentDescription}</p>`
                             : ''}
                     </td>
+                    <td>${aboutCar} <br><button class="btn btn-sm btn-warning editCarBtn" data-userid="${userId}">Edit</button></td>
                     <td>
                         ${proofImage}
                         <input type="file" class="form-control-file uploadProof" data-userid="${docSnap.id}">
                     </td>
                 </tr>
             `;
-        });
-
-                    const currentFilter = document.getElementById("membershipFilter").value;
-                    const currentSearch = document.getElementById("searchInput").value;
-
-               
+        }
                     document.getElementById("userTableBody").innerHTML = userListHTML;
+                    assignMembershipListeners();  // Pastikan tombol bisa diklik
+                    console.log("Filtering... Value:", document.getElementById("membershipFilter").value);
+                    filterTable();
+                    if (applyFilter) {
+            filterTable(); // Now filter after fetch
+        }
+
+
                     $('#proofCarousel').carousel({
                         interval: false,
                         wrap: true
                     });
-                  
-                    document.getElementById("membershipFilter").value = currentFilter;
-                    document.getElementById("searchInput").value = currentSearch;
-                    filterTable();
+
+
                     $('#proofCarousel').carousel(0);  // Reset ke slide pertama
-                    document.getElementById("membershipFilter").addEventListener("change", () => {
-                        filterTable();  // Panggil langsung, tidak simpan apapun
-                    });
 
+                    
                     document.querySelectorAll(".uploadProof").forEach(uploadProofHandler);
-       // Listen for the modal to open and set default values
-       document.querySelectorAll('.selectPaymentMethod').forEach(button => {
-    button.addEventListener('click', async (event) => {
-        const userId = event.target.dataset.userid;
 
-        // Open the modal to select a payment method
-        $('#paymentMethodModal').modal('show');
-
-        const paymentMethodSelect = document.getElementById("paymentMethodSelect");
-        const paymentDescriptionInput = document.getElementById("paymentDescriptionInput");
-
-        // Get current payment method data from Firestore
+                    document.querySelectorAll('.editCarBtn').forEach(button => {
+    button.addEventListener('click', async () => {
+        const userId = button.dataset.userid;
         const userRef = doc(db, "Users", userId);
         const userSnap = await getDoc(userRef);
         const userData = userSnap.data();
-        const paymentMethod = userData.paymentMethod || "PayNow";
-        const paymentDescription = userData.paymentDescription || "";
 
-        // Set the default values
-        paymentMethodSelect.value = paymentMethod;
-        paymentDescriptionInput.value = paymentDescription;
-
-        // Show or hide the description input based on the payment method
-        if (paymentMethod === "Other") {
-            paymentDescriptionInput.style.display = "block";
-        } else {
-            paymentDescriptionInput.style.display = "none";
+        // Fetch car data from the "carPlates" collection using the user's carPlate
+        let carData = {};
+        if (userData.carPlate) {
+            const carRef = doc(db, "carPlates", userData.carPlate);
+            const carSnap = await getDoc(carRef);
+            if (carSnap.exists()) {
+                carData = carSnap.data();
+            }
         }
 
-        // Handle save button click
-        document.getElementById('savePaymentMethodBtn').onclick = async () => {
-            const selectedPaymentMethod = paymentMethodSelect.value;
-            const description = selectedPaymentMethod === "Other" ? paymentDescriptionInput.value : "";
+        // Populate the modal fields with user data and car data
+        document.getElementById("editCarPlate").value = userData.carPlate || "";
+        document.getElementById("editCarBrand").value = carData.carBrand || ""; // From carPlates collection
+        document.getElementById("editCarModel").value = carData.carModel || ""; // From carPlates collection
+        document.getElementById("editCarDescription").value = carData.carModelDescription || "";
+        document.getElementById("editCarCompany").value = carData.carCompanyDescription || "";
+        document.getElementById("editInsMonth").value = userData.InsExpMonth || "";
+        document.getElementById("editDOB").value = userData.dob || "";
 
-            // Save the payment method to Firestore
-            await savePaymentMethodToFirestore(userId, selectedPaymentMethod, description);
+        // Show the modal
+        $('#editCarModal').modal('show');
 
-            // Close the modal
-            $('#paymentMethodModal').modal('hide');
+        // Handle saving the changes
+        document.getElementById('saveCarDetails').onclick = async () => {
+            const updatedPlate = document.getElementById("editCarPlate").value.trim();
+            const updatedBrand = document.getElementById("editCarBrand").value.trim();
+            const updatedModel = document.getElementById("editCarModel").value.trim();
+            const updatedDescription = document.getElementById("editCarDescription").value.trim();
+            const updatedCompany = document.getElementById("editCarCompany").value.trim();
+            const updatedIns = document.getElementById("editInsMonth").value.trim();
+            const updatedDOB = document.getElementById("editDOB").value.trim();
+
+            // Update the user's car details in the Users collection
+            await updateDoc(userRef, {
+                carPlate: updatedPlate,
+                InsExpMonth: updatedIns,
+                dob: updatedDOB
+            });
+
+            // If the car data was updated, update the carPlates collection as well
+            if (updatedPlate) {
+                const carRef = doc(db, "carPlates", updatedPlate);
+                await updateDoc(carRef, {
+                    carBrand: updatedBrand,
+                    carModel: updatedModel,
+                    carModelDescription: updatedDescription,
+                    carCompanyDescription: updatedCompany
+                });
+            }
+
+            // Close the modal and refresh the users list
+            $('#editCarModal').modal('hide');
+            loadAllUsers(); // Refresh the table with updated data
         };
     });
 });
 
+                    // Listen for the modal to open and set default values
+                    document.querySelectorAll('.selectPaymentMethod').forEach(button => {
+                        button.addEventListener('click', async (event) => {
+                            const userId = event.target.dataset.userid;
+
+                            // Open the modal to select a payment method
+                            $('#paymentMethodModal').modal('show');
+
+                            const paymentMethodSelect = document.getElementById("paymentMethodSelect");
+                            const paymentDescriptionInput = document.getElementById("paymentDescriptionInput");
+
+                            // Get current payment method data from Firestore
+                            const userRef = doc(db, "Users", userId);
+                            const userSnap = await getDoc(userRef);
+                            const userData = userSnap.data();
+                            const paymentMethod = userData.paymentMethod || "PayNow";
+                            const paymentDescription = userData.paymentDescription || "";
+
+                            // Set the default values
+                            paymentMethodSelect.value = paymentMethod;
+                            paymentDescriptionInput.value = paymentDescription;
+
+                            // Show or hide the description input based on the payment method
+                            if (paymentMethod === "Other") {
+                                paymentDescriptionInput.style.display = "block";
+                            } else {
+                                paymentDescriptionInput.style.display = "none";
+                            }
+
+                            // Handle save button click
+                            document.getElementById('savePaymentMethodBtn').onclick = async () => {
+                                const selectedPaymentMethod = paymentMethodSelect.value;
+                                const description = selectedPaymentMethod === "Other" ? paymentDescriptionInput.value : "";
+
+                                // Save the payment method to Firestore
+                                await savePaymentMethodToFirestore(userId, selectedPaymentMethod, description);
+
+                                // Close the modal
+                                $('#paymentMethodModal').modal('hide');
+                            };
+                        });
+                    });
 
 
-async function savePaymentMethodToFirestore(userId, paymentMethod, description) {
-    const userRef = doc(db, "Users", userId);
-    const paymentData = {
-        paymentMethod: paymentMethod,
-        paymentDescription: paymentMethod === "Other" ? description : "",  // Save description only if "Other" is selected
-    };
 
-    try {
-        // Save the payment method to Firestore
-        await updateDoc(userRef, paymentData);
+                    async function savePaymentMethodToFirestore(userId, paymentMethod, description) {
+                        const userRef = doc(db, "Users", userId);
+                        const paymentData = {
+                            paymentMethod: paymentMethod,
+                            paymentDescription: paymentMethod === "Other" ? description : "",  // Save description only if "Other" is selected
+                        };
 
-        // After saving, immediately update the UI
-        updatePaymentMethodUI(userId, paymentMethod, description);  // This updates the button text and description dynamically
+                        try {
+                            // Save the payment method to Firestore
+                            await updateDoc(userRef, paymentData);
 
-        // Optionally, you can show a success alert
-        Swal.fire({
-            title: "✅ Payment Method Updated",
-            text: "The payment method and description have been updated.",
-            icon: "success",
-            confirmButtonColor: "#44cc44"
-        });
+                            // After saving, immediately update the UI
+                            updatePaymentMethodUI(userId, paymentMethod, description);  // This updates the button text and description dynamically
 
-        // Clear the description input field
-        document.getElementById("paymentDescriptionInput").value = "";
-        document.getElementById("paymentDescriptionInput").style.display = "none"; // Hide the input field
+                            // Optionally, you can show a success alert
+                            Swal.fire({
+                                title: "✅ Payment Method Updated",
+                                text: "The payment method and description have been updated.",
+                                icon: "success",
+                                confirmButtonColor: "#44cc44"
+                            });
 
-    } catch (error) {
-        console.error("Error updating payment method:", error);
-        Swal.fire({
-            title: "❌ Error",
-            text: error.message,
-            icon: "error",
-            confirmButtonColor: "#ff4444"
-        });
-    }
-}
-document.querySelectorAll('.deleteMembershipBtn').forEach(button => {
-    button.addEventListener('click', async (event) => {
-        const userId = event.target.dataset.userid;
+                            // Clear the description input field
+                            document.getElementById("paymentDescriptionInput").value = "";
+                            document.getElementById("paymentDescriptionInput").style.display = "none"; // Hide the input field
 
-        const confirm = await Swal.fire({
-            title: "Are you sure?",
-            text: "You are about to delete this membership. This action cannot be undone.",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#ccc",
-            confirmButtonText: "Yes, delete membership",
-            cancelButtonText: "Cancel"
-        });
+                        } catch (error) {
+                            console.error("Error updating payment method:", error);
+                            Swal.fire({
+                                title: "❌ Error",
+                                text: error.message,
+                                icon: "error",
+                                confirmButtonColor: "#ff4444"
+                            });
+                        }
+                    }
+                    document.querySelectorAll('.deleteMembershipBtn').forEach(button => {
+                        button.addEventListener('click', async (event) => {
+                            const userId = event.target.dataset.userid;
 
-        if (!confirm.isConfirmed) {
-            return;  // If the user cancels, do nothing
-        }
+                            const confirm = await Swal.fire({
+                                title: "Are you sure?",
+                                text: "You are about to delete this membership. This action cannot be undone.",
+                                icon: "warning",
+                                showCancelButton: true,
+                                confirmButtonColor: "#d33",
+                                cancelButtonColor: "#ccc",
+                                confirmButtonText: "Yes, delete membership",
+                                cancelButtonText: "Cancel"
+                            });
 
-        // Proceed with deleting the membership if confirmed
-        try {
-            // Update membership data in Firestore
-            await updateDoc(doc(db, "Users", userId), {
-                membership: "None",  // Remove membership information
-                paymentStatus: "Not Paid",  // Update payment status
-                membershipStart: null,  // Clear start date
-                membershipEnd: null,  // Clear end date
-            });
+                            if (!confirm.isConfirmed) {
+                                return;  // If the user cancels, do nothing
+                            }
 
-            // Update UI without removing the row
-            const userRow = document.getElementById(`user-${userId}`);
-            const membershipButton = userRow.querySelector('.selectMembership');
-            const deleteButton = userRow.querySelector('.deleteMembershipBtn');
+                            // Proceed with deleting the membership if confirmed
+                            try {
+                                // Update membership data in Firestore
+                                await updateDoc(doc(db, "Users", userId), {
+                                    membership: "None",  // Remove membership information
+                                    paymentStatus: "Not Paid",  // Update payment status
+                                    membershipStart: null,  // Clear start date
+                                    membershipEnd: null,  // Clear end date
+                                });
 
-            // Update the membership button
-            membershipButton.innerText = "None";
-            membershipButton.classList.remove('btn-info');
-            membershipButton.classList.add('btn-secondary');
+                                // Update UI without removing the row
+                                const userRow = document.getElementById(`user-${userId}`);
+                                const membershipButton = userRow.querySelector('.selectMembership');
+                                const deleteButton = userRow.querySelector('.deleteMembershipBtn');
 
-            // Remove the delete button entirely from the DOM
-            if (deleteButton) {
-                deleteButton.remove();  // Remove the delete button from the DOM
-            }
+                                // Update the membership button
+                                membershipButton.innerText = "None";
+                                membershipButton.classList.remove('btn-info');
+                                membershipButton.classList.add('btn-secondary');
 
-            Swal.fire({
-                title: "✅ Membership Deleted!",
-                text: "The membership has been successfully deleted.",
-                icon: "success",
-                confirmButtonColor: "#44cc44"
-            });
+                                // Remove the delete button entirely from the DOM
+                                if (deleteButton) {
+                                    deleteButton.remove();  // Remove the delete button from the DOM
+                                }
 
-        } catch (error) {
-            Swal.fire({
-                title: "❌ Error",
-                text: "There was an issue deleting the membership. Please try again.",
-                icon: "error",
-                confirmButtonColor: "#ff4444"
-            });
-        }
-    });
-});
+                                Swal.fire({
+                                    title: "✅ Membership Deleted!",
+                                    text: "The membership has been successfully deleted.",
+                                    icon: "success",
+                                    confirmButtonColor: "#44cc44"
+                                });
 
-async function updatePaymentMethodUI(userId, paymentMethod, paymentDescription) {
-    const paymentButton = document.querySelector(`#user-${userId} .selectPaymentMethod`);
+                            } catch (error) {
+                                Swal.fire({
+                                    title: "❌ Error",
+                                    text: "There was an issue deleting the membership. Please try again.",
+                                    icon: "error",
+                                    confirmButtonColor: "#ff4444"
+                                });
+                            }
+                        });
+                    });
 
-    if (paymentButton) {
-        // Update the payment method displayed on the button
-        paymentButton.innerText = paymentMethod === "Other" ? `Other` : paymentMethod;
-        
-        // Find the existing description paragraph
-        let descriptionParagraph = document.querySelector(`#user-${userId} .payment-description`);
+                    async function updatePaymentMethodUI(userId, paymentMethod, paymentDescription) {
+                        const paymentButton = document.querySelector(`#user-${userId} .selectPaymentMethod`);
 
-        // Remove any existing description
-        if (descriptionParagraph) {
-            descriptionParagraph.remove();
-        }
+                        if (paymentButton) {
+                            // Update the payment method displayed on the button
+                            paymentButton.innerText = paymentMethod === "Other" ? `Other` : paymentMethod;
 
-        // If payment method is "Other" and there is a description, display it
-        if (paymentMethod === "Other" && paymentDescription && paymentDescription.trim() !== "") {
-            // Create a new description paragraph
-            descriptionParagraph = document.createElement("p");
-            descriptionParagraph.classList.add("payment-description");
-            descriptionParagraph.style.fontSize = "12px";
-            descriptionParagraph.style.color = "#555";
-            descriptionParagraph.style.marginTop = "5px";
-            descriptionParagraph.innerText = paymentDescription;
+                            // Find the existing description paragraph
+                            let descriptionParagraph = document.querySelector(`#user-${userId} .payment-description`);
 
-            // Insert the new description after the payment method button
-            paymentButton.insertAdjacentElement('afterend', descriptionParagraph);
-        }
-    }
-}
+                            // Remove any existing description
+                            if (descriptionParagraph) {
+                                descriptionParagraph.remove();
+                            }
 
-document.getElementById('downloadCSV').addEventListener('click', async function() {
-    try {
-        // Start loading screen (optional)
+                            // If payment method is "Other" and there is a description, display it
+                            if (paymentMethod === "Other" && paymentDescription && paymentDescription.trim() !== "") {
+                                // Create a new description paragraph
+                                descriptionParagraph = document.createElement("p");
+                                descriptionParagraph.classList.add("payment-description");
+                                descriptionParagraph.style.fontSize = "12px";
+                                descriptionParagraph.style.color = "#555";
+                                descriptionParagraph.style.marginTop = "5px";
+                                descriptionParagraph.innerText = paymentDescription;
 
-        // Get all users from Firestore
-        const usersRef = collection(db, "Users");
-        const querySnapshot = await getDocs(usersRef);
+                                // Insert the new description after the payment method button
+                                paymentButton.insertAdjacentElement('afterend', descriptionParagraph);
+                            }
+                        }
+                    }
 
-        let data = [];
-        const headers = [
-            'No.', 'Name', 'Handphone', 'Car Plate', 'Email', 'Birthday Month',
-            'Insurance Expiry Month', 'Car Make', 'Car Model'
-        ];
+                    document.getElementById('downloadCSV').addEventListener('click', async function () {
+                        try {
+                            // Start loading screen (optional)
 
-        // Add headers to data array
-        data.push(headers);
+                            // Get all users from Firestore
+                            const usersRef = collection(db, "Users");
+                            const querySnapshot = await getDocs(usersRef);
 
-        // Loop through each document (user data) and collect necessary information
-        let rowNumber = 1; // Start numbering from 1
-        for (const docSnap of querySnapshot.docs) {
-            const user = docSnap.data();
+                            let data = [];
+                            const headers = [
+                                'No.', 'Name', 'Handphone', 'Car Plate', 'Email', 'Birthday Month',
+                                'Insurance Expiry Month', 'Car Make', 'Car Model'
+                            ];
 
-            // Exclude users with role 'admin'
-            if (user.role && user.role === "admin") {
-                continue; // Skip the current iteration if the role is 'admin'
-            }
+                            // Add headers to data array
+                            data.push(headers);
 
-            // Add a check to ensure `carPlate` exists before querying carPlates
-            let carData = {};
-            if (user.carPlate) {
-                const carPlateRef = doc(db, "carPlates", user.carPlate);
-                const carSnap = await getDoc(carPlateRef);
-                carData = carSnap.exists() ? carSnap.data() : {};
-            }
+                            // Loop through each document (user data) and collect necessary information
+                            let rowNumber = 1; // Start numbering from 1
+                            for (const docSnap of querySnapshot.docs) {
+                                const user = docSnap.data();
 
-            const userData = [
-                rowNumber++, // Increment row number for each user
-                user.userName || "Unknown", // Name
-                user.userContact || "Not Available", // Handphone
-                user.carPlate || "Not Available", // Car Plate
-                user.email || "Not Available", // Email
-                user.dob || "Not Available", // Birthday Month
-                user.InsExpMonth || "Not Available", // Insurance Expiry Month
-                carData.carBrand || "Not Available", // Car Make
-                carData.carModel || "Not Available" // Car Model
-            ];
+                                // Exclude users with role 'admin'
+                                if (user.role && user.role === "admin") {
+                                    continue; // Skip the current iteration if the role is 'admin'
+                                }
 
-            // Add row data to the data array
-            data.push(userData);
-        }
+                                // Add a check to ensure `carPlate` exists before querying carPlates
+                                let carData = {};
+                                if (user.carPlate) {
+                                    const carPlateRef = doc(db, "carPlates", user.carPlate);
+                                    const carSnap = await getDoc(carPlateRef);
+                                    carData = carSnap.exists() ? carSnap.data() : {};
+                                }
 
-        // Create a new Excel workbook
-        const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet('User Data');
+                                const userData = [
+                                    rowNumber++, // Increment row number for each user
+                                    user.userName || "Unknown", // Name
+                                    user.userContact || "Not Available", // Handphone
+                                    user.carPlate || "Not Available", // Car Plate
+                                    user.email || "Not Available", // Email
+                                    user.dob || "Not Available", // Birthday Month
+                                    user.InsExpMonth || "Not Available", // Insurance Expiry Month
+                                    carData.carBrand || "Not Available", // Car Make
+                                    carData.carModel || "Not Available" // Car Model
+                                ];
 
-        // Add columns to the worksheet with auto width for "No."
-        worksheet.columns = headers.map((header, index) => ({
-            header: header,
-            key: header,
-            width: index === 0 ? 10 : 20  // Set a smaller width for 'No.' and larger for others
-        }));
+                                // Add row data to the data array
+                                data.push(userData);
+                            }
 
-        // Add rows to the worksheet
-        data.slice(1).forEach(row => {
-            worksheet.addRow(row);
-        });
+                            // Create a new Excel workbook
+                            const workbook = new ExcelJS.Workbook();
+                            const worksheet = workbook.addWorksheet('User Data');
 
-        // Style headers (set background color, bold, center text, etc.)
-        worksheet.getRow(1).eachCell((cell) => {
-            cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true }; // Center the text and wrap text
-            cell.font = { bold: true, size: 12 }; // Make the font bold and larger
-            cell.fill = {
-                type: 'pattern',
-                pattern: 'solid',
-                fgColor: { argb: 'BEBEBE' } // Light gray background color
-            };
-        });
+                            // Add columns to the worksheet with auto width for "No."
+                            worksheet.columns = headers.map((header, index) => ({
+                                header: header,
+                                key: header,
+                                width: index === 0 ? 10 : 20  // Set a smaller width for 'No.' and larger for others
+                            }));
 
-        // Apply border around the table and wrap text for all cells
-        worksheet.eachRow((row) => {
-            row.eachCell((cell) => {
-                cell.border = {
-                    top: { style: 'thin' },
-                    left: { style: 'thin' },
-                    bottom: { style: 'thin' },
-                    right: { style: 'thin' }
-                };
-                cell.alignment = { wrapText: true, horizontal: 'center', vertical: 'middle' }; // Enable text wrapping and center alignment for each cell
-            });
-        });
+                            // Add rows to the worksheet
+                            data.slice(1).forEach(row => {
+                                worksheet.addRow(row);
+                            });
 
-        // Get the current date and time to use in the filename (local time)
-        const now = new Date();
-        const dateStr = now.toLocaleString('en-US', {
-            weekday: 'short',
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false
-        }).replace(/[^\w\s]/g, '_'); // Format as: Weekday_YYYY_MM_DD_HH_MM_SS
+                            // Style headers (set background color, bold, center text, etc.)
+                            worksheet.getRow(1).eachCell((cell) => {
+                                cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true }; // Center the text and wrap text
+                                cell.font = { bold: true, size: 12 }; // Make the font bold and larger
+                                cell.fill = {
+                                    type: 'pattern',
+                                    pattern: 'solid',
+                                    fgColor: { argb: 'BEBEBE' } // Light gray background color
+                                };
+                            });
 
-        // Set up the response and filename
-        const buffer = await workbook.xlsx.writeBuffer();
-        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                            // Apply border around the table and wrap text for all cells
+                            worksheet.eachRow((row) => {
+                                row.eachCell((cell) => {
+                                    cell.border = {
+                                        top: { style: 'thin' },
+                                        left: { style: 'thin' },
+                                        bottom: { style: 'thin' },
+                                        right: { style: 'thin' }
+                                    };
+                                    cell.alignment = { wrapText: true, horizontal: 'center', vertical: 'middle' }; // Enable text wrapping and center alignment for each cell
+                                });
+                            });
 
-        // Create a link element to trigger the download
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = `yellowbull_data_${dateStr}.xlsx`; // Filename includes date and time
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+                            // Get the current date and time to use in the filename (local time)
+                            const now = new Date();
+                            const dateStr = now.toLocaleString('en-US', {
+                                weekday: 'short',
+                                year: 'numeric',
+                                month: '2-digit',
+                                day: '2-digit',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                second: '2-digit',
+                                hour12: false
+                            }).replace(/[^\w\s]/g, '_'); // Format as: Weekday_YYYY_MM_DD_HH_MM_SS
 
-    } catch (error) {
-        console.error("Error exporting data:", error);
-        Swal.fire({
-            title: "❌ Error",
-            text: "An error occurred while exporting data.",
-            icon: "error",
-            confirmButtonColor: "#ff4444"
-        });
+                            // Set up the response and filename
+                            const buffer = await workbook.xlsx.writeBuffer();
+                            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
-        // Hide loading screen (optional)
-        document.getElementById("loadingScreen").style.display = "none";
-    }
-});
+                            // Create a link element to trigger the download
+                            const link = document.createElement("a");
+                            link.href = URL.createObjectURL(blob);
+                            link.download = `yellowbull_data_${dateStr}.xlsx`; // Filename includes date and time
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
 
-document.getElementById("paymentMethodSelect").addEventListener("change", function() {
-    const paymentDescriptionInput = document.getElementById("paymentDescriptionInput");
+                        } catch (error) {
+                            console.error("Error exporting data:", error);
+                            Swal.fire({
+                                title: "❌ Error",
+                                text: "An error occurred while exporting data.",
+                                icon: "error",
+                                confirmButtonColor: "#ff4444"
+                            });
 
-    // Clear any previously entered description when switching payment method
-    if (this.value !== "Other") {
-        paymentDescriptionInput.style.display = "none"; // Hide the description input if it's not "Other"
-        paymentDescriptionInput.value = "";  // Clear the previous description
-    } else {
-        paymentDescriptionInput.style.display = "block"; // Show the description input for "Other"
-    }
-});
+                            // Hide loading screen (optional)
+                            document.getElementById("loadingScreen").style.display = "none";
+                        }
+                    });
+
+                    document.getElementById("paymentMethodSelect").addEventListener("change", function () {
+                        const paymentDescriptionInput = document.getElementById("paymentDescriptionInput");
+
+                        // Clear any previously entered description when switching payment method
+                        if (this.value !== "Other") {
+                            paymentDescriptionInput.style.display = "none"; // Hide the description input if it's not "Other"
+                            paymentDescriptionInput.value = "";  // Clear the previous description
+                        } else {
+                            paymentDescriptionInput.style.display = "block"; // Show the description input for "Other"
+                        }
+                    });
 
                     function uploadProofHandler(input) {
                         input.addEventListener("change", async (e) => {
@@ -1012,70 +1227,10 @@ document.getElementById("paymentMethodSelect").addEventListener("change", functi
 
                     });
 
-                    document.getElementById("membershipFilter").addEventListener("change", filterTable);
-                    document.getElementById("searchInput").addEventListener("input", filterTable);
+              
+                    
                     document.getElementById("deleteExpiredBtn").addEventListener("click", deleteExpiredMembers);
-
-                    function filterTable() {
-    const filterValue = document.getElementById("membershipFilter").value.toLowerCase();
-    const searchValue = document.getElementById("searchInput").value.toLowerCase();
-    const rows = document.querySelectorAll("#userTableBody tr");
-    checkMembershipExpiration();
-    let visibleCount = 0;
-    let totalPrice = 0;
-    const now = new Date();
-    const sevenDays = 7 * 24 * 60 * 60 * 1000;  // 7 hari dalam ms
-
-    assignMembershipListeners();
-
-    rows.forEach(row => {
-        const name = row.querySelector("td:nth-child(1)").innerText.toLowerCase();
-        const email = row.querySelector("td:nth-child(2)").innerText.toLowerCase();
-        const membershipButton = row.querySelector("td:nth-child(3) button");
-        const membership = membershipButton.innerText.toLowerCase();
-
-        let showRow = false;
-
-        if (filterValue === "all") {
-            showRow = true;
-        } else if (filterValue === "renew") {
-            const userId = row.id.replace("user-", "");
-            const userData = JSON.parse(localStorage.getItem(`userData-${userId}`));  // ⬅️ Simpan userData saat loadAllUsers
-            if (userData && userData.membershipEnd && userData.membership !== "expired") {
-                const endDate = new Date(userData.membershipEnd);
-                const timeLeft = endDate - now;
-                if (timeLeft > 0 && timeLeft <= sevenDays) {
-                    showRow = true;
-                }
-            }
-        } else {
-            showRow = membership === filterValue;
-        }
-
-        const matchSearch = name.includes(searchValue) || email.includes(searchValue);
-
-        if (showRow && matchSearch) {
-            row.style.display = "";
-            visibleCount++;
-
-            const priceStr = row.getAttribute("data-price");
-            const priceNum = parseFloat(priceStr);
-            if (!isNaN(priceNum)) {
-                totalPrice += priceNum;
-            }
-        } else {
-            row.style.display = "none";
-        }
-    });
-
-    document.getElementById("userCount").innerText = `Total Users: ${visibleCount}`;
-    document.getElementById("totalPrice").innerText = `Total Price: $${totalPrice}`;
-}
-
-                    document.getElementById("membershipFilter").addEventListener("change", async () => {
-                        await loadAllUsers();  // Fetch ulang data
-                    });
-
+                  
                     async function deleteExpiredMembers() {
                         const confirm = await Swal.fire({
                             title: "Delete All Expired?",
@@ -1102,7 +1257,6 @@ document.getElementById("paymentMethodSelect").addEventListener("change", functi
                         Swal.fire("Deleted!", "All expired members have been deleted.", "success");
                         loadAllUsers();
                     }
-
 
                     document.querySelectorAll("img[alt='Proof']").forEach(img => {
                         img.addEventListener("click", () => {
@@ -1184,6 +1338,63 @@ document.getElementById("paymentMethodSelect").addEventListener("change", functi
                 }
             }
 
+
+            function filterTable() {
+    const filterValue = document.getElementById("membershipFilter").value.toLowerCase();
+    const searchValue = document.getElementById("searchInput").value.toLowerCase();
+    const rows = document.querySelectorAll("#userTableBody tr");
+
+    checkMembershipExpiration()
+    assignMembershipListeners()
+    let visibleCount = 0;
+    let totalPrice = 0;
+    const now = new Date();
+    const sevenDays = 7 * 24 * 60 * 60 * 1000;
+
+    rows.forEach(row => {
+        const name = row.querySelector("td:nth-child(1)").innerText.toLowerCase();
+        const email = row.querySelector("td:nth-child(2)").innerText.toLowerCase();
+        const membershipButton = row.querySelector("td:nth-child(3) button");
+        const membership = membershipButton.innerText.toLowerCase();
+
+        let showRow = false;
+
+        if (filterValue === "all") {
+            showRow = true;
+        } else if (filterValue === "renew") {
+            const userId = row.id.replace("user-", "");
+            const userData = JSON.parse(localStorage.getItem(`userData-${userId}`));
+            if (userData && userData.membershipEnd && userData.membership !== "expired") {
+                const endDate = new Date(userData.membershipEnd);
+                const timeLeft = endDate - now;
+                if (timeLeft > 0 && timeLeft <= sevenDays) {
+                    showRow = true;
+                }
+            }
+        } else {
+            showRow = membership === filterValue;
+        }
+
+        const matchSearch = name.includes(searchValue) || email.includes(searchValue);
+
+        if (showRow && matchSearch) {
+            row.style.display = "";
+            visibleCount++;
+            const priceStr = row.getAttribute("data-price");
+            const priceNum = parseFloat(priceStr);
+            if (!isNaN(priceNum)) {
+                totalPrice += priceNum;
+            }
+        } else {
+            row.style.display = "none";
+        }
+    });
+
+    document.getElementById("userCount").innerText = `Total Users: ${visibleCount}`;
+    document.getElementById("totalPrice").innerText = `Total Price: $${totalPrice}`;
+}
+
+
             $(document).on("click", "#infoIcon", function () {
                 Swal.fire({
                     title: "ℹ️ Payment Proof Info",
@@ -1196,98 +1407,128 @@ document.getElementById("paymentMethodSelect").addEventListener("change", functi
             });
 
             $(document).on("click", "img[alt='Proof']", function () {
-    const imgSrc = $(this).attr("src");
-    const userRow = $(this).closest("tr");
-    const userId = userRow.attr("id").replace("user-", "");
-    const userName = userRow.find("td:first-child").text();
+                const imgSrc = $(this).attr("src");
+                const userRow = $(this).closest("tr");
+                const userId = userRow.attr("id").replace("user-", "");
+                const userName = userRow.find("td:first-child").text();
 
-    // Filter to get the latest proof image for each user
-    const latestProofImagesMap = {};
+                // Filter to get the latest proof image for each user
+                const latestProofImagesMap = {};
 
-    proofImages.forEach((imgObj) => {
-        // Update map with the latest image for each user
-        if (!latestProofImagesMap[imgObj.userId] || imgObj.uploadedAt > latestProofImagesMap[imgObj.userId].uploadedAt) {
-            latestProofImagesMap[imgObj.userId] = imgObj;
-        }
-    });
+                proofImages.forEach((imgObj) => {
+                    // Update map with the latest image for each user
+                    if (!latestProofImagesMap[imgObj.userId] || imgObj.uploadedAt > latestProofImagesMap[imgObj.userId].uploadedAt) {
+                        latestProofImagesMap[imgObj.userId] = imgObj;
+                    }
+                });
 
-    // Get an array of the latest proof images
-    const latestProofImages = Object.values(latestProofImagesMap);
+                // Get an array of the latest proof images
+                const latestProofImages = Object.values(latestProofImagesMap);
 
-    // Find the index of the clicked image
-    const clickedIndex = latestProofImages.findIndex(p => p.url === imgSrc);
+                // Find the index of the clicked image
+                const clickedIndex = latestProofImages.findIndex(p => p.url === imgSrc);
 
-    if (clickedIndex === -1) {
-        Swal.fire("❌ Image not found in preview list", "", "error");
-        return;
-    }
+                if (clickedIndex === -1) {
+                    Swal.fire("❌ Image not found in preview list", "", "error");
+                    return;
+                }
 
-    const carouselInner = $("#carouselInner");
-    const carouselIndicators = $("#carouselIndicators");
+                const carouselInner = $("#carouselInner");
+                const carouselIndicators = $("#carouselIndicators");
 
-    // Update carousel items and indicators with the latest proof images
-    carouselInner.html(latestProofImages.map((imgObj, index) => `
+                // Update carousel items and indicators with the latest proof images
+                carouselInner.html(latestProofImages.map((imgObj, index) => `
         <div class="carousel-item ${index === clickedIndex ? 'active' : ''}">
             <img class="d-block w-100" src="${imgObj.url}" alt="${imgObj.userName}">
         </div>
     `).join(""));
 
-    carouselIndicators.html(latestProofImages.map((_, index) => `
+                carouselIndicators.html(latestProofImages.map((_, index) => `
         <li data-target="#proofCarousel" data-slide-to="${index}" ${index === clickedIndex ? 'class="active"' : ''}></li>
     `).join(""));
 
-    $('#previewModal').modal('show');
-    $('#proofCarousel').carousel(clickedIndex);
+                $('#previewModal').modal('show');
+                $('#proofCarousel').carousel(clickedIndex);
 
-    // Update preview metadata
-    const updatePreviewMeta = (index) => {
-        const imgData = latestProofImages[index];
-        const uploadTime = imgData.uploadedAt
-            ? new Date(imgData.uploadedAt).toLocaleString()
-            : "Unknown time";
-        $("#previewMeta").text(`${imgData.userName} - ${uploadTime}`);
-    };
+                // Update preview metadata
+                const updatePreviewMeta = (index) => {
+                    const imgData = latestProofImages[index];
+                    const uploadTime = imgData.uploadedAt
+                        ? new Date(imgData.uploadedAt).toLocaleString()
+                        : "Unknown time";
+                    $("#previewMeta").text(`${imgData.userName} - ${uploadTime}`);
+                };
 
-    updatePreviewMeta(clickedIndex);
+                updatePreviewMeta(clickedIndex);
 
-    $('#proofCarousel').on('slide.bs.carousel', function (e) {
-        const nextIndex = $(e.relatedTarget).index();
-        updatePreviewMeta(nextIndex);
-    });
-});
+                $('#proofCarousel').on('slide.bs.carousel', function (e) {
+                    const nextIndex = $(e.relatedTarget).index();
+                    updatePreviewMeta(nextIndex);
+                });
+            });
 
+
+
+ 
             function openMembershipModal(userId) {
                 $("#membershipModal").modal("show");
 
                 document.getElementById("saveMembership").onclick = async function () {
-                    const selectedMembership = document.getElementById("membershipSelect").value;
-                    const startDate = new Date();
-                    const endDate = new Date();
-                    endDate.setFullYear(startDate.getFullYear() + 1);  // 🔥 Membership berlaku selama 1 tahun
+    const selectedMembership = document.getElementById("membershipSelect").value;
+    const startDate = document.getElementById("membershipStartDate").value;  // Get the selected start date
 
-                    const selectedPrice = membershipPriceMap[selectedMembership];
+    // Convert startDate to a Date object (local time)
+    const localStartDate = new Date(startDate);
+    
+    // Adjust for local time: Get the local time based on the system time zone.
+    const localStartDateAdjusted = new Date(localStartDate.getTime() - localStartDate.getTimezoneOffset() * 60000);
 
-                    await updateDoc(doc(db, "Users", userId), {
-                        membership: selectedMembership,
-                        paymentStatus: "Done",
-                        membershipPrice: selectedPrice,
-                        membershipStart: Timestamp.fromDate(startDate),
-                        membershipEnd: Timestamp.fromDate(endDate),
-                    });
+    // Calculate the end date (1 year from start date) in local time.
+    const endDate = new Date(localStartDateAdjusted);
+    endDate.setFullYear(endDate.getFullYear() + 1);
 
-                    $("#membershipModal").modal("hide");
-                    loadAllUsers();
-                };
+    // Adjust the end date to local time as well
+    const localEndDate = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000);
+
+    const selectedPrice = membershipPriceMap[selectedMembership];
+
+    // Validate start date
+    if (!startDate) {
+        Swal.fire({
+            title: "❌ Start date is required",
+            text: "Please select a start date for the membership.",
+            icon: "error",
+            confirmButtonColor: "#ff4444"
+        });
+        return;
+    }
+
+    // Convert local start and end dates to Firestore Timestamps (keeping them in local time)
+    const localStartDateTimestamp = Timestamp.fromDate(localStartDateAdjusted);
+    const localEndDateTimestamp = Timestamp.fromDate(localEndDate);
+
+    // Save membership data to Firestore
+    await updateDoc(doc(db, "Users", userId), {
+        membership: selectedMembership,
+        paymentStatus: "Done",
+        membershipPrice: selectedPrice,
+        membershipStart: localStartDateTimestamp,  // Save local start date
+        membershipEnd: localEndDateTimestamp,  // Save local end date
+    });
+
+    $("#membershipModal").modal("hide");
+    loadAllUsers();
+};
             }
             // Fungsi untuk assign ulang listener setiap kali tombol membership di-reload
-function assignMembershipListeners() {
-    document.querySelectorAll(".selectMembership").forEach(button => {
-        button.onclick = (event) => {
-            const userId = event.target.dataset.userid;
-            openMembershipModal(userId);
-        };
-    });
-}
+            function assignMembershipListeners() {
+                document.querySelectorAll(".selectMembership").forEach(button => {
+                    button.onclick = (event) => {
+                        const userId = event.target.dataset.userid;
+                        openMembershipModal(userId);
+                    };
+                });
+            }
 
 
             function listenForMembershipUpdates() {
@@ -1301,22 +1542,22 @@ function assignMembershipListeners() {
                         const membershipStatus = userData.membership || "None";
                         const membershipEnd = userData.membershipEnd ? userData.membershipEnd.toDate() : null;
 
-                      
+
 
 
                         const paymentMethod = user.paymentMethod || "PayNow";
-    const paymentDescription = user.paymentDescription || "";
-    updatePaymentMethodUI(userId, paymentMethod, paymentDescription);
-    const paymentMethodSelect = document.querySelector(`.payment-method[data-userid="${userId}"]`);
-    const paymentDescriptionInput = document.querySelector(`.payment-description[data-userid="${userId}"]`);
+                        const paymentDescription = user.paymentDescription || "";
+                        updatePaymentMethodUI(userId, paymentMethod, paymentDescription);
+                        const paymentMethodSelect = document.querySelector(`.payment-method[data-userid="${userId}"]`);
+                        const paymentDescriptionInput = document.querySelector(`.payment-description[data-userid="${userId}"]`);
 
-    if (paymentMethodSelect) {
-        paymentMethodSelect.value = paymentMethod;
-    }
+                        if (paymentMethodSelect) {
+                            paymentMethodSelect.value = paymentMethod;
+                        }
 
-    if (paymentMethod === "Other" && paymentDescriptionInput) {
-        paymentDescriptionInput.value = paymentDescription;
-    }
+                        if (paymentMethod === "Other" && paymentDescriptionInput) {
+                            paymentDescriptionInput.value = paymentDescription;
+                        }
 
                         const userRow = document.getElementById(`user-${userId}`);
                         if (!userRow) return;
@@ -1330,7 +1571,7 @@ function assignMembershipListeners() {
         ${membershipStatus}
     </button>
 `;
-assignMembershipListeners();
+                            assignMembershipListeners();
 
                         } else {
                             membershipActions.innerHTML = `
@@ -1368,51 +1609,54 @@ assignMembershipListeners();
 
 
             async function renewMembership(userId) {
-    const confirm = await Swal.fire({
-        title: "Are you sure?",
-        text: "You are about to renew the membership for another year.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#44cc44",
-        cancelButtonColor: "#ccc",
-        confirmButtonText: "Yes, renew membership",
-        cancelButtonText: "Cancel"
-    });
+                const confirm = await Swal.fire({
+                    title: "Are you sure?",
+                    text: "You are about to renew the membership for another year.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#44cc44",
+                    cancelButtonColor: "#ccc",
+                    confirmButtonText: "Yes, renew membership",
+                    cancelButtonText: "Cancel"
+                });
 
-    if (!confirm.isConfirmed) {
-        return;  // If the user cancels, do nothing
+                if (!confirm.isConfirmed) {
+                    return;  // If the user cancels, do nothing
+                }
+
+                // Proceed with renewal if confirmed
+                const startDate = new Date();
+                const endDate = new Date();
+                endDate.setFullYear(startDate.getFullYear() + 1);  // 🔥 Membership berlaku selama 1 tahun
+
+                try {
+                    await updateDoc(doc(db, "Users", userId), {
+                        membershipEnd: Timestamp.fromDate(endDate),
+                        paymentStatus: "Done",
+                    });
+
+                    Swal.fire({
+                        title: "✅ Membership Renewed!",
+                        text: "Your membership has been extended for another year.",
+                        icon: "success",
+                        confirmButtonColor: "#44cc44"
+                    });
+
+                    removeRenewButton(userId);
+                    checkMembershipExpiration();
+                } catch (error) {
+                    Swal.fire({
+                        title: "❌ Error",
+                        text: "There was an issue renewing the membership. Please try again.",
+                        icon: "error",
+                        confirmButtonColor: "#ff4444"
+                    });
+                }
+            }
+
+            if (document.getElementById("userTableBody")) {
+        loadAllUsers(true);  // ⬅️ fetch + langsung filter "All"
     }
-
-    // Proceed with renewal if confirmed
-    const startDate = new Date();
-    const endDate = new Date();
-    endDate.setFullYear(startDate.getFullYear() + 1);  // 🔥 Membership berlaku selama 1 tahun
-
-    try {
-        await updateDoc(doc(db, "Users", userId), {
-            membershipEnd: Timestamp.fromDate(endDate),
-            paymentStatus: "Done",
-        });
-
-        Swal.fire({
-            title: "✅ Membership Renewed!",
-            text: "Your membership has been extended for another year.",
-            icon: "success",
-            confirmButtonColor: "#44cc44"
-        });
-
-        removeRenewButton(userId);
-        checkMembershipExpiration();
-    } catch (error) {
-        Swal.fire({
-            title: "❌ Error",
-            text: "There was an issue renewing the membership. Please try again.",
-            icon: "error",
-            confirmButtonColor: "#ff4444"
-        });
-    }
-}
-
             // 🔹 Function to remove the "Renew" button after clicking it
             function removeRenewButton(userId) {
                 const userRow = document.getElementById(`user-${userId}`);
@@ -1494,44 +1738,44 @@ assignMembershipListeners();
 
             const resetPasswordBtn = document.getElementById("resetPasswordBtn");
 
-resetPasswordBtn.addEventListener("click", async () => {
-    const user = auth.currentUser;  // Get the currently logged in user
+            resetPasswordBtn.addEventListener("click", async () => {
+                const user = auth.currentUser;  // Get the currently logged in user
 
-    if (user) {
-        try {
-            // Send a password reset email to the user
-            await resetPassword(user.email);
-            
-            // Show success message
-            Swal.fire({
-                title: "✅ Reset Password Email Sent!",
-                text: "Please check your inbox to reset your password.",
-                icon: "info",
-                background: "#fffa90",
-                color: "#000",
-                confirmButtonColor: "#ffcc00"
+                if (user) {
+                    try {
+                        // Send a password reset email to the user
+                        await resetPassword(user.email);
+
+                        // Show success message
+                        Swal.fire({
+                            title: "✅ Reset Password Email Sent!",
+                            text: "Please check your inbox to reset your password.",
+                            icon: "info",
+                            background: "#fffa90",
+                            color: "#000",
+                            confirmButtonColor: "#ffcc00"
+                        });
+                    } catch (error) {
+                        // Handle errors
+                        Swal.fire({
+                            title: "❌ Failed to Send Reset Password Email",
+                            text: error.message,
+                            icon: "error",
+                            background: "#ffcccc",
+                            color: "#000",
+                            confirmButtonColor: "#ff4444"
+                        });
+                    }
+                } else {
+                    // User not logged in
+                    Swal.fire({
+                        title: "❌ Not Logged In",
+                        text: "Please log in to reset your password.",
+                        icon: "warning",
+                        confirmButtonColor: "#ff4444"
+                    });
+                }
             });
-        } catch (error) {
-            // Handle errors
-            Swal.fire({
-                title: "❌ Failed to Send Reset Password Email",
-                text: error.message,
-                icon: "error",
-                background: "#ffcccc",
-                color: "#000",
-                confirmButtonColor: "#ff4444"
-            });
-        }
-    } else {
-        // User not logged in
-        Swal.fire({
-            title: "❌ Not Logged In",
-            text: "Please log in to reset your password.",
-            icon: "warning",
-            confirmButtonColor: "#ff4444"
-        });
-    }
-});
 
             // ✅ Pastikan `editProfileForm` sudah ada sebelum menambahkan event listener
             const checkEditForm = setInterval(() => {
@@ -1843,39 +2087,40 @@ z-index: 9999;">
         </div>
 
         <div class="modal fade" id="editProfileModal" tabindex="-1" role="dialog"
-        aria-labelledby="editProfileModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editProfileModalLabel">Edit Personal Information</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="editProfileForm">
-                        <div class="form-group">
-                            <label for="editUsername">Full Name</label>
-                            <input type="text" id="editUsername" class="form-control">
-                        </div>
-    
-                        <div class="form-group">
-                            <label for="editEmail">Email</label>
-                            <input type="email" id="editEmail" class="form-control">
-                        </div>
-                        <div class="form-group d-flex justify-content-start">
-                            <!-- Reset Password Button -->
-                            <button type="button" id="resetPasswordBtn" class="btn btn-danger" style="margin-right:10px;">Reset Password</button>
-                
-                            <!-- Update Profile Button -->
-                            <button type="submit" class="btn btn-primary">Update Profile</button>
-                        </div>
-                    </form>
+            aria-labelledby="editProfileModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editProfileModalLabel">Edit Personal Information</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editProfileForm">
+                            <div class="form-group">
+                                <label for="editUsername">Full Name</label>
+                                <input type="text" id="editUsername" class="form-control">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="editEmail">Email</label>
+                                <input type="email" id="editEmail" class="form-control">
+                            </div>
+                            <div class="form-group d-flex justify-content-start">
+                                <!-- Reset Password Button -->
+                                <button type="button" id="resetPasswordBtn" class="btn btn-danger"
+                                    style="margin-right:10px;">Reset Password</button>
+
+                                <!-- Update Profile Button -->
+                                <button type="submit" class="btn btn-primary">Update Profile</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    
+
     </section>
 
     <script>
