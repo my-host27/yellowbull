@@ -40,6 +40,14 @@
         }
 
 
+        .table th:nth-child(2),
+            .table td:nth-child(2) {
+                max-width: 150px;
+                /* Batasi lebar kolom email */
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                white-space: normal;
+            }
 
         .custom-alert {
             position: fixed;
@@ -255,8 +263,8 @@ if (logoutBtn) {
 
                                 if (carSnap.exists()) {
                                     const carData = carSnap.data();
-                                    document.getElementById("car_model").innerText = carData.carModel || "Not Available";
-                                    document.getElementById("car_brand").innerText = carData.carBrand || "Not Available";
+                                    document.getElementById("car_model").innerText = carData.carModel + " (" + carData.carModelDescription+")"|| "Not Available";
+                                    document.getElementById("car_brand").innerText = carData.carBrand + " (" + carData.carCompanyDescription+")"|| "Not Available";
                                 }
                             }
 
