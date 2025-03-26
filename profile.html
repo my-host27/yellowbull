@@ -30,6 +30,19 @@
             z-index: 99;
         }
 
+        .sticky-nav {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            background-color: white;
+            padding: 10px 0;
+        }
+
+        .btn.btn-sm.btn-warning.editCarBtn {
+    width: 100%;
+    text-align: center; /* Align text in the center */
+    white-space: nowrap; /* Prevent button text from breaking into multiple lines */
+}
         .table th {
             text-align: center !important;
             vertical-align: middle !important;
@@ -47,6 +60,11 @@
                 word-wrap: break-word;
                 overflow-wrap: break-word;
                 white-space: normal;
+            }
+
+            .table th:nth-child(8),
+            .table td:nth-child(8) {
+           font-size: 14px;
             }
 
         .custom-alert {
@@ -135,6 +153,15 @@
                 /* Ukuran teks di tabel lebih kecil */
             }
 
+            .table th:nth-child(8),
+            .table td:nth-child(8) {
+                max-width: 250px;
+                font-size: 12px;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                white-space: normal;
+            }
+
             .btn {
                 font-size: 14px;
                 /* Ukuran tombol lebih kecil */
@@ -152,6 +179,7 @@
                 font-size: 14px;
                 /* Ukuran teks dalam modal lebih kecil */
             }
+
 
 
             .alert-warning {
@@ -409,6 +437,9 @@ if (logoutBtn) {
                 const adminDashboardHTML = `
         <section class="admin-dashboard">
             <div class="container">
+                <div id="loadingIndicator" style="display: none; text-align: center;">
+    <span>Loading...</span> <!-- You can replace this with an actual spinner if you like -->
+</div>
                     <h2>Admin Dashboard</h2>
                 <p>Welcome, Admin!</p>
              <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
@@ -431,7 +462,7 @@ if (logoutBtn) {
   <!-- Search Bar -->
   <div class="form-group mb-2 mb-md-0">
     <label for="searchInput">Search:</label>
-    <input type="text" id="searchInput" class="form-control" placeholder="Search name or email...">
+    <input type="text" id="searchInput" class="form-control" placeholder="Search name email, or about car...">
   </div>
 
   <!-- Buttons for Delete and Download CSV -->
@@ -446,13 +477,13 @@ if (logoutBtn) {
 
 <!-- New summary bar for count and total -->
 <div class="mb-3">
-  <span id="userCount">Total Users: 0</span> |
-  <span id="totalPrice">Total Price: $0</span>
+  <span id="userCount">Total Users: 0</span> 
+  <!--<span id="totalPrice">Total Price: $0</span>-->
 </div>
             
                 <div class="table-responsive">
                     <table class="table table-bordered">
-                        <thead class="thead-dark">
+                        <thead class="thead-dark sticky-nav">
                             <tr>
                            <th style="width: 10%;">Name</th>
                         <th style="width: 17%;">Email</th>
@@ -604,15 +635,18 @@ if (logoutBtn) {
                     <input type="text" class="form-control" id="editCarDescription">
                 </div>
                 <!-- Car Company -->
-                <div class="form-group">
+                  <!-- <div class="form-group">
                     <label for="editCarCompany">Car Company</label>
                     <input type="text" class="form-control" id="editCarCompany">
-                </div>
+                </div> -->
                 <!-- Insurance Expiry Month -->
-                <div class="form-group">
-                    <label for="editInsMonth">Insurance Expiry Month</label>
-                    <input type="text" class="form-control" id="editInsMonth">
-                </div>
+            <!-- Insurance Expiry Month -->
+<div class="form-group">
+    <label for="editInsMonth">Insurance Expiry Date</label>
+    <input type="date" class="form-control" id="editInsMonth">
+</div>
+
+
                 <!-- DOB -->
                 <div class="form-group">
                     <label for="editDOB">Date of Birth</label>
@@ -718,15 +752,51 @@ document.getElementById("searchInput").addEventListener("input", () => {
                 })
                 : "Not Available";
 
-            const aboutCar = `
-                Plate: ${user.carPlate || "N/A"}<br>
-                Brand: ${carData.carBrand || "Other"}<br>
-                Model: ${carData.carModel || "Other"}<br>
-                Description: ${carData.carModelDescription || "Other"}<br>
-                Company: ${carData.carCompanyDescription || "Other"}<br>
-                Insurance Expiry: ${carData.InsExpMonth || "N/A"}<br>
-                DOB: ${user.dob || "N/A"}
-            `;
+
+
+                
+                const insuranceExpiry = user.InsExpMonth;
+                console.log("Insurance Expiry:", insuranceExpiry);
+console.log("Type of Insurance Expiry:", typeof insuranceExpiry);
+
+let formattedExpiryDate = "N/A"; // Default if no date is available
+
+if (insuranceExpiry) {
+    let expiryDate;
+
+    if (typeof insuranceExpiry === 'string') {
+        // If only month is given (e.g., "May"), show the month directly
+        formattedExpiryDate = insuranceExpiry;  // Display the month as a string
+    } else if (insuranceExpiry instanceof Date) {
+        expiryDate = insuranceExpiry;  // If it's already a Date object
+    } else if (insuranceExpiry.toDate) {
+        // Handle Firestore Timestamp format
+        expiryDate = insuranceExpiry.toDate();  // Convert Firestore timestamp to Date
+    }
+
+    // If a valid Date object is found, format it as a full date
+    if (expiryDate instanceof Date && !isNaN(expiryDate)) {
+        formattedExpiryDate = expiryDate.toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
+    }
+} else {
+    formattedExpiryDate = "N/A"; // If no value is provided, set it as "N/A"
+}
+
+console.log("Formatted Insurance Expiry:", formattedExpiryDate);
+
+const aboutCar = `
+    Plate: ${user.carPlate || "N/A"}<br>
+    Brand: ${carData.carBrand || "Other"}<br>
+    Model: ${carData.carModel || "Other"}<br>
+    Description: ${carData.carModelDescription || "Other"}<br>
+    Company: ${carData.carCompanyDescription || "Other"}<br>
+    Insurance Expiry: ${formattedExpiryDate}<br>
+    DOB: ${user.dob || "N/A"}
+`;
 
             // Store user data in local storage
             localStorage.setItem(`userData-${docSnap.id}`, JSON.stringify({
@@ -816,50 +886,81 @@ document.getElementById("searchInput").addEventListener("input", () => {
             }
         }
 
-        // Populate the modal fields with user data and car data
-        document.getElementById("editCarPlate").value = userData.carPlate || "";
-        document.getElementById("editCarBrand").value = carData.carBrand || ""; // From carPlates collection
-        document.getElementById("editCarModel").value = carData.carModel || ""; // From carPlates collection
-        document.getElementById("editCarDescription").value = carData.carModelDescription || "";
-        document.getElementById("editCarCompany").value = carData.carCompanyDescription || "";
-        document.getElementById("editInsMonth").value = userData.InsExpMonth || "";
-        document.getElementById("editDOB").value = userData.dob || "";
+ // Populate the modal fields with user data and car data
+document.getElementById("editCarPlate").value = userData.carPlate || "";
+document.getElementById("editCarBrand").value = carData.carBrand || ""; // From carPlates collection
+document.getElementById("editCarModel").value = carData.carModel || ""; // From carPlates collection
+document.getElementById("editCarDescription").value = carData.carModelDescription || "";
+document.getElementById("editDOB").value = userData.dob || "";
 
-        // Show the modal
-        $('#editCarModal').modal('show');
+// Handle Insurance Expiry Date
+if (userData.InsExpMonth) {
+    let formattedDate = "";
+    
+    if (userData.InsExpMonth && userData.InsExpMonth.toDate) {
+    const insDate = userData.InsExpMonth.toDate();
+    const year = insDate.getFullYear();
+    const month = ("0" + (insDate.getMonth() + 1)).slice(-2);
+    const day = ("0" + insDate.getDate()).slice(-2);
+    formattedDate = `${year}-${month}-${day}`;
+} else if (typeof userData.InsExpMonth === "string") {
+    const dateStr = `1 ${userData.InsExpMonth} 2025`;
+    const tempDate = new Date(dateStr);
+    const year = tempDate.getFullYear();
+    const month = ("0" + (tempDate.getMonth() + 1)).slice(-2);
+    const day = ("0" + tempDate.getDate()).slice(-2);
+    formattedDate = `${year}-${month}-${day}`;
+}
 
-        // Handle saving the changes
-        document.getElementById('saveCarDetails').onclick = async () => {
-            const updatedPlate = document.getElementById("editCarPlate").value.trim();
-            const updatedBrand = document.getElementById("editCarBrand").value.trim();
-            const updatedModel = document.getElementById("editCarModel").value.trim();
-            const updatedDescription = document.getElementById("editCarDescription").value.trim();
-            const updatedCompany = document.getElementById("editCarCompany").value.trim();
-            const updatedIns = document.getElementById("editInsMonth").value.trim();
-            const updatedDOB = document.getElementById("editDOB").value.trim();
 
-            // Update the user's car details in the Users collection
-            await updateDoc(userRef, {
-                carPlate: updatedPlate,
-                InsExpMonth: updatedIns,
-                dob: updatedDOB
-            });
 
-            // If the car data was updated, update the carPlates collection as well
-            if (updatedPlate) {
-                const carRef = doc(db, "carPlates", updatedPlate);
-                await updateDoc(carRef, {
-                    carBrand: updatedBrand,
-                    carModel: updatedModel,
-                    carModelDescription: updatedDescription,
-                    carCompanyDescription: updatedCompany
-                });
-            }
+    // Set the formatted date in the input field
+    document.getElementById("editInsMonth").value = formattedDate;  
+} else {
+    document.getElementById("editInsMonth").value = "";  // Handle if empty or "N/A"
+}
 
-            // Close the modal and refresh the users list
-            $('#editCarModal').modal('hide');
-            loadAllUsers(); // Refresh the table with updated data
-        };
+// Show the modal
+$('#editCarModal').modal('show');
+
+      // Handle saving the changes
+document.getElementById('saveCarDetails').onclick = async () => {
+    const updatedPlate = document.getElementById("editCarPlate").value.trim();
+    const updatedBrand = document.getElementById("editCarBrand").value.trim();
+    const updatedModel = document.getElementById("editCarModel").value.trim();
+    const updatedDescription = document.getElementById("editCarDescription").value.trim();
+    const updatedIns = document.getElementById("editInsMonth").value.trim();
+    const updatedDOB = document.getElementById("editDOB").value.trim();
+
+    let insuranceExpiryDate = null;
+    if (updatedIns) {
+        insuranceExpiryDate = new Date(updatedIns); // ✔️ this is the correct way
+    }
+
+    try {
+        await updateDoc(userRef, {
+            carPlate: updatedPlate,
+            InsExpMonth: insuranceExpiryDate,
+            dob: updatedDOB
+        });
+        console.log("Car details updated successfully.");
+    } catch (error) {
+        console.error("Error updating car details:", error);
+    }
+
+    if (updatedPlate) {
+        const carRef = doc(db, "carPlates", updatedPlate);
+        await updateDoc(carRef, {
+            carBrand: updatedBrand,
+            carModel: updatedModel,
+            carModelDescription: updatedDescription,
+        });
+    }
+
+    $('#editCarModal').modal('hide');
+    loadAllUsers();
+};
+
     });
 });
 
@@ -1338,14 +1439,14 @@ document.getElementById("searchInput").addEventListener("input", () => {
                 }
             }
 
-
             function filterTable() {
     const filterValue = document.getElementById("membershipFilter").value.toLowerCase();
     const searchValue = document.getElementById("searchInput").value.toLowerCase();
     const rows = document.querySelectorAll("#userTableBody tr");
 
-    checkMembershipExpiration()
-    assignMembershipListeners()
+    checkMembershipExpiration();
+    assignMembershipListeners();
+    
     let visibleCount = 0;
     let totalPrice = 0;
     const now = new Date();
@@ -1356,6 +1457,10 @@ document.getElementById("searchInput").addEventListener("input", () => {
         const email = row.querySelector("td:nth-child(2)").innerText.toLowerCase();
         const membershipButton = row.querySelector("td:nth-child(3) button");
         const membership = membershipButton.innerText.toLowerCase();
+        
+        // Extract carPlate from the "About Car" column
+        const aboutCar = row.querySelector("td:nth-child(8)").innerText.toLowerCase();
+        const carPlateMatch = aboutCar.includes(searchValue);  // Searching within the About Car column
 
         let showRow = false;
 
@@ -1375,7 +1480,8 @@ document.getElementById("searchInput").addEventListener("input", () => {
             showRow = membership === filterValue;
         }
 
-        const matchSearch = name.includes(searchValue) || email.includes(searchValue);
+        // Now check if the search matches either the name, email, or carPlate
+        const matchSearch = name.includes(searchValue) || email.includes(searchValue) || carPlateMatch;
 
         if (showRow && matchSearch) {
             row.style.display = "";
@@ -1391,9 +1497,8 @@ document.getElementById("searchInput").addEventListener("input", () => {
     });
 
     document.getElementById("userCount").innerText = `Total Users: ${visibleCount}`;
-    document.getElementById("totalPrice").innerText = `Total Price: $${totalPrice}`;
+    // document.getElementById("totalPrice").innerText = `Total Price: $${totalPrice}`;
 }
-
 
             $(document).on("click", "#infoIcon", function () {
                 Swal.fire({
