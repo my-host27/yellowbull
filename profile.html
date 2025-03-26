@@ -649,8 +649,26 @@ if (logoutBtn) {
 
                 <!-- DOB -->
                 <div class="form-group">
-                    <label for="editDOB">Date of Birth</label>
-                    <input type="text" class="form-control" id="editDOB">
+                    <label for="editDOB">Birthday Month</label>
+	<select id="editDOB" class="form-control " name="dob">
+
+										<option disabled hidden selected>select month</option>
+									
+									<option  value="Jan">Jan</option>
+									<option  value="Feb">Feb</option>
+									<option  value="Mar">Mar</option>
+									<option  value="Apr">Apr</option>
+									<option  value="May">May</option>
+									<option  value="Jun">Jun</option>
+									<option  value="Jul">Jul</option>
+									<option  value="Aug">Aug</option>
+									<option  value="Sep">Sep</option>
+									<option  value="Oct">Oct</option>
+									<option  value="Nov">Nov</option>
+									<option  value="Dec">Dec</option>
+
+
+									</select>
                 </div>
             </div>
             <div class="modal-footer">
@@ -795,7 +813,7 @@ const aboutCar = `
     Description: ${carData.carModelDescription || "Other"}<br>
     Company: ${carData.carCompanyDescription || "Other"}<br>
     Insurance Expiry: ${formattedExpiryDate}<br>
-    DOB: ${user.dob || "N/A"}
+    Birthday Month: ${user.dob || "N/A"}
 `;
 
             // Store user data in local storage
