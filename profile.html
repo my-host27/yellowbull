@@ -220,7 +220,7 @@
 
     <script type="module">
         import {
-            auth, db, onAuthStateChanged, doc, getDoc, updateDoc, collection, Timestamp, getDocs, onSnapshot,
+            auth, db, onAuthStateChanged, doc, getDoc, updateDoc, collection, Timestamp, getDocs, onSnapshot, setDoc, query, where, deleteDoc,
             sendEmailVerification, updateEmail, reauthenticateWithCredential, EmailAuthProvider, verifyBeforeUpdateEmail, logoutUser, storage, ref, uploadBytes, getDownloadURL, resetPassword
         } from "./firebase-config.js";
 
@@ -837,7 +837,8 @@ const aboutCar = `
             userListHTML += `
                 <tr id="user-${docSnap.id}" data-price="${price.replace(/[^\d]/g, '')}">
                     <td>${user.userName || "Unknown"}</td>
-                    <td>${user.email || "No Email"}</td>
+<td>${user.email || "No Email"} ${generateServicingBalanceHTML(membership)}</td>
+
                     <td class="membership-actions">
                         <button class="btn btn-${membership === "Expired" ? "danger" : "info"} btn-sm selectMembership" data-userid="${docSnap.id}">
                             ${membership}
@@ -941,8 +942,6 @@ if (userData.InsExpMonth) {
 
 // Show the modal
 $('#editCarModal').modal('show');
-
-      // Handle saving the changes
 document.getElementById('saveCarDetails').onclick = async () => {
     const updatedPlate = document.getElementById("editCarPlate").value.trim();
     const updatedBrand = document.getElementById("editCarBrand").value.trim();
@@ -953,33 +952,58 @@ document.getElementById('saveCarDetails').onclick = async () => {
 
     let insuranceExpiryDate = null;
     if (updatedIns) {
-        insuranceExpiryDate = new Date(updatedIns); // ✔️ this is the correct way
+        insuranceExpiryDate = new Date(updatedIns);
     }
 
+    const oldPlate = userData.carPlate;
+
     try {
+        const userRef = doc(db, "Users", userId);
+
+        // 1. Update data user di koleksi Users
         await updateDoc(userRef, {
             carPlate: updatedPlate,
             InsExpMonth: insuranceExpiryDate,
             dob: updatedDOB
         });
-        console.log("Car details updated successfully.");
+
+        // 2. Cek semua carPlates dengan userID yang sama
+        const carPlatesRef = collection(db, "carPlates");
+        const q = query(carPlatesRef, where("userID", "==", userId));
+        const snapshot = await getDocs(q);
+
+        let oldData = null;
+
+        for (const docSnap of snapshot.docs) {
+            if (docSnap.id !== updatedPlate) {
+                oldData = docSnap.data();  // Simpan data lama
+                await deleteDoc(doc(db, "carPlates", docSnap.id));  // Hapus dokumen duplikat
+            }
+        }
+
+        // 3. Gabungkan data lama (jika ada) dengan data baru
+        const newData = {
+            carBrand: updatedBrand || oldData?.carBrand || "",
+            carModel: updatedModel || oldData?.carModel || "",
+            carModelDescription: updatedDescription || oldData?.carModelDescription || "",
+            carPlate: updatedPlate,
+            userID: userId,
+            InsExpMonth: insuranceExpiryDate || oldData?.InsExpMonth || ""
+        };
+
+        // 4. Simpan dokumen baru ke carPlates (dengan ID = plat baru)
+        const carRef = doc(db, "carPlates", updatedPlate);
+        await setDoc(carRef, newData, { merge: true });
+
+        Swal.fire("✅ Success", "Car details updated!", "success");
+        $('#editCarModal').modal('hide');
+        loadAllUsers();
+
     } catch (error) {
         console.error("Error updating car details:", error);
+        Swal.fire("❌ Error", error.message, "error");
     }
-
-    if (updatedPlate) {
-        const carRef = doc(db, "carPlates", updatedPlate);
-        await updateDoc(carRef, {
-            carBrand: updatedBrand,
-            carModel: updatedModel,
-            carModelDescription: updatedDescription,
-        });
-    }
-
-    $('#editCarModal').modal('hide');
-    loadAllUsers();
 };
-
     });
 });
 
@@ -1025,6 +1049,34 @@ document.getElementById('saveCarDetails').onclick = async () => {
                             };
                         });
                     });
+
+                    function generateServicingBalanceHTML(membership) {
+    const base = {
+        "Pre-Inspection": 0,
+        "Roadside Assist": 0,
+        "Towing": 0,
+        "Top-Up AC": 0,
+        "Car Servicing": 2  // fixed for all
+    };
+
+    if (membership.includes("Mega Oil") || membership.includes("Castrol")) {
+        base["Pre-Inspection"] = 2;
+        base["Roadside Assist"] = 2;
+        base["Towing"] = 2;
+    }
+
+    if (!membership.includes("basic") && !membership.includes("Towing Package")) {
+        base["Top-Up AC"] = 1;
+    }
+
+    let html = `<div style="margin-top:5px; font-size:12px;">
+      🔧 <b>Servicing Balance:</b><br>`;
+    for (const [key, val] of Object.entries(base)) {
+        html += `${key}: ${val}<br>`;
+    }
+    html += `</div>`;
+    return html;
+}
 
 
 
@@ -1602,6 +1654,16 @@ if (userData) {
                 });
             });
 
+            const servicingBalanceMap = {
+    "4 Liters Mega Oil basic": 2,
+    "4 Liters Mega Oil": 2,
+    "5 Liters Mega Oil": 2,
+    "4 Liters Castrol Oil": 2,
+    "5 Liters Castrol Oil": 2,
+    "Towing Package": 0,
+};
+
+
 
 
  
@@ -1643,13 +1705,33 @@ if (userData) {
     const localEndDateTimestamp = Timestamp.fromDate(localEndDate);
 
     // Save membership data to Firestore
-    await updateDoc(doc(db, "Users", userId), {
-        membership: selectedMembership,
-        paymentStatus: "Done",
-        membershipPrice: selectedPrice,
-        membershipStart: localStartDateTimestamp,  // Save local start date
-        membershipEnd: localEndDateTimestamp,  // Save local end date
-    });
+   const servicingBalance = {
+    "Pre-Inspection": 0,
+    "Roadside Assist": 0,
+    "Towing": 0,
+    "Top-Up AC": 0,
+    "Car Servicing": 2
+};
+
+if (selectedMembership.includes("Mega Oil") || selectedMembership.includes("Castrol")) {
+    servicingBalance["Pre-Inspection"] = 2;
+    servicingBalance["Roadside Assist"] = 2;
+    servicingBalance["Towing"] = 2;
+}
+if (!selectedMembership.includes("basic") && !selectedMembership.includes("Towing Package")) {
+    servicingBalance["Top-Up AC"] = 1;
+}
+
+// Simpan ke Firestore:
+await updateDoc(doc(db, "Users", userId), {
+    membership: selectedMembership,
+    paymentStatus: "Done",
+    membershipPrice: selectedPrice,
+    membershipStart: localStartDateTimestamp,
+    membershipEnd: localEndDateTimestamp,
+    servicingBalance: servicingBalance
+});
+
 
     $("#membershipModal").modal("hide");
     loadAllUsers();

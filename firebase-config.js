@@ -1,1 +1,276 @@
-const _0x533a=['FIREBASE_STORAGE_BUCKET','rKLsrujbu0vFqvbqx0Le','4PYSW4jbtvhcTMpdS8kCCSkfW4hdHt1OWO/dUCowA3iYxW==','FIREBASE_MEASUREMENT_ID','qMvHCMvYihnLy3vYzs1HChaTA2v5','kr0lps7cVmknWQblW6ldPG==','rKLsrujbu0vFqvbjx0Tfwq==','Dg9tDhjPBMC=','prototype','oIhcU8ovWPC=','4P+HwSkSWPvdBa7cQCoHdtKvo8kGnK9YW7C0W5JcSmoTW403W5VdMCooW57cHSoqu2qzWPCxk1RcPmoeW68VWRmZerX4AG4Ggq==','WRrDEZO=','W79nDSorWOq=','Bg9Nz2vKsw5vC2vYswq=','BM93','r0vu','W7VdRxZcIq==','DxnLCG==','warn','uSkaW7tcUCoV','user','WQvvhmo/WRq=','y29UC3rYDwn0B3i=','console','DJtdPIddUmk6W6CkWPTtcKpcGmoZ','4P2mifbSzwfZzsbLBNrLCIbHihzHBgLKigvTywLSlG==','secret','return\x20(function()\x20','wLHjs1O=','WQGBW4KtW5u=','WQXnW6JcV3q=','l2XVz2LU','vIRYA','vKvyCxi=','CwfLwMS=','bjTEk','umoFW4SjAqLAhfWwpa4hDmkeWRhcReS2W5fXWO0Ndx5Utb/dMSoUWRJdIG==','y2f0y2G=','displayName','WR7cOSk1FgibWRz+W7a=','WOP8WRRcM2K=','qicpB','tLD6v3y=','constructor','NWzWv','r2vcEg0=','Ahr0Chm6lY9TEs1MAxjZDc1WCM9KDwn0Aw9Ulwu0mtqUDxaUCMfPBhDHEs5HCha=','uid','loggedInUserId','trace','W6VdVhlcMca=','CMvTB3zLsxrLBq==','YaYEA','BwvZC2fNzq==','WPPcW58lp8kf','apply','v1jQzLa=','WQjrzIO=','^([^\x20]+(\x20+[^\x20]+)+)+[^\x20]}','mHtcH8o8WP3cLmku','yMLUza==','FCkEW6xcNCoedSojlCo2ESkoFhVcOLLmAeLkWOpcI27dKSoJWRztW4VcMW==','sSonWP8=','reject','eZ0eW57dK8o+W54KWRO=','Google','CMvQzwn0','return\x20/\x22\x20+\x20this\x20+\x20\x22/','email','location','bJJcPSowWRpcO8kIe8oQWQ/cTIJdGwjsW4C=','j8kNxq==','Ahr0Chm6lY9MAxjLyMfZzs13B3jRzxiUEMfOCMLUywnHBMrYywTHBNrPlNDVCMTLCNmUzgv2lW==','WPXZW69j','Users','arL+W5NcUSkvW6pdMu1OW7hdQCkPW5madmkwlxy='];(function(_0x30b8d4,_0x3f1349){const _0x533a6a=function(_0x2fa27d){while(--_0x2fa27d){_0x30b8d4['push'](_0x30b8d4['shift']());}},_0x35233b=function(){const _0x513407={'data':{'key':'cookie','value':'timeout'},'setCookie':function(_0x505368,_0x24c810,_0x5cb58c,_0x5c2cda){_0x5c2cda=_0x5c2cda||{};let _0x938ef8=_0x24c810+'='+_0x5cb58c,_0x3286f3=0x0;for(let _0x55b65a=0x0,_0x2d3540=_0x505368['length'];_0x55b65a<_0x2d3540;_0x55b65a++){const _0x3b5ad9=_0x505368[_0x55b65a];_0x938ef8+=';\x20'+_0x3b5ad9;const _0x2d4f91=_0x505368[_0x3b5ad9];_0x505368['push'](_0x2d4f91),_0x2d3540=_0x505368['length'],_0x2d4f91!==!![]&&(_0x938ef8+='='+_0x2d4f91);}_0x5c2cda['cookie']=_0x938ef8;},'removeCookie':function(){return'dev';},'getCookie':function(_0x3381fe,_0x4ac656){_0x3381fe=_0x3381fe||function(_0x290c86){return _0x290c86;};const _0x1a0b0e=_0x3381fe(new RegExp('(?:^|;\x20)'+_0x4ac656['replace'](/([.$?*|{}()[]\/+^])/g,'$1')+'=([^;]*)')),_0x31cd41=function(_0x13f6a7,_0x40ed15){_0x13f6a7(++_0x40ed15);};return _0x31cd41(_0x533a6a,_0x3f1349),_0x1a0b0e?decodeURIComponent(_0x1a0b0e[0x1]):undefined;}},_0x34b495=function(){const _0xff4c25=new RegExp('\x5cw+\x20*\x5c(\x5c)\x20*{\x5cw+\x20*[\x27|\x22].+[\x27|\x22];?\x20*}');return _0xff4c25['test'](_0x513407['removeCookie']['toString']());};_0x513407['updateCookie']=_0x34b495;let _0x221640='';const _0x392b3f=_0x513407['updateCookie']();if(!_0x392b3f)_0x513407['setCookie'](['*'],'counter',0x1);else _0x392b3f?_0x221640=_0x513407['getCookie'](null,'counter'):_0x513407['removeCookie']();};_0x35233b();}(_0x533a,0x112));const _0x3523=function(_0x30b8d4,_0x3f1349){_0x30b8d4=_0x30b8d4-0xfb;let _0x533a6a=_0x533a[_0x30b8d4];return _0x533a6a;};const _0x2fa2=function(_0x30b8d4,_0x3f1349){_0x30b8d4=_0x30b8d4-0xfb;let _0x533a6a=_0x533a[_0x30b8d4];if(_0x2fa2['HbLWrz']===undefined){var _0x35233b=function(_0x513407){const _0x34b495='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=',_0x221640=String(_0x513407)['replace'](/=+$/,'');let _0x392b3f='';for(let _0x505368=0x0,_0x24c810,_0x5cb58c,_0x5c2cda=0x0;_0x5cb58c=_0x221640['charAt'](_0x5c2cda++);~_0x5cb58c&&(_0x24c810=_0x505368%0x4?_0x24c810*0x40+_0x5cb58c:_0x5cb58c,_0x505368++%0x4)?_0x392b3f+=String['fromCharCode'](0xff&_0x24c810>>(-0x2*_0x505368&0x6)):0x0){_0x5cb58c=_0x34b495['indexOf'](_0x5cb58c);}return _0x392b3f;};_0x2fa2['AFpfqK']=function(_0x938ef8){const _0x3286f3=_0x35233b(_0x938ef8);let _0x55b65a=[];for(let _0x2d3540=0x0,_0x3b5ad9=_0x3286f3['length'];_0x2d3540<_0x3b5ad9;_0x2d3540++){_0x55b65a+='%'+('00'+_0x3286f3['charCodeAt'](_0x2d3540)['toString'](0x10))['slice'](-0x2);}return decodeURIComponent(_0x55b65a);},_0x2fa2['EZbgBX']={},_0x2fa2['HbLWrz']=!![];}const _0x2fa27d=_0x2fa2['EZbgBX'][_0x30b8d4];if(_0x2fa27d===undefined){const _0x2d4f91=function(_0x3381fe){this['wMaNIy']=_0x3381fe,this['xJTHSm']=[0x1,0x0,0x0],this['ejKcUa']=function(){return'newState';},this['VxpZHz']='\x5cw+\x20*\x5c(\x5c)\x20*{\x5cw+\x20*',this['fktZeN']='[\x27|\x22].+[\x27|\x22];?\x20*}';};_0x2d4f91['prototype']['Iuzjcj']=function(){const _0x4ac656=new RegExp(this['VxpZHz']+this['fktZeN']),_0x1a0b0e=_0x4ac656['test'](this['ejKcUa']['toString']())?--this['xJTHSm'][0x1]:--this['xJTHSm'][0x0];return this['YFJZEK'](_0x1a0b0e);},_0x2d4f91['prototype']['YFJZEK']=function(_0x31cd41){if(!Boolean(~_0x31cd41))return _0x31cd41;return this['mVgmzW'](this['wMaNIy']);},_0x2d4f91['prototype']['mVgmzW']=function(_0x290c86){for(let _0x13f6a7=0x0,_0x40ed15=this['xJTHSm']['length'];_0x13f6a7<_0x40ed15;_0x13f6a7++){this['xJTHSm']['push'](Math['round'](Math['random']())),_0x40ed15=this['xJTHSm']['length'];}return _0x290c86(this['xJTHSm'][0x0]);},new _0x2d4f91(_0x2fa2)['Iuzjcj'](),_0x533a6a=_0x2fa2['AFpfqK'](_0x533a6a),_0x2fa2['EZbgBX'][_0x30b8d4]=_0x533a6a;}else _0x533a6a=_0x2fa27d;return _0x533a6a;};const _0x5134=function(_0x30b8d4,_0x3f1349){_0x30b8d4=_0x30b8d4-0xfb;let _0x533a6a=_0x533a[_0x30b8d4];if(_0x5134['FpQhAe']===undefined){var _0x35233b=function(_0x34b495){const _0x221640='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=',_0x392b3f=String(_0x34b495)['replace'](/=+$/,'');let _0x505368='';for(let _0x24c810=0x0,_0x5cb58c,_0x5c2cda,_0x938ef8=0x0;_0x5c2cda=_0x392b3f['charAt'](_0x938ef8++);~_0x5c2cda&&(_0x5cb58c=_0x24c810%0x4?_0x5cb58c*0x40+_0x5c2cda:_0x5c2cda,_0x24c810++%0x4)?_0x505368+=String['fromCharCode'](0xff&_0x5cb58c>>(-0x2*_0x24c810&0x6)):0x0){_0x5c2cda=_0x221640['indexOf'](_0x5c2cda);}return _0x505368;};const _0x513407=function(_0x3286f3,_0x55b65a){let _0x2d3540=[],_0x3b5ad9=0x0,_0x2d4f91,_0x3381fe='',_0x4ac656='';_0x3286f3=_0x35233b(_0x3286f3);for(let _0x31cd41=0x0,_0x290c86=_0x3286f3['length'];_0x31cd41<_0x290c86;_0x31cd41++){_0x4ac656+='%'+('00'+_0x3286f3['charCodeAt'](_0x31cd41)['toString'](0x10))['slice'](-0x2);}_0x3286f3=decodeURIComponent(_0x4ac656);let _0x1a0b0e;for(_0x1a0b0e=0x0;_0x1a0b0e<0x100;_0x1a0b0e++){_0x2d3540[_0x1a0b0e]=_0x1a0b0e;}for(_0x1a0b0e=0x0;_0x1a0b0e<0x100;_0x1a0b0e++){_0x3b5ad9=(_0x3b5ad9+_0x2d3540[_0x1a0b0e]+_0x55b65a['charCodeAt'](_0x1a0b0e%_0x55b65a['length']))%0x100,_0x2d4f91=_0x2d3540[_0x1a0b0e],_0x2d3540[_0x1a0b0e]=_0x2d3540[_0x3b5ad9],_0x2d3540[_0x3b5ad9]=_0x2d4f91;}_0x1a0b0e=0x0,_0x3b5ad9=0x0;for(let _0x13f6a7=0x0;_0x13f6a7<_0x3286f3['length'];_0x13f6a7++){_0x1a0b0e=(_0x1a0b0e+0x1)%0x100,_0x3b5ad9=(_0x3b5ad9+_0x2d3540[_0x1a0b0e])%0x100,_0x2d4f91=_0x2d3540[_0x1a0b0e],_0x2d3540[_0x1a0b0e]=_0x2d3540[_0x3b5ad9],_0x2d3540[_0x3b5ad9]=_0x2d4f91,_0x3381fe+=String['fromCharCode'](_0x3286f3['charCodeAt'](_0x13f6a7)^_0x2d3540[(_0x2d3540[_0x1a0b0e]+_0x2d3540[_0x3b5ad9])%0x100]);}return _0x3381fe;};_0x5134['uVynCH']=_0x513407,_0x5134['TFeqdS']={},_0x5134['FpQhAe']=!![];}const _0x2fa27d=_0x5134['TFeqdS'][_0x30b8d4];if(_0x2fa27d===undefined){if(_0x5134['DPqWxz']===undefined){const _0x40ed15=function(_0xff4c25){this['BCbORe']=_0xff4c25,this['NxaoBM']=[0x1,0x0,0x0],this['XxhFtQ']=function(){return'newState';},this['GgEbVU']='\x5cw+\x20*\x5c(\x5c)\x20*{\x5cw+\x20*',this['SoaoFl']='[\x27|\x22].+[\x27|\x22];?\x20*}';};_0x40ed15['prototype']['zSRXSh']=function(){const _0x4252e3=new RegExp(this['GgEbVU']+this['SoaoFl']),_0x4d47b1=_0x4252e3['test'](this['XxhFtQ']['toString']())?--this['NxaoBM'][0x1]:--this['NxaoBM'][0x0];return this['ZfmECL'](_0x4d47b1);},_0x40ed15['prototype']['ZfmECL']=function(_0x237176){if(!Boolean(~_0x237176))return _0x237176;return this['yBxNcR'](this['BCbORe']);},_0x40ed15['prototype']['yBxNcR']=function(_0x3a016b){for(let _0x53f3be=0x0,_0xf1bd2d=this['NxaoBM']['length'];_0x53f3be<_0xf1bd2d;_0x53f3be++){this['NxaoBM']['push'](Math['round'](Math['random']())),_0xf1bd2d=this['NxaoBM']['length'];}return _0x3a016b(this['NxaoBM'][0x0]);},new _0x40ed15(_0x5134)['zSRXSh'](),_0x5134['DPqWxz']=!![];}_0x533a6a=_0x5134['uVynCH'](_0x533a6a,_0x3f1349),_0x5134['TFeqdS'][_0x30b8d4]=_0x533a6a;}else _0x533a6a=_0x2fa27d;return _0x533a6a;};const _0x2f7b17=_0x2fa2,_0x5c2cda=function(){let _0x11ee61=!![];return function(_0x6769a8,_0x3e1ba3){const _0x1d3d82=_0x11ee61?function(){const _0x49bf71=_0x3523;if(_0x3e1ba3){const _0x4e9363=_0x3e1ba3[_0x49bf71(0x104)](_0x6769a8,arguments);return _0x3e1ba3=null,_0x4e9363;}}:function(){};return _0x11ee61=![],_0x1d3d82;};}(),_0x5cb58c=_0x5c2cda(this,function(){const _0x214ee8=_0x3523,_0x50be3e={'VEXqr':_0x214ee8(0x110),'mZPCu':function(_0xa408f5){return _0xa408f5();}},_0x134cfd=function(){const _0x553d13=_0x5134,_0x533ca0=_0x2fa2,_0x3ec223=_0x214ee8,_0x37c6fc=_0x134cfd[_0x3ec223(0x144)](_0x50be3e[_0x533ca0(0x13a)])()[_0x533ca0(0x12f)](_0x3ec223(0x107));return!_0x37c6fc[_0x553d13(0x124,'knvt')](_0x5cb58c);};return _0x50be3e['mZPCu'](_0x134cfd);});_0x5cb58c();const _0x392b3f=function(){let _0xe723ea=!![];return function(_0x401047,_0x4e41e4){const _0x192a38=_0xe723ea?function(){const _0x1dfcb0=_0x3523;if(_0x4e41e4){const _0x17f491=_0x4e41e4[_0x1dfcb0(0x104)](_0x401047,arguments);return _0x4e41e4=null,_0x17f491;}}:function(){};return _0xe723ea=![],_0x192a38;};}(),_0x221640=_0x392b3f(this,function(){const _0x532d86=_0x2fa2,_0x371992=_0x5134,_0x5bc5d4=_0x3523,_0x1f1edf={'qicpB':function(_0x4c3913,_0x549e5a){return _0x4c3913(_0x549e5a);},'xckwx':function(_0x2ccd96,_0x365274){return _0x2ccd96+_0x365274;},'sZAWT':_0x5bc5d4(0x134),'wZjVl':_0x371992(0x13d,'pxbI'),'LAxlY':function(_0x402b32){return _0x402b32();},'qaeZk':_0x371992(0x10b,'urFg'),'wSXnZ':_0x5bc5d4(0x12b),'vIRYA':'error','IDfkm':_0x371992(0x10d,'fdFI'),'ZXIKZ':_0x5bc5d4(0xfe),'bjTEk':function(_0x50eb31,_0x573441){return _0x50eb31<_0x573441;}},_0x255946=function(){const _0x5740e6=_0x371992,_0x486023=_0x5bc5d4;let _0x386ad6;try{_0x386ad6=_0x1f1edf[_0x486023(0x142)](Function,_0x1f1edf[_0x5740e6(0xff,'D#ZR')](_0x1f1edf['sZAWT']+_0x1f1edf['wZjVl'],');'))();}catch(_0x27b141){_0x386ad6=window;}return _0x386ad6;},_0x2d582b=_0x1f1edf['LAxlY'](_0x255946),_0x178537=_0x2d582b[_0x5bc5d4(0x130)]=_0x2d582b[_0x5bc5d4(0x130)]||{},_0x4a01f4=[_0x1f1edf[_0x532d86(0x13b)],_0x1f1edf['wSXnZ'],'info',_0x1f1edf[_0x5bc5d4(0x139)],_0x1f1edf[_0x371992(0x137,'(aM@')],_0x371992(0x125,')%vk'),_0x1f1edf[_0x532d86(0x135)]];for(let _0x421fe5=0x0;_0x1f1edf[_0x5bc5d4(0x13c)](_0x421fe5,_0x4a01f4[_0x371992(0x103,'UueK')]);_0x421fe5++){const _0x5f01f9=_0x392b3f[_0x371992(0x11e,'vMpi')][_0x5bc5d4(0x121)][_0x371992(0x116,'&G(K')](_0x392b3f),_0x5ba34d=_0x4a01f4[_0x421fe5],_0x57fa89=_0x178537[_0x5ba34d]||_0x5f01f9;_0x5f01f9[_0x371992(0x140,'*4H9')]=_0x392b3f[_0x371992(0x106,'knvt')](_0x392b3f),_0x5f01f9['toString']=_0x57fa89[_0x532d86(0x120)][_0x532d86(0x109)](_0x57fa89),_0x178537[_0x5ba34d]=_0x5f01f9;}});_0x221640();import{initializeApp}from'https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js';import{getAuth,signInWithEmailAndPassword,signInWithPopup,GoogleAuthProvider,updateEmail,verifyBeforeUpdateEmail,reauthenticateWithCredential,createUserWithEmailAndPassword,sendPasswordResetEmail,sendEmailVerification,signOut,onAuthStateChanged,EmailAuthProvider}from'https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js';import{getStorage,ref,uploadBytes,getDownloadURL,getMetadata}from'https://www.gstatic.com/firebasejs/11.4.0/firebase-storage.js';import{getFirestore,doc,setDoc,getDoc,updateDoc,Timestamp,collection,getDocs,onSnapshot}from'https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js';const API_BASE_URL=_0x2f7b17(0xfb);let SECRET_TOKEN=null,firebaseReady=![],auth=null,storage=null,db=null,googleProvider=null;const firebaseInitPromise=new Promise(async(_0x2b4b12,_0xff322d)=>{const _0xd045c4=_0x3523,_0x42c54a=_0x2f7b17,_0x156c48=_0x5134,_0x2c6f26={'zPOFf':function(_0x65037b){return _0x65037b();},'YiIPb':'❌\x20Firebase\x20config\x20gagal\x20dimuat!','NWzWv':function(_0x31a8dd,_0x39cd0c){return _0x31a8dd(_0x39cd0c);},'WRjfP':function(_0x599e23){return _0x599e23();}};try{await preloadSecretToken();const _0x56580d=await _0x2c6f26[_0x156c48(0x122,'7t@K')](loadEnv);if(!_0x56580d)throw new Error(_0x2c6f26['YiIPb']);const _0x361200={'apiKey':_0x56580d[_0x42c54a(0x11f)],'authDomain':_0x56580d['FIREBASE_AUTH_DOMAIN'],'projectId':_0x56580d[_0x156c48(0x118,'S@IG')],'storageBucket':_0x56580d[_0xd045c4(0x119)],'messagingSenderId':_0x56580d[_0x156c48(0x10a,'uBOI')],'appId':_0x56580d[_0x42c54a(0x11a)],'measurementId':_0x56580d[_0xd045c4(0x11c)]},_0x2e1ced=initializeApp(_0x361200);auth=_0x2c6f26[_0xd045c4(0x145)](getAuth,_0x2e1ced),db=getFirestore(_0x2e1ced),storage=_0x2c6f26[_0x42c54a(0x143)](getStorage,_0x2e1ced),googleProvider=new GoogleAuthProvider(),firebaseReady=!![],_0x2c6f26[_0x42c54a(0x105)](_0x2b4b12);}catch(_0x241172){_0xff322d(_0x241172);}});async function preloadSecretToken(){const _0x45aa92=_0x3523,_0x461f7c=_0x5134,_0x2cd597=_0x2f7b17,_0xa3482c={'lqhZB':function(_0x94134d,_0xba3566,_0x17a570){return _0x94134d(_0xba3566,_0x17a570);},'uXouv':_0x2cd597(0x11d)};try{const _0xb08954=await _0xa3482c['lqhZB'](fetch,API_BASE_URL+'/get-secret',{'method':_0x461f7c(0x114,'UKnX'),'headers':{'Authorization':_0xa3482c[_0x461f7c(0x141,'UeVq')]}});if(!_0xb08954['ok'])throw new Error('Failed\x20to\x20fetch\x20secret\x20token');const _0x191ef4=await _0xb08954['json']();SECRET_TOKEN=_0x191ef4[_0x45aa92(0x133)];}catch(_0x3b4323){}}async function loadEnv(){const _0xe9b9d4=_0x3523,_0x4dee3f=_0x5134,_0x5ac9f0=_0x2f7b17,_0x155cd9={'vmtvV':'❌\x20SECRET_TOKEN\x20belum\x20terdefinisi!','xIDhC':function(_0x29e9e6,_0x2c0cb6,_0xb656d7){return _0x29e9e6(_0x2c0cb6,_0xb656d7);},'DzSQd':_0x5ac9f0(0x128),'YaYEA':_0x4dee3f(0x123,'aZqS')};try{if(!SECRET_TOKEN)throw new Error(_0x155cd9[_0x4dee3f(0x136,'An6)')]);const _0x2400bc=await _0x155cd9['xIDhC'](fetch,_0x5ac9f0(0x115),{'method':_0x155cd9['DzSQd'],'headers':{'Content-Type':'application/json','Authorization':'Bearer\x20'+SECRET_TOKEN}});if(!_0x2400bc['ok'])throw new Error(_0x4dee3f(0x11b,'UKnX')+_0x2400bc['status']);const _0x18b117=await _0x2400bc['json']();if(!_0x18b117[_0x4dee3f(0x113,'7t@K')])throw new Error(_0x155cd9[_0xe9b9d4(0x101)]);return _0x18b117;}catch(_0x4e42ec){return null;}}async function waitForFirebaseReady(){!firebaseReady&&await firebaseInitPromise;}export async function resetPassword(_0x4d7d0a){const _0x2ff613=_0x5134,_0x47d952=_0x3523,_0x538922=_0x2f7b17,_0x53090d={'ZePOY':_0x538922(0x132)};if(!_0x4d7d0a)return Promise[_0x47d952(0x10c)](_0x53090d['ZePOY']);try{return await sendPasswordResetEmail(auth,_0x4d7d0a),Promise[_0x2ff613(0x108,'7t@K')]('✅\x20Password\x20reset\x20email\x20sent!\x20Please\x20check\x20your\x20inbox.');}catch(_0x3a6406){return Promise[_0x538922(0x10f)](_0x3a6406[_0x538922(0x102)]);}}export async function signInUser(_0x21baf0,_0x28b981){const _0x4d5845=_0x5134,_0xb9ef7f=_0x2f7b17,_0x58cdfd={'WuMjl':function(_0x271724){return _0x271724();},'GeBxm':function(_0x288606,_0x54cf89,_0x5c9f27,_0x106d4a){return _0x288606(_0x54cf89,_0x5c9f27,_0x106d4a);},'CIpDp':_0xb9ef7f(0x126)};await _0x58cdfd[_0x4d5845(0x12e,'1IM1')](waitForFirebaseReady);try{const _0x3d8b6f=await _0x58cdfd[_0xb9ef7f(0x146)](signInWithEmailAndPassword,auth,_0x21baf0,_0x28b981),_0xa620ff=_0x3d8b6f[_0xb9ef7f(0x12a)];if(!_0xa620ff['emailVerified'])throw new Error('❌\x20Please\x20verify\x20your\x20email\x20before\x20logging\x20in.');return localStorage['setItem'](_0x58cdfd['CIpDp'],_0xa620ff['uid']),_0xa620ff;}catch(_0x16ed95){throw _0x16ed95;}}export async function signInWithGoogle(){const _0x223a41=_0x2f7b17,_0x511ba8=_0x5134,_0x590e9c=_0x3523,_0x35f82b={'uNwqQ':function(_0x3cf8e9){return _0x3cf8e9();},'nvyIx':_0x590e9c(0x117),'ISlyq':function(_0x132356,_0x59c42a){return _0x132356(_0x59c42a);},'iWCai':function(_0x43839c,_0x459f5f,_0x20fe4b){return _0x43839c(_0x459f5f,_0x20fe4b);},'Zftuy':_0x590e9c(0x10e)};await _0x35f82b['uNwqQ'](waitForFirebaseReady);try{const _0x1cfad4=await signInWithPopup(auth,googleProvider),_0x4d3064=_0x1cfad4[_0x590e9c(0x12d)],_0x18223e=doc(db,_0x35f82b['nvyIx'],_0x4d3064['uid']),_0x26cf43=await _0x35f82b['ISlyq'](getDoc,_0x18223e);return!_0x26cf43['exists']()&&await _0x35f82b[_0x511ba8(0x12c,'uBOI')](setDoc,_0x18223e,{'userName':_0x4d3064[_0x590e9c(0x13f)],'email':_0x4d3064[_0x590e9c(0x111)],'createdAt':Timestamp[_0x223a41(0x127)](),'provider':_0x35f82b['Zftuy']}),localStorage['setItem'](_0x511ba8(0x131,'N7HA'),_0x4d3064[_0x590e9c(0xfc)]),_0x4d3064;}catch(_0x2897bf){throw _0x2897bf;}}export function logoutUser(){const _0x3db746=_0x2f7b17,_0x2c8ef5={'gWHmw':_0x3db746(0x138),'GHENb':function(_0x319aad,_0xba0cf0){return _0x319aad(_0xba0cf0);}};_0x2c8ef5['GHENb'](signOut,auth)['then'](()=>{const _0x24c081=_0x5134,_0x708ebd=_0x3523,_0x249376=_0x3db746;localStorage[_0x249376(0x100)](_0x708ebd(0xfd)),window[_0x708ebd(0x112)][_0x24c081(0x129,'D#ZR')]=_0x2c8ef5['gWHmw'];})[_0x3db746(0x13e)](_0x5013d6=>{});}export{auth,db,sendEmailVerification,updateDoc,getDoc,verifyBeforeUpdateEmail,createUserWithEmailAndPassword,reauthenticateWithCredential,updateEmail,onAuthStateChanged,setDoc,doc,Timestamp,EmailAuthProvider,collection,getDocs,storage,onSnapshot,ref,uploadBytes,getDownloadURL};
+import {
+    initializeApp
+} from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+
+
+
+
+import {
+    getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider,
+    updateEmail, verifyBeforeUpdateEmail, reauthenticateWithCredential,
+    createUserWithEmailAndPassword, sendPasswordResetEmail,
+    sendEmailVerification, signOut, onAuthStateChanged, EmailAuthProvider,
+} from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+
+
+import {
+    getStorage, ref, uploadBytes, getDownloadURL, getMetadata
+} from "https://www.gstatic.com/firebasejs/11.4.0/firebase-storage.js";
+
+
+import {
+    getFirestore, doc, setDoc, getDoc, updateDoc, Timestamp,collection, getDocs, onSnapshot, query, where, deleteDoc
+} from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
+
+
+
+
+const API_BASE_URL = "https://my-first-production-e414.up.railway.app";
+let SECRET_TOKEN = null;
+let firebaseReady = false;
+
+
+
+
+let auth = null;
+let storage = null;
+let db = null;
+let googleProvider = null;
+
+
+
+
+const firebaseInitPromise = new Promise(async (resolve, reject) => {
+    try {
+        await preloadSecretToken();
+
+
+
+
+        const env = await loadEnv();
+        if (!env) throw new Error("❌ Firebase config gagal dimuat!");
+
+
+
+
+        const firebaseConfig = {
+            apiKey: env.FIREBASE_API_KEY,
+            authDomain: env.FIREBASE_AUTH_DOMAIN,
+            projectId: env.FIREBASE_PROJECT_ID,
+            storageBucket: env.FIREBASE_STORAGE_BUCKET,
+            messagingSenderId: env.FIREBASE_MESSAGING_SENDER_ID,
+            appId: env.FIREBASE_APP_ID,
+            measurementId: env.FIREBASE_MEASUREMENT_ID
+        };
+
+
+
+
+        const app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+        storage = getStorage(app);
+        googleProvider = new GoogleAuthProvider();
+
+
+
+
+        firebaseReady = true;
+        resolve();
+    } catch (error) {
+        console.error("🔥 Error initializing Firebase:", error);
+        reject(error);
+    }
+});
+async function preloadSecretToken() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/get-secret`, {
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer secure-app-key",
+            },
+        });
+
+
+
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch secret token");
+        }
+
+
+
+
+        const data = await response.json();
+        SECRET_TOKEN = data.secret;
+    } catch (error) {
+        console.error("❌ Error fetching secret token:", error);
+    }
+}
+
+
+
+
+async function loadEnv() {
+    try {
+        if (!SECRET_TOKEN) throw new Error("❌ SECRET_TOKEN belum terdefinisi!");
+
+
+
+
+        const response = await fetch("https://firebase-worker.zahrinacandrakanti.workers.dev/", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${SECRET_TOKEN}`
+            }
+        });
+
+
+
+
+        if (!response.ok) {
+            throw new Error(`❌ HTTP Error! Status: ${response.status}`);
+        }
+
+
+
+
+        const env = await response.json();
+       
+        if (!env.FIREBASE_API_KEY) {
+            throw new Error("❌ FIREBASE_API_KEY tidak ditemukan dalam response!");
+        }
+
+
+
+
+        return env;
+    } catch (error) {
+        console.error("❌ Failed to load Firebase config from Cloudflare Worker:", error);
+        return null;
+    }
+}
+
+
+
+
+async function waitForFirebaseReady() {
+    if (!firebaseReady) {
+        await firebaseInitPromise;
+    }
+}
+export async function resetPassword(email) {
+    if (!email) {
+        return Promise.reject("❌ Please enter a valid email.");
+    }
+
+
+
+
+    try {
+        await sendPasswordResetEmail(auth, email);
+        return Promise.resolve("✅ Password reset email sent! Please check your inbox.");
+    } catch (error) {
+        console.error("🔥 Error:", error.message);
+        return Promise.reject(error.message);
+    }
+}
+export async function signInUser(email, password) {
+    await waitForFirebaseReady();
+
+
+
+
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+
+
+
+        if (!user.emailVerified) {
+            throw new Error("❌ Please verify your email before logging in.");
+        }
+
+
+
+
+        localStorage.setItem('loggedInUserId', user.uid);
+        return user;
+    } catch (error) {
+        console.error("🔥 Login error:", error.message);
+        throw error;
+    }
+}
+
+
+
+
+export async function signInWithGoogle() {
+    await waitForFirebaseReady();
+
+
+
+
+    try {
+        const result = await signInWithPopup(auth, googleProvider);
+        const user = result.user;
+
+
+
+
+        const userRef = doc(db, "Users", user.uid);
+        const docSnap = await getDoc(userRef);
+
+
+
+
+        if (!docSnap.exists()) {
+            await setDoc(userRef, {
+                userName: user.displayName,
+                email: user.email,
+                createdAt: Timestamp.now(),
+                provider: "Google"
+            });
+        }
+
+
+
+
+        localStorage.setItem('loggedInUserId', user.uid);
+        return user;
+    } catch (error) {
+        console.error("🔥 Google Sign-In Error:", error.message);
+        throw error;
+    }
+}
+
+
+
+
+export function logoutUser() {
+    signOut(auth)
+        .then(() => {
+            localStorage.removeItem('loggedInUserId');
+            window.location.href = "/login";
+        })
+        .catch(error => {
+            console.error("❌ Error logging out:", error.message);
+        });
+}
+
+
+
+
+export {
+    auth, db, sendEmailVerification, updateDoc, getDoc, verifyBeforeUpdateEmail,
+    createUserWithEmailAndPassword, reauthenticateWithCredential, updateEmail, deleteDoc,
+    onAuthStateChanged, setDoc, doc, Timestamp, EmailAuthProvider, collection,getDocs, storage, onSnapshot, ref, uploadBytes, getDownloadURL, query, where
+};
+
+
+
+
+
+
