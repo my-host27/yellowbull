@@ -220,7 +220,7 @@
 
     <script type="module">
         import {
-            auth, db, onAuthStateChanged, doc, getDoc, updateDoc, collection, Timestamp, getDocs, onSnapshot, setDoc, query, where, deleteDoc,
+            auth, db, onAuthStateChanged, doc, getDoc, updateDoc, collection, sendEmailReminder, Timestamp, getDocs, onSnapshot, setDoc, query, where, deleteDoc, functions, httpsCallable,
             sendEmailVerification, updateEmail, reauthenticateWithCredential, EmailAuthProvider, verifyBeforeUpdateEmail, logoutUser, storage, ref, uploadBytes, getDownloadURL, resetPassword
         } from "./firebase-config.js";
 
@@ -2006,22 +2006,56 @@ await updateDoc(doc(db, "Users", userId), {
             }
 
             // 🔹 Function to show the renew button
-            function showRenewButton(userId) {
-                const userRow = document.getElementById(`user-${userId}`);
-                if (!userRow) return;
+            async function showRenewButton(userId) {
+    const userRow = document.getElementById(`user-${userId}`);
+    if (!userRow) return;
 
-                const membershipActions = userRow.querySelector(".membership-actions");
-                if (!membershipActions) return;
+    const membershipActions = userRow.querySelector(".membership-actions");
+    if (!membershipActions) return;
 
-                if (!membershipActions.querySelector(".renew-btn")) {
-                    const renewButton = document.createElement("button");
-                    renewButton.classList.add("btn", "btn-warning", "btn-sm", "renew-btn");
-                    renewButton.innerText = "Renew";
-                    renewButton.onclick = () => renewMembership(userId);
+    if (!membershipActions.querySelector(".renew-btn")) {
+        const userRef = doc(db, "Users", userId);
+        const userSnap = await getDoc(userRef);
+        const userData = userSnap.data();
 
-                    membershipActions.appendChild(renewButton);
-                }
-            }
+        // 🔒 Validasi data user
+        if (!userData?.email || !userData?.userName) {
+            console.error(`❌ Cannot send email: Missing email or userName for ${userId}`);
+            return;
+        }
+
+        // 🚫 Jangan kirim email kalau membership sudah Expired
+        if (userData.membership === "Expired") {
+            console.log(`❌ Membership expired. No email reminder sent to ${userData.email}`);
+            return;
+        }
+
+        // 🕒 Cek apakah reminder terakhir sudah lebih dari 3 hari
+        const lastSent = userData.lastReminderSent?.toDate();
+        const now = new Date();
+        const threeDays = 3 * 24 * 60 * 60 * 1000; // 3 hari dalam ms
+
+        if (!lastSent || (now - lastSent > threeDays)) {
+            console.log(`📧 Sending email reminder to ${userData.email}`);
+            await sendEmailReminder(userData.email, userData.userName);
+
+            // ⏱ Simpan timestamp pengiriman
+            await updateDoc(userRef, {
+                lastReminderSent: Timestamp.now()
+            });
+        } else {
+            console.log(`⏳ Reminder already sent within the last 3 days to ${userData.email}`);
+        }
+
+        // 🔘 Tampilkan tombol Renew
+        const renewButton = document.createElement("button");
+        renewButton.classList.add("btn", "btn-warning", "btn-sm", "renew-btn");
+        renewButton.innerText = "Renew";
+        renewButton.onclick = () => renewMembership(userId);
+
+        membershipActions.appendChild(renewButton);
+    }
+}
 
             // 🔄 Run this check every 1 minute
             setInterval(async () => {

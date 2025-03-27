@@ -2,6 +2,11 @@ import {
     initializeApp
 } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
 
+import {
+    getFunctions,
+    httpsCallable
+} from "https://www.gstatic.com/firebasejs/11.4.0/firebase-functions.js";
+
 
 
 
@@ -36,6 +41,7 @@ let auth = null;
 let storage = null;
 let db = null;
 let googleProvider = null;
+let functions = null;
 
 
 
@@ -67,6 +73,7 @@ const firebaseInitPromise = new Promise(async (resolve, reject) => {
 
 
         const app = initializeApp(firebaseConfig);
+        functions = getFunctions(app, "us-central1");
         auth = getAuth(app);
         db = getFirestore(app);
         storage = getStorage(app);
@@ -261,11 +268,33 @@ export function logoutUser() {
 }
 
 
+export async function sendEmailReminder(to, name) {
+    try {
+        const response = await fetch("https://us-central1-yellowbull-96845.cloudfunctions.net/sendRenewalReminder", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ to, name })
+        });
+
+        if (!response.ok) {
+            throw new Error("❌ Failed to send email reminder");
+        }
+
+        const result = await response.json();
+        console.log("✅ Email reminder sent:", result);
+        return result;
+    } catch (error) {
+        console.error("❌ Error sending email reminder:", error);
+        throw error;
+    }
+}
 
 
 export {
     auth, db, sendEmailVerification, updateDoc, getDoc, verifyBeforeUpdateEmail,
-    createUserWithEmailAndPassword, reauthenticateWithCredential, updateEmail, deleteDoc,
+    createUserWithEmailAndPassword, reauthenticateWithCredential, updateEmail, deleteDoc, functions, httpsCallable,
     onAuthStateChanged, setDoc, doc, Timestamp, EmailAuthProvider, collection,getDocs, storage, onSnapshot, ref, uploadBytes, getDownloadURL, query, where
 };
 

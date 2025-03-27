@@ -7,6 +7,5 @@ public/secrets.js
 .firebase/
 .wrangler/
 flask-secret-server/
-functions/
 public/
 
