@@ -239,6 +239,8 @@
 
         document.addEventListener("DOMContentLoaded", function () {
             const userTable = document.getElementById("userTableBody");
+    
+
 
             // ✅ Pastikan `auth` sudah terinisialisasi sebelum menjalankan listener
             const checkAuth = setInterval(() => {
@@ -721,11 +723,11 @@ if (logoutBtn) {
 document.getElementById("searchInput").addEventListener("input", () => {
     loadAllUsers(true); // fetch ulang + filter
 });
-                setTimeout(() => {
-                    checkMembershipExpiration();  // Cek lagi setelah load
-                }, 1000);
+                // setTimeout(() => {
+                //     checkMembershipExpiration();  // Cek lagi setelah load
+                // }, 1000);
 
-
+                checkMembershipExpiration();
 
 
                 setTimeout(() => {
@@ -901,8 +903,13 @@ const aboutCar = `
                     document.getElementById("userTableBody").innerHTML = userListHTML;
                     assignMembershipListeners();  // Pastikan tombol bisa diklik
                     console.log("Filtering... Value:", document.getElementById("membershipFilter").value);
+
+
                     filterTable();
                     if (applyFilter) {
+                                        document.querySelectorAll(".membership-actions").forEach(actions => {
+    actions.dataset.renewShown = "false";
+});
             filterTable(); // Now filter after fetch
         }
 
@@ -1309,6 +1316,9 @@ document.getElementById('saveCarDetails').onclick = async () => {
                                 if (user.role && user.role === "admin") {
                                     continue; // Skip the current iteration if the role is 'admin'
                                 }
+                                if (user.emailVerified === false) {
+                                    continue; // Skip the current iteration if the role is 'admin'
+                                }
 
                                 // Add a check to ensure `carPlate` exists before querying carPlates
                                 let carData = {};
@@ -1318,17 +1328,31 @@ document.getElementById('saveCarDetails').onclick = async () => {
                                     carData = carSnap.exists() ? carSnap.data() : {};
                                 }
 
-                                const userData = [
-                                    rowNumber++, // Increment row number for each user
-                                    user.userName || "Unknown", // Name
-                                    user.userContact || "Not Available", // Handphone
-                                    user.carPlate || "Not Available", // Car Plate
-                                    user.email || "Not Available", // Email
-                                    user.dob || "Not Available", // Birthday Month
-                                    user.InsExpMonth || "Not Available", // Insurance Expiry Month
-                                    carData.carBrand || "Not Available", // Car Make
-                                    carData.carModel || "Not Available" // Car Model
-                                ];
+                               // Format Insurance Expiry Month
+let formattedIns = "Not Available";
+if (user.InsExpMonth) {
+    if (typeof user.InsExpMonth === "string") {
+        formattedIns = user.InsExpMonth;
+    } else if (user.InsExpMonth?.toDate) {
+        const insDate = user.InsExpMonth.toDate();
+        formattedIns = insDate.toLocaleDateString('en-GB', {
+            day: '2-digit', month: 'short', year: 'numeric'
+        });
+    }
+}
+
+const userData = [
+    rowNumber++,                                  // No.
+    user.userName || "Unknown",                   // Name
+    user.userContact || "Not Available",          // Handphone
+    user.carPlate || "Not Available",             // Car Plate
+    user.email || "Not Available",                // Email
+    user.dob || "Not Available",                  // Birthday Month
+    formattedIns,                                 // Insurance Expiry Month
+    carData.carBrand || "Not Available",          // Car Make
+    carData.carModel || "Not Available"           // Car Model
+];
+
 
                                 // Add row data to the data array
                                 data.push(userData);
@@ -1584,16 +1608,14 @@ document.getElementById('saveCarDetails').onclick = async () => {
                 }
             }
 
-            function filterTable() {
+          function filterTable() {
     const filterValue = document.getElementById("membershipFilter").value.toLowerCase();
     const searchValue = document.getElementById("searchInput").value.toLowerCase();
     const rows = document.querySelectorAll("#userTableBody tr");
-    
 
-    checkMembershipExpiration();
-    assignMembershipListeners();
-    
-    
+    assignMembershipListeners(); // Tetap perlu
+    // Jangan panggil checkMembershipExpiration() di sini!
+
     let visibleCount = 0;
     let totalPrice = 0;
     const now = new Date();
@@ -1604,39 +1626,35 @@ document.getElementById('saveCarDetails').onclick = async () => {
         const email = row.querySelector("td:nth-child(2)").innerText.toLowerCase();
         const membershipButton = row.querySelector("td:nth-child(3) button");
         const membership = membershipButton.innerText.toLowerCase();
-        
-        // Extract carPlate from the "About Car" column
         const aboutCar = row.querySelector("td:nth-child(8)").innerText.toLowerCase();
-        const carPlateMatch = aboutCar.includes(searchValue);  // Searching within the About Car column
+        const carPlateMatch = aboutCar.includes(searchValue);
 
         let showRow = false;
 
         const userId = row.id.replace("user-", "");
-const userData = JSON.parse(localStorage.getItem(`userData-${userId}`));
+        const userData = JSON.parse(localStorage.getItem(`userData-${userId}`));
+        if (!userData) return;
 
-// Tambahkan filter untuk admin dan email belum terverifikasi
-if (userData) {
-    if (userData.role === "admin") return;
-    if (userData.emailVerified === false) return;
-}
+        if (userData.role === "admin" || userData.emailVerified === false) return;
 
+        const endDate = new Date(userData.membershipEnd);
+        const timeLeft = endDate - now;
+
+        // 🔥 Munculkan tombol Renew kalau kurang dari 7 hari dan belum expired
+        if (timeLeft > 0 && timeLeft <= sevenDays && membership !== "expired") {
+
+        }
+
+        // Tentukan baris ditampilkan atau tidak
         if (filterValue === "all") {
             showRow = true;
         } else if (filterValue === "renew") {
-            const userId = row.id.replace("user-", "");
-            const userData = JSON.parse(localStorage.getItem(`userData-${userId}`));
-            if (userData && userData.membershipEnd && userData.membership !== "expired") {
-                const endDate = new Date(userData.membershipEnd);
-                const timeLeft = endDate - now;
-                if (timeLeft > 0 && timeLeft <= sevenDays) {
-                    showRow = true;
-                }
-            }
+            showRow = (timeLeft > 0 && timeLeft <= sevenDays && membership !== "expired");
         } else {
             showRow = membership === filterValue;
         }
 
-        // Now check if the search matches either the name, email, or carPlate
+        // 🔍 Filter berdasarkan search bar
         const matchSearch = name.includes(searchValue) || email.includes(searchValue) || carPlateMatch;
 
         if (showRow && matchSearch) {
@@ -1644,16 +1662,15 @@ if (userData) {
             visibleCount++;
             const priceStr = row.getAttribute("data-price");
             const priceNum = parseFloat(priceStr);
-            if (!isNaN(priceNum)) {
-                totalPrice += priceNum;
-            }
+            if (!isNaN(priceNum)) totalPrice += priceNum;
         } else {
             row.style.display = "none";
         }
     });
 
     document.getElementById("userCount").innerText = `Total Users: ${visibleCount}`;
-    // document.getElementById("totalPrice").innerText = `Total Price: $${totalPrice}`;
+    // checkMembershipExpiration();  // ⬅️ Tambahkan ini
+
 }
 
             $(document).on("click", "#infoIcon", function () {
@@ -1854,8 +1871,10 @@ await updateDoc(doc(db, "Users", userId), {
                         if (!userRow) return;
 
                         const membershipActions = userRow.querySelector(".membership-actions");
-                        if (!membershipActions) return;
 
+                        if (!membershipActions) return;
+        if (membershipActions.getAttribute("data-renew-shown") === "true") return;
+            membershipActions.setAttribute("data-renew-shown", "true");
                         if (membershipStatus === "Expired") {
                             membershipActions.innerHTML = `
     <button class="btn btn-${membershipStatus === "Expired" ? "danger" : "info"} btn-sm selectMembership" data-userid="${userId}">
@@ -1884,9 +1903,13 @@ await updateDoc(doc(db, "Users", userId), {
                                     paymentStatus: "Not Paid",
                                 });
                             } else if (timeLeft <= sevenDays) {
+    const membershipActions = userRow.querySelector(".membership-actions");
 
-                                showRenewButton(userId);
-                            }
+    if (!membershipActions.querySelector(".renew-btn")) {
+        showRenewButton(userId);
+    }
+}
+
                         }
                     });
                 });
@@ -1963,107 +1986,104 @@ await updateDoc(doc(db, "Users", userId), {
             }
 
             // **Cek setiap 1 menit apakah ada membership yang expired**
-            setInterval(async () => {
-                await checkMembershipExpiration();
-            }, 60 * 1000);
-            async function checkMembershipExpiration() {
+            // setInterval(async () => {
+            //     await checkMembershipExpiration();
+            // }, 60 * 1000);
+         async function checkMembershipExpiration() {
+    const usersRef = collection(db, "Users");
+    const querySnapshot = await getDocs(usersRef);
+    const now = new Date();
 
-                const usersRef = collection(db, "Users");
-                const querySnapshot = await getDocs(usersRef);
-                const now = new Date();
+    const oneWeek = 7 * 24 * 60 * 60 * 1000;
 
-                querySnapshot.forEach(async (docSnap) => {
-                    const userData = docSnap.data();
-                    const userId = docSnap.id;
+    querySnapshot.forEach(async (docSnap) => {
+        const userData = docSnap.data();
+        const userId = docSnap.id;
 
-                    if (userData.membershipEnd && userData.membershipEnd.toDate) {
-                        const membershipEndDate = userData.membershipEnd.toDate();
-                        const timeLeft = membershipEndDate - now;
-                        const oneWeek = 7 * 24 * 60 * 60 * 1000;  // 🔥 1 minggu dalam milidetik
-                        if (timeLeft <= 0) {
+        if (userData.membershipEnd && userData.membershipEnd.toDate) {
+            const membershipEndDate = userData.membershipEnd.toDate();
+            const timeLeft = membershipEndDate - now;
 
-                            await updateDoc(doc(db, "Users", userId), {
-    membership: "Expired",
-    paymentStatus: "Not Paid",
-    servicingBalance: {
-        "Pre-Inspection": 0,
-        "Roadside Assist": 0,
-        "Towing": 0,
-        "Top-Up AC": 0,
-        "Car Servicing": 0
-    }
-});
-
-
-                            listenForMembershipUpdates();
-                        } else if (timeLeft <= oneWeek) {
-                            showRenewButton(userId);
-                        }
+            if (timeLeft <= 0) {
+                await updateDoc(doc(db, "Users", userId), {
+                    membership: "Expired",
+                    paymentStatus: "Not Paid",
+                    servicingBalance: {
+                        "Pre-Inspection": 0,
+                        "Roadside Assist": 0,
+                        "Towing": 0,
+                        "Top-Up AC": 0,
+                        "Car Servicing": 0
                     }
                 });
 
-                setTimeout(checkMembershipExpiration, 60 * 1000);
+                listenForMembershipUpdates();
+            } else if (timeLeft <= oneWeek) {
+                const userRow = document.getElementById(`user-${userId}`);
+                if (!userRow) return;
+
+                const membershipActions = userRow.querySelector(".membership-actions");
+                if (!membershipActions) return;
+
+                const existingRenewBtn = membershipActions.querySelector(".renew-btn");
+
+                // ✅ Jika tombol sudah ada, jangan panggil showRenewButton lagi
+                if (!existingRenewBtn) {
+                    showRenewButton(userId);
+                }
             }
+        }
+    });
+
+    setTimeout(checkMembershipExpiration, 1000);
+}
 
             // 🔹 Function to show the renew button
-            async function showRenewButton(userId) {
+        async function showRenewButton(userId) {
     const userRow = document.getElementById(`user-${userId}`);
     if (!userRow) return;
 
     const membershipActions = userRow.querySelector(".membership-actions");
     if (!membershipActions) return;
 
-    if (!membershipActions.querySelector(".renew-btn")) {
-        const userRef = doc(db, "Users", userId);
-        const userSnap = await getDoc(userRef);
-        const userData = userSnap.data();
-
-        // 🔒 Validasi data user
-        if (!userData?.email || !userData?.userName) {
-            console.error(`❌ Cannot send email: Missing email or userName for ${userId}`);
-            return;
-        }
-
-        // 🚫 Jangan kirim email kalau membership sudah Expired
-        if (userData.membership === "Expired") {
-            console.log(`❌ Membership expired. No email reminder sent to ${userData.email}`);
-            return;
-        }
-
-        // 🕒 Cek apakah reminder terakhir sudah lebih dari 3 hari
-        const lastSent = userData.lastReminderSent?.toDate();
-        const now = new Date();
-        const threeDays = 3 * 24 * 60 * 60 * 1000; // 3 hari dalam ms
-
-        if (!lastSent || (now - lastSent > threeDays)) {
-            console.log(`📧 Sending email reminder to ${userData.email}`);
-            await sendEmailReminder(userData.email, userData.userName);
-
-            // ⏱ Simpan timestamp pengiriman
-            await updateDoc(userRef, {
-                lastReminderSent: Timestamp.now()
-            });
-        } else {
-            console.log(`⏳ Reminder already sent within the last 3 days to ${userData.email}`);
-        }
-
-        // 🔘 Tampilkan tombol Renew
-        const renewButton = document.createElement("button");
-        renewButton.classList.add("btn", "btn-warning", "btn-sm", "renew-btn");
-        renewButton.innerText = "Renew";
-        renewButton.onclick = () => renewMembership(userId);
-
-        membershipActions.appendChild(renewButton);
+   if (membershipActions.querySelector(".renew-btn")) {
+        return; // Stop jika sudah ada tombol renew
     }
+    const userRef = doc(db, "Users", userId);
+    const userSnap = await getDoc(userRef);
+    const userData = userSnap.data();
+
+    if (!userData?.email || !userData?.userName) return;
+    if (userData.membership === "Expired") return;
+
+    const lastSent = userData.lastReminderSent?.toDate();
+    const now = new Date();
+    const threeDays = 3 * 24 * 60 * 60 * 1000;
+
+    if (!lastSent || (now - lastSent > threeDays)) {
+        console.log(`📧 Sending email reminder to ${userData.email}`);
+        await sendEmailReminder(userData.email, userData.userName);
+        await updateDoc(userRef, {
+            lastReminderSent: Timestamp.now()
+        });
+    }
+
+    const renewButton = document.createElement("button");
+    renewButton.classList.add("btn", "btn-warning", "btn-sm", "renew-btn");
+    renewButton.innerText = "Renew";
+    renewButton.onclick = () => renewMembership(userId);
+
+    membershipActions.appendChild(renewButton);
+    
 }
 
-            // 🔄 Run this check every 1 minute
-            setInterval(async () => {
-                await checkMembershipExpiration();
-            }, 60 * 1000);
+            // // 🔄 Run this check every 1 minute
+            // setInterval(async () => {
+            //     await checkMembershipExpiration();
+            // }, 60 * 1000);
 
             document.addEventListener("DOMContentLoaded", async () => {
-                await checkMembershipExpiration();
+                // await checkMembershipExpiration();
                 if (document.getElementById("userTableBody")) {
                     await loadAllUsers();
                 }
