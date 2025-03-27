@@ -282,6 +282,8 @@ if (logoutBtn) {
 
                         if (docSnap.exists()) {
                             const userData = docSnap.data();
+
+
                             document.getElementById("username").innerText = userData.userName || "User";
                             document.getElementById("vehicle_no").innerText = userData.carPlate || "Not Available";
                             document.getElementById("currentEmail").innerText = user.email || "Not Available";
@@ -304,7 +306,29 @@ if (logoutBtn) {
 
                             onSnapshot(userRef, (docSnap) => {
                                 const userData = docSnap.data();
-                                updateMembershipUI(userData);  // Call UI update function with live data
+                                updateMembershipUI(userData);  
+                                
+                            // Show servicing balance only if user has active membership
+const membership = userData.membership;
+const servicingBalance = userData.servicingBalance;
+
+if (membership && membership !== "None" && membership !== "Expired" && servicingBalance) {
+    const servicingCard = document.getElementById("servicingBalanceCard");
+    const servicingContent = document.getElementById("servicingBalanceContent");
+
+    let html = "<ul class='list-group'>";
+    for (const [key, val] of Object.entries(servicingBalance)) {
+        html += `<li class="list-group-item d-flex justify-content-between align-items-center">
+                    ${key}
+                    <span class="badge badge-primary badge-pill">${val}</span>
+                 </li>`;
+    }
+    html += "</ul>";
+
+    servicingContent.innerHTML = html;
+    servicingCard.style.display = "block";
+}
+
                             });
 
 
@@ -2437,6 +2461,15 @@ z-index: 9999;">
 
 
             <a href="/plans" class="btn btn-purchase">Purchase Plan</a>
+            <div id="servicingBalanceCard" class="card mt-4" style="display:none;">
+  <div class="card-header bg-warning text-white font-weight-bold">
+Servicing Balance
+  </div>
+  <div class="card-body" id="servicingBalanceContent">
+    <!-- Dynamic content here -->
+  </div>
+</div>
+
         </div>
 
         <div class="modal fade" id="editProfileModal" tabindex="-1" role="dialog"
