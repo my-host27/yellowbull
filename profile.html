@@ -751,6 +751,7 @@ document.getElementById("searchInput").addEventListener("input", () => {
 
             // Skip admin users
             if (user.role === "admin") continue;
+            if (user.emailVerified === false) continue;
 
             const userId = docSnap.id;
             const paymentMethod = user.paymentMethod || "Not Selected";
@@ -1461,9 +1462,11 @@ document.getElementById('saveCarDetails').onclick = async () => {
     const filterValue = document.getElementById("membershipFilter").value.toLowerCase();
     const searchValue = document.getElementById("searchInput").value.toLowerCase();
     const rows = document.querySelectorAll("#userTableBody tr");
+    
 
     checkMembershipExpiration();
     assignMembershipListeners();
+    
     
     let visibleCount = 0;
     let totalPrice = 0;
@@ -1481,6 +1484,15 @@ document.getElementById('saveCarDetails').onclick = async () => {
         const carPlateMatch = aboutCar.includes(searchValue);  // Searching within the About Car column
 
         let showRow = false;
+
+        const userId = row.id.replace("user-", "");
+const userData = JSON.parse(localStorage.getItem(`userData-${userId}`));
+
+// Tambahkan filter untuk admin dan email belum terverifikasi
+if (userData) {
+    if (userData.role === "admin") return;
+    if (userData.emailVerified === false) return;
+}
 
         if (filterValue === "all") {
             showRow = true;
