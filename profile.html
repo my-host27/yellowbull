@@ -316,18 +316,27 @@ if (membership && membership !== "None" && membership !== "Expired" && servicing
     const servicingCard = document.getElementById("servicingBalanceCard");
     const servicingContent = document.getElementById("servicingBalanceContent");
 
-    let html = "<ul class='list-group'>";
-    for (const [key, val] of Object.entries(servicingBalance)) {
-        html += `<li class="list-group-item d-flex justify-content-between align-items-center">
-                    ${key}
-                    <span class="badge badge-primary badge-pill">${val}</span>
-                 </li>`;
-    }
-    html += "</ul>";
+    // Hanya tampilkan layanan dengan balance > 0
+    const activeServices = Object.entries(servicingBalance).filter(([_, val]) => val > 0);
 
-    servicingContent.innerHTML = html;
-    servicingCard.style.display = "block";
+    if (activeServices.length > 0) {
+        let html = "<ul class='list-group'>";
+        for (const [key, val] of activeServices) {
+            html += `<li class="list-group-item d-flex justify-content-between align-items-center">
+                        ${key}
+                        <span class="badge badge-primary badge-pill">${val}</span>
+                    </li>`;
+        }
+        html += "</ul>";
+
+        servicingContent.innerHTML = html;
+        servicingCard.style.display = "block";
+    } else {
+        // Jika semua balance 0, sembunyikan kartu
+        servicingCard.style.display = "none";
+    }
 }
+
 
                             });
 
