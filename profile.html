@@ -220,7 +220,7 @@
 
     <script type="module">
         import {
-            auth, db, onAuthStateChanged, doc, getDoc, updateDoc, collection, sendEmailReminder, Timestamp, getDocs, onSnapshot, setDoc, query, where, deleteDoc, functions, httpsCallable,
+            auth, db, onAuthStateChanged, doc, getDoc, updateDoc, collection, sendEmailReminder, Timestamp, getDocs, onSnapshot, setDoc, query, where, deleteDoc, functions, httpsCallable, deleteField,
             sendEmailVerification, updateEmail, reauthenticateWithCredential, EmailAuthProvider, verifyBeforeUpdateEmail, logoutUser, storage, ref, uploadBytes, getDownloadURL, resetPassword
         } from "./firebase-config.js";
 
@@ -2058,7 +2058,14 @@ await updateDoc(doc(db, "Users", userId), {
                 });
 
                 listenForMembershipUpdates();
-            } else if (timeLeft <= oneWeek) {
+            }else if (timeLeft > oneWeek && userData.lastReminderSent) {
+    await updateDoc(doc(db, "Users", userId), {
+        lastReminderSent: deleteField()
+    });
+}
+ else if (timeLeft <= oneWeek) {
+                
+                
                 const userRow = document.getElementById(`user-${userId}`);
                 if (!userRow) return;
 
@@ -2098,9 +2105,9 @@ await updateDoc(doc(db, "Users", userId), {
 
     const lastSent = userData.lastReminderSent?.toDate();
     const now = new Date();
-    const threeDays = 3 * 24 * 60 * 60 * 1000;
+    const oneDay = 24 * 60 * 60 * 1000;
 
-    if (!lastSent || (now - lastSent > threeDays)) {
+if (!lastSent || (now - lastSent > oneDay)) {
         console.log(`📧 Sending email reminder to ${userData.email}`);
         await sendEmailReminder(userData.email, userData.userName);
         await updateDoc(userRef, {

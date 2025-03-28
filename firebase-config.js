@@ -24,7 +24,7 @@ import {
 
 
 import {
-    getFirestore, doc, setDoc, getDoc, updateDoc, Timestamp,collection, getDocs, onSnapshot, query, where, deleteDoc
+    getFirestore, doc, setDoc, getDoc, updateDoc, Timestamp,collection, getDocs, onSnapshot, query, where, deleteDoc, deleteField
 } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
 
 
@@ -294,7 +294,7 @@ export async function sendEmailReminder(to, name) {
 
 export {
     auth, db, sendEmailVerification, updateDoc, getDoc, verifyBeforeUpdateEmail,
-    createUserWithEmailAndPassword, reauthenticateWithCredential, updateEmail, deleteDoc, functions, httpsCallable,
+    createUserWithEmailAndPassword, reauthenticateWithCredential, updateEmail, deleteDoc, functions, httpsCallable, deleteField,
     onAuthStateChanged, setDoc, doc, Timestamp, EmailAuthProvider, collection,getDocs, storage, onSnapshot, ref, uploadBytes, getDownloadURL, query, where
 };
 
