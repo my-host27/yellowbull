@@ -1834,16 +1834,23 @@ const userData = [
     "Roadside Assist": 0,
     "Towing": 0,
     "Top-Up AC": 0,
-    "Car Servicing": 2
+    "Car Servicing": 0
 };
 
-if (selectedMembership.includes("Mega Oil") || selectedMembership.includes("Castrol")) {
-    servicingBalance["Pre-Inspection"] = 2;
-    servicingBalance["Roadside Assist"] = 2;
-    servicingBalance["Towing"] = 2;
-}
-if (!selectedMembership.includes("basic") && !selectedMembership.includes("Towing Package")) {
-    servicingBalance["Top-Up AC"] = 1;
+if (selectedMembership === "Towing Package") {
+    servicingBalance["Towing"] = 3;
+    servicingBalance["Roadside Assist"] = 3;  // untuk Jump Start
+} else {
+    if (!selectedMembership.includes("basic")) {
+        servicingBalance["Top-Up AC"] = 1;
+    }
+    if (selectedMembership.includes("Mega Oil") || selectedMembership.includes("Castrol")) {
+        servicingBalance["Pre-Inspection"] = 2;
+        servicingBalance["Roadside Assist"] = 2;
+        servicingBalance["Towing"] = 2;
+        servicingBalance["Car Servicing"] = 2;
+        
+    }
 }
 
 // Simpan ke Firestore:
