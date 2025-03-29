@@ -7,8 +7,8 @@ admin.initializeApp();
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'zahrinacandrakanti@gmail.com',
-    pass: 'kmjrqqktalayennh'
+    user: 'yellowbull2404@gmail.com',
+    pass: 'qrryvbhunniwqkmu'
   }
 });
 
@@ -24,7 +24,7 @@ exports.sendRenewalReminder = functions.https.onRequest((req, res) => {
     }
 
     const mailOptions = {
-      from: 'zahrinacandrakanti@gmail.com',
+      from: 'yellowbull2404@gmail.com',
       to,
       subject: '⏰ Membership Renewal Reminder',
       html: `<p>Hi ${name || "there"},</p>
@@ -54,8 +54,8 @@ exports.scheduledMembershipReminder = onSchedule("every 24 hours", async (event)
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'zahrinacandrakanti@gmail.com',
-      pass: 'kmjrqqktalayennh'
+      user: 'yellowbull2404@gmail.com',
+      pass: 'qrryvbhunniwqkmu'
     }
   });
 
@@ -75,7 +75,7 @@ exports.scheduledMembershipReminder = onSchedule("every 24 hours", async (event)
 
       if (shouldSend) {
         const mailOptions = {
-          from: 'zahrinacandrakanti@gmail.com',
+          from: 'yellowbull2404@gmail.com',
           to: email,
           subject: '⏰ Membership Renewal Reminder',
           html: `<p>Hi ${userName},</p>
@@ -112,8 +112,8 @@ exports.scheduledServicingReminder = onSchedule("every 24 hours", async (event) 
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'zahrinacandrakanti@gmail.com',
-      pass: 'kmjrqqktalayennh'
+      user: 'yellowbull2404@gmail.com',
+      pass: 'qrryvbhunniwqkmu'
     }
   });
 
@@ -152,7 +152,7 @@ exports.scheduledServicingReminder = onSchedule("every 24 hours", async (event) 
     emailContent += `<p>Best regards,<br/>Yellowbull Team</p>`;
 
     const mailOptions = {
-      from: 'zahrinacandrakanti@gmail.com',
+      from: 'yellowbull2404@gmail.com',
       to: email,
       subject: '🔧 Servicing Balance Reminder',
       html: emailContent
