@@ -103,3 +103,69 @@ exports.scheduledMembershipReminder = onSchedule("every 24 hours", async (event)
 
   return null;
 });
+
+exports.scheduledServicingReminder = onSchedule("every 24 hours", async (event) => {
+  const db = admin.firestore();
+  const usersSnapshot = await db.collection("Users").get();
+  const now = new Date();
+
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'zahrinacandrakanti@gmail.com',
+      pass: 'kmjrqqktalayennh'
+    }
+  });
+
+  for (const doc of usersSnapshot.docs) {
+    const data = doc.data();
+    const { servicingBalance, email, userName, membership, membershipStart } = data;
+
+    if (!email || !userName || !servicingBalance || membership === "Expired" || !membershipStart) continue;
+
+    const start = membershipStart.toDate();
+    const diffMonths = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
+
+    const isReminderDay =
+      diffMonths % 3 === 0 &&
+      now.getDate() === start.getDate() &&
+      now.getHours() < 6;  // biar cuma kirim 1x per hari
+
+    if (!isReminderDay) continue;
+
+    const servicesLeft = Object.entries(servicingBalance)
+      .filter(([_, val]) => val > 0)
+      .map(([key, val]) => `${key}: ${val}`);
+
+    let emailContent = `<p>Hi ${userName},</p>`;
+
+    if (servicesLeft.length > 0) {
+      emailContent += `<p>Here is your remaining servicing balance:</p><ul>`;
+      servicesLeft.forEach(service => {
+        emailContent += `<li>${service}</li>`;
+      });
+      emailContent += `</ul><p>Use them before your membership expires.</p>`;
+    } else {
+      emailContent += `<p>All your servicing balances have been used.</p><p>Please consider renewing your membership to continue enjoying our services.</p>`;
+    }
+
+    emailContent += `<p>Best regards,<br/>Yellowbull Team</p>`;
+
+    const mailOptions = {
+      from: 'zahrinacandrakanti@gmail.com',
+      to: email,
+      subject: '🔧 Servicing Balance Reminder',
+      html: emailContent
+    };
+
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log(`📧 Servicing email sent to ${email}`);
+    } catch (err) {
+      console.error(`❌ Failed to send servicing reminder to ${email}:`, err.message);
+    }
+  }
+
+  return null;
+});
+
