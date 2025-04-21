@@ -8,4 +8,5 @@ public/secrets.js
 .wrangler/
 flask-secret-server/
 public/
+functions
 
