@@ -72,14 +72,114 @@ exports.scheduledMembershipReminder = onSchedule("every 24 hours", async (event)
     // Generate the services list based on remaining servicing balance
     const validServicingBalance = servicingBalance && typeof servicingBalance === 'object' ? servicingBalance : {};
     let servicesList = '';
-    Object.entries(validServicingBalance).forEach(([service, count]) => {
-      if (count > 0) {
-        servicesList += `<li>✅ ${service} (${count} left)</li>`;
-      }
-    });
 
-    // Send reminder at H-1 month (30 days before expiration)
-    if (timeLeft <= oneMonth && timeLeft > oneMonth - oneDay) { // within the last 24 hours of the 1 month mark
+    // Loop through the servicingBalance object to create a list of available services
+    const serviceNames = [
+      { name: 'Car Servicing', label: 'Car servicing(s) left (engine oil and original filter)' },
+      { name: 'Roadside Assist', label: 'Emergency roadside assistance' },
+      { name: 'Pre-Inspection', label: 'FREE Vehicle pre-inspection' },
+      { name: 'Towing', label: 'FREE Towing to any workshop' },
+      { name: 'Top-Up AC', label: 'FREE Top-up air conditioning gas' },
+      { name: 'Jump Start', label: 'FREE Jump Start Services in Singapore' },
+      { name: 'Breakdown Assist', label: 'Onsite Breakdown Assistance (Available in selected parts of Malaysia)' }
+    ];
+
+    // If the package is Towing Package, only show Towing-related services
+    if (membership === 'Towing Package') {
+      if (validServicingBalance['Towing'] > 0) {
+        servicesList += `<div>✅ FREE Tows in Singapore</div>`;
+      }
+
+      if (validServicingBalance['Jump Start'] > 0) {
+        servicesList += `<div>✅ FREE Jump Start Services in Singapore</div>`;
+      }
+      if (validServicingBalance['Breakdown Assist'] > 0) {
+        servicesList += `<div>✅ Onsite Breakdown Assistance (Available in selected parts of Malaysia)</div>`;
+      }
+    } else {
+      // For other packages, show all available services
+      serviceNames.forEach(({ name, label }) => {
+        if (validServicingBalance[name] > 0) {
+          servicesList += `<div>✅ ${label} (${validServicingBalance[name]} left)</div>`;
+        }
+      });
+    }
+
+    // Customize email content based on package type
+    let emailSubject = '';
+    let emailBody = '';
+    let discount = ''; // Default to no discount
+
+    // Handling for Towing Package
+    if (membership === 'Towing Package') {
+      emailSubject = `Reminder: Your Towing Package with Yellow Bull SG is Expiring Soon!`;
+      emailBody = `<p>Dear ${userName} - ${carPlate},</p>
+                   <p>We hope you're doing well! This is a friendly reminder that your <b> Towing Package </b> with <b> YellowBull SG </b> will expire on <b>${endDate.toDateString()}</b>.</p>
+                   <p>Before your package expires, don’t forget to use your remaining benefits:</p>
+
+                     ${servicesList || '<div>No remaining services left.</div>'}
+                   
+                   <p><b>Renew your package today</b> to ensure continued protection and benefits for your car! Contact us via:</p>
+                   <p>📧 <b>Email</b>: yellowbull2404@gmail.com<br/>
+                      📞 <b>WhatsApp</b>: +65 9101 3232 / +65 9101 2323 / +65 8206 1664</p>
+                   <p>Check out other package plans and exclusive promotions on our website:</p>
+                   <p>🌐 <b>Website</b>: www.yellowbull.com.sg</p>
+                   <p>If you have any questions, feel free to reach out. We’ll be happy to assist you!</p>
+                   <p>Thanks,<br/>YELLOW BULL PTE LTD</p>`;
+    } else if (membership === '5 Liters Castrol Oil') {
+      discount = '15%'; // Specific discount for 5 Liters Castrol Oil package
+      emailSubject = `Reminder: Your Annual Car Care Package with Yellow Bull SG is Expiring Soon!`;
+      emailBody = `<p>Dear ${userName} - ${carPlate},</p>
+                   <p>We hope you're doing well! This is a friendly reminder that your <b>${membership}</b> - <b>Annual Car Care Package</b> with <b>YellowBull SG<b> will expire on <b>${endDate.toDateString()}</b>.</p>
+                   <p>Before your package expires, don’t forget to use your remaining benefits:</p>
+                   
+                     ${servicesList || '<div>No remaining services left.</div>'}
+                     <div>✅ [${discount}] OFF Other services</div>
+            
+                   <p><b>Renew your package today</b> to ensure continued protection and benefits for your car! Contact us via:</p>
+                   <p>📧 <b>Email</b>: yellowbull2404@gmail.com<br/>
+                      📞 <b>WhatsApp</b>: +65 9101 3232 / +65 9101 2323 / +65 8206 1664</p>
+                   <p>Check out other package plans and exclusive promotions on our website:</p>
+                   <p>🌐 <b>Website</b>: www.yellowbull.com.sg</p>
+                   <p>If you have any questions, feel free to reach out. We’ll be happy to assist you!</p>
+                   <p>Thanks,<br/>YELLOW BULL PTE LTD</p>`;
+    } else if (membership === '4 Liters Mega Oil basic') {
+      // No discount for Mega Oil Basic
+      emailSubject = `Reminder: Your Annual Car Care Package with Yellow Bull SG is Expiring Soon!`;
+      emailBody = `<p>Dear ${userName} - ${carPlate},</p>
+                   <p>We hope you're doing well! This is a friendly reminder that your <b>${membership}</b> - <b>Annual Car Care Package</b> with <b>YellowBull SG<b> will expire on <b>${endDate.toDateString()}</b>.</p>
+                   <p>Before your package expires, don’t forget to use your remaining benefits:</p>
+
+                     ${servicesList || '<div>No remaining services left.</div>'}
+
+                   <p><b>Renew your package today</b> to ensure continued protection and benefits for your car! Contact us via:</p>
+                   <p>📧 <b>Email</b>: yellowbull2404@gmail.com<br/>
+                      📞 <b>WhatsApp</b>: +65 9101 3232 / +65 9101 2323 / +65 8206 1664</p>
+                   <p>Check out other package plans and exclusive promotions on our website:</p>
+                   <p>🌐 <b>Website</b>: www.yellowbull.com.sg</p>
+                   <p>If you have any questions, feel free to reach out. We’ll be happy to assist you!</p>
+                   <p>Thanks,<br/>YELLOW BULL PTE LTD</p>`;
+    } else { 
+      discount = '10%'; // Default discount for other packages
+      emailSubject = `Reminder: Your Annual Car Care Package with Yellow Bull SG is Expiring Soon!`;
+      emailBody = `<p>Dear ${userName} - ${carPlate},</p>
+                   <p>We hope you're doing well! This is a friendly reminder that your <b>${membership}</b> - <b>Annual Car Care Package</b> with <b>YellowBull SG<b> will expire on <b>${endDate.toDateString()}</b>.</p>
+                   <p>Before your package expires, don’t forget to use your remaining benefits:</p>
+                   
+                     ${servicesList || '<div>No remaining services left.</div>'}
+                     <div>✅ [${discount}] OFF Other services</div>
+                  
+                   <p><b>Renew your package today</b> to ensure continued protection and benefits for your car! Contact us via:</p>
+                   <p>📧 <b>Email</b>: yellowbull2404@gmail.com<br/>
+                      📞 <b>WhatsApp</b>: +65 9101 3232 / +65 9101 2323 / +65 8206 1664</p>
+                   <p>Check out other package plans and exclusive promotions on our website:</p>
+                   <p>🌐 <b>Website</b>: www.yellowbull.com.sg</p>
+                   <p>If you have any questions, feel free to reach out. We’ll be happy to assist you!</p>
+                   <p>Thanks,<br/>YELLOW BULL PTE LTD</p>`;
+    }
+
+    // Send reminder for both H-1 month and H-7 days with the same email body
+    const sendReminder = async (timeLeft, subject, body) => {
       const lastSent = lastReminderSent?.toDate();
       const shouldSend = !lastSent || (now - lastSent > oneDay);
 
@@ -87,30 +187,13 @@ exports.scheduledMembershipReminder = onSchedule("every 24 hours", async (event)
         const mailOptions = {
           from: 'yellowbull2404@gmail.com',
           to: email,
-          subject: `Reminder: Your ${membership} Package with Yellow Bull SG is Expiring Soon!`,
-          html: `<p>Dear ${userName} - ${carPlate},</p>
-                 <p>We hope you're doing well! This is a friendly reminder that your ${membership} - Annual Car Care Package with YellowBull SG will expire on ${endDate.toDateString()}.</p>
-                 <p>Before your package expires, don’t forget to use your remaining benefits:</p>
-                 <ul>
-                   ${servicesList || '<li>No remaining services left.</li>'}
-                   <li>✅ Emergency roadside assistance</li>
-                   <li>✅ FREE Vehicle pre-inspection</li>
-                   <li>✅ FREE Towing to any workshop</li>
-                   <li>✅ FREE Top-up air conditioning gas</li>
-                   <li>✅ [X%] OFF Other services</li>
-                 </ul>
-                 <p>Renew your package today to ensure continued protection and benefits for your car! Contact us via:</p>
-                 <p>📧 Email: yellowbull2404@gmail.com<br/>
-                    📞 WhatsApp: +65 9101 3232 / +65 9101 2323 / +65 8206 1664</p>
-                 <p>Check out other package plans and exclusive promotions on our website:</p>
-                 <p>🌐 Website: www.yellowbull.com.sg</p>
-                 <p>If you have any questions, feel free to reach out. We’ll be happy to assist you!</p>
-                 <p>Thanks,<br/>YELLOW BULL PTE LTD</p>`
+          subject: subject,
+          html: body
         };
 
         try {
           await transporter.sendMail(mailOptions);
-          console.log(`📧 Email sent to ${email} at H-1 month`);
+          console.log(`📧 Email sent to ${email}`);
           await doc.ref.update({
             lastReminderSent: admin.firestore.Timestamp.now() // Update the timestamp when reminder is sent
           });
@@ -118,33 +201,16 @@ exports.scheduledMembershipReminder = onSchedule("every 24 hours", async (event)
           console.error(`❌ Failed to send email to ${email}:`, err.message);
         }
       }
+    };
+
+    // Send reminder at H-1 month (30 days before expiration)
+    if (timeLeft <= oneMonth && timeLeft > oneMonth - oneDay) {
+      await sendReminder(timeLeft, emailSubject, emailBody);
     }
 
     // Send reminder at H-7 days (7 days before expiration)
-    if (timeLeft > 0 && timeLeft <= oneWeek) { // within the last 24 hours of the 7 days mark
-      const lastSent = lastReminderSent?.toDate();
-      const shouldSend = !lastSent || (now - lastSent > oneDay);
-
-      if (shouldSend) {
-        const mailOptions = {
-          from: 'yellowbull2404@gmail.com',
-          to: email,
-          subject: '⏰ Membership Renewal Reminder',
-          html: `<p>Hi ${userName},</p>
-                 <p>Your membership will expire on ${endDate.toDateString()}. Please contact admin to renew.</p>
-                 <p>Best regards,<br/>Yellowbull Team</p>`
-        };
-
-        try {
-          await transporter.sendMail(mailOptions);
-          console.log(`📧 Email sent to ${email} at H-7 days`);
-          await doc.ref.update({
-            lastReminderSent: admin.firestore.Timestamp.now() // Update the timestamp when reminder is sent
-          });
-        } catch (err) {
-          console.error(`❌ Failed to send email to ${email}:`, err.message);
-        }
-      }
+    if (timeLeft > 0 && timeLeft <= oneWeek) {
+      await sendReminder(timeLeft, emailSubject, emailBody);
     }
 
     // Reset lastReminderSent if membership is still valid and more than a week is left
@@ -162,7 +228,6 @@ exports.scheduledServicingReminder = onSchedule("every 24 hours", async (event) 
   const usersSnapshot = await db.collection("Users").get();
   const now = new Date();
 
-
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -171,70 +236,100 @@ exports.scheduledServicingReminder = onSchedule("every 24 hours", async (event) 
     }
   });
 
-
   for (const doc of usersSnapshot.docs) {
     const data = doc.data();
-    const { servicingBalance, email, userName, membership, membershipStart } = data;
+    const { servicingBalance, email, userName, membership, membershipStart, membershipEnd, carPlate, lastNotified } = data;
 
+    // Skip if data is missing or membership is expired
+    if (!email || !userName || !servicingBalance || membership === "Expired" || !membershipStart || !membershipEnd) continue;
 
-    if (!email || !userName || !servicingBalance || membership === "Expired" || !membershipStart) continue;
-
+    const endDate = membershipEnd.toDate();
+    const timeLeft = endDate - now;
 
     const servicesLeft = Object.entries(servicingBalance)
-      .filter(([_, val]) => val > 0)  // Only include services that still have balance
+      .filter(([_, val]) => val > 0)
       .map(([key, val]) => `${key}: ${val}`);
 
-
     const servicesOut = Object.entries(servicingBalance)
-      .filter(([_, val]) => val === 0) // Check if any service has a balance of 0
-      .map(([key, _]) => key);  // Extract the service names that have 0 balance
+      .filter(([_, val]) => val === 0)
+      .map(([key, _]) => key);
 
+    // Check if notification was already sent within the last 24 hours
+    if (lastNotified && (now - lastNotified.toDate()) < 24 * 60 * 60 * 1000) {
+      console.log(`⏱️ Skipping email for ${email} - notification already sent in the last 24 hours.`);
+      continue;
+    }
 
-    if (servicesOut.length > 0) { // Send email if there are services with 0 balance
-      let emailContent = `<p>Hi ${userName},</p>`;
+    let emailSubject = '';
+    let emailBody = '';
 
+    // If there are services with 0 balance, send the full service details email
+    if (servicesOut.length > 0) {
+      if (membership === "Towing Package") {
+        emailSubject = `Yellow Bull Towing Package Update: Your Remaining Package Balance`;
+        emailBody = `<p>Dear ${userName} - ${carPlate},</p>
+                     <p>We hope you're doing well! Here’s an update on your <b>Towing Package</b> with Yellow Bull SG.</p>
+                     <p>Here’s your updated remaining balance:</p>`;
 
-      emailContent += `<p>We noticed that the following services have been used up:</p><ul>`;
-      servicesOut.forEach(service => {
-        emailContent += `<li>❌ ${service} (No balance left)</li>`;
-      });
-      emailContent += `</ul>`;
+        if (servicingBalance['Towing'] > 0) emailBody += `<div>✅ FREE Tows in Singapore (${servicingBalance['Towing']} left)</div>`;
+        if (servicingBalance['Jump Start'] > 0) emailBody += `<div>✅ FREE Jump Start Services in Singapore (${servicingBalance['Jump Start']} left)</div>`;
+        if (servicingBalance['Breakdown Assist'] > 0) emailBody += `<div>✅ Onsite Breakdown Assistance (Available in selected parts of Malaysia) (${servicingBalance['Breakdown Assist']} left)</div>`;
 
-
-      if (servicesLeft.length > 0) {
-        emailContent += `<p>Here is your remaining servicing balance:</p><ul>`;
-        servicesLeft.forEach(service => {
-          emailContent += `<li>✅ ${service}</li>`;
-        });
-        emailContent += `</ul><p>Use them before your membership expires.</p>`;
+        emailBody += `<p>Ensure you maximize your benefits before your package expires on <b>${endDate.toDateString()}</b>!</p>
+                      <p>To book your next service or if you have any questions, feel free to contact us:</p>
+                      <p>📧 <b>Email</b>: yellowbull2404@gmail.com<br/>📞 <b>WhatsApp</b>: +65 9101 3232 / +65 9101 2323 / +65 8206 1664</p>
+                      <p>For more details about our services and package renewals, visit our website:</p>
+                      <p>🌐 <b>Website</b>: www.yellowbull.com.sg</p>
+                      <p>Thank you for choosing Yellow Bull SG!</p>
+                      <p>Best regards,<br/>YELLOW BULL PTE LTD</p>`;
       } else {
-        emailContent += `<p>All your servicing balances have been used.</p><p>Please consider renewing your membership to continue enjoying our services.</p>`;
+        // Annual Car Care Package template
+        emailSubject = `Yellow Bull Car Care Package Update: Your Remaining Servicing Balance`;
+        emailBody = `<p>Dear ${userName} - ${carPlate},</p>
+                     <p>We hope you're doing well! Here’s an update on your <b> ${membership} </b>- <b>Annual Car Care Package</b> with <b>Yellow Bull SG</b>.</p>
+                     <p>Here’s your updated remaining balance:</p>`;
+
+        if (servicingBalance['Car Servicing'] > 0) emailBody += `<div>✅ Car servicing(s) left (engine oil and original filter) (${servicingBalance['Car Servicing']} left)</div>`;
+        if (servicingBalance['Roadside Assist'] > 0) emailBody += `<div>✅ Emergency roadside assistance (${servicingBalance['Roadside Assist']} left)</div>`;
+        if (servicingBalance['Pre-Inspection'] > 0) emailBody += `<div>✅ FREE Vehicle pre-inspection (${servicingBalance['Pre-Inspection']} left)</div>`;
+        if (servicingBalance['Towing'] > 0) emailBody += `<div>✅ FREE Towing to any workshop (${servicingBalance['Towing']} left)</div>`;
+        if (servicingBalance['Top-Up AC'] > 0) emailBody += `<div>✅ FREE Top-up air conditioning gas (${servicingBalance['Top-Up AC']} left)</div>`;
+
+        emailBody += `<p>Ensure you maximize your benefits before your package expires on <b>${endDate.toDateString()}</b>!</p>
+                      <p>To book your next service or if you have any questions, feel free to contact us:</p>
+                      <p>📧 <b>Email</b>: yellowbull2404@gmail.com<br/>📞 <b>WhatsApp</b>: +65 9101 3232 / +65 9101 2323 / +65 8206 1664</p>
+                      <p>For more details about our services and package renewals, visit our website:</p>
+                      <p>🌐 <b>Website</b>: www.yellowbull.com.sg</p>
+                      <p>Thank you for choosing Yellow Bull SG!</p>
+                      <p>Best regards,<br/>YELLOW BULL PTE LTD</p>`;
       }
 
-
-      emailContent += `<p>Best regards,<br/>Yellowbull Team</p>`;
-
-
+      // Send the email
       const mailOptions = {
         from: 'yellowbull2404@gmail.com',
         to: email,
-        subject: '🔧 Servicing Balance Reminder',
-        html: emailContent
+        subject: emailSubject,
+        html: emailBody
       };
-
 
       try {
         await transporter.sendMail(mailOptions);
         console.log(`📧 Servicing email sent to ${email}`);
+
+        // Update last notified timestamp
+        await db.collection("Users").doc(doc.id).update({
+          lastNotified: admin.firestore.FieldValue.serverTimestamp()
+        });
       } catch (err) {
         console.error(`❌ Failed to send servicing reminder to ${email}:`, err.message);
       }
     }
   }
 
-
   return null;
 });
+
+
 
 
 

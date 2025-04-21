@@ -726,7 +726,7 @@
       </div>
       <div class="modal-body">
         <form id="servicingForm">
-          ${["Pre-Inspection", "Roadside Assist", "Towing", "Top-Up AC", "Car Servicing"].map(service => `
+          ${["Pre-Inspection", "Roadside Assist", "Towing", "Top-Up AC", "Car Servicing", "Jump Start", "Breakdown Assist"].map(service => `
             <div class="form-group">
               <label>${service}</label>
               <input type="number" class="form-control" id="service-${service.replace(/\s+/g, '')}" min="0" value="0">
@@ -963,48 +963,64 @@
 
 
                     document.querySelectorAll(".editServicingBtn").forEach(button => {
-                        button.addEventListener("click", async (event) => {
-                            const userId = event.target.dataset.userid;
-                            const userRef = doc(db, "Users", userId);
-                            const userSnap = await getDoc(userRef);
-                            const userData = userSnap.data();
-                            const balance = userData.servicingBalance || {};
+    button.addEventListener("click", async (event) => {
+        const userId = event.target.dataset.userid;
+        const userRef = doc(db, "Users", userId);
+        const userSnap = await getDoc(userRef);
+        const userData = userSnap.data();
+        const balance = userData.servicingBalance || {};
 
-                            // Set value di input form
-                            ["Pre-Inspection", "Roadside Assist", "Towing", "Top-Up AC", "Car Servicing"].forEach(service => {
-                                const input = document.getElementById(`service-${service.replace(/\s+/g, '')}`);
-                                input.value = balance[service] ?? 0;
-                            });
+        // Clear existing form fields before adding the correct fields based on the membership
+        const servicingForm = document.getElementById("servicingForm");
+        servicingForm.innerHTML = '';
 
-                            // Simpan ID untuk nanti saat klik Save
-                            document.getElementById("saveServicingBtn").setAttribute("data-userid", userId);
+        // Define all possible services
+        const services = ["Pre-Inspection", "Roadside Assist", "Towing", "Top-Up AC", "Car Servicing", "Breakdown Assist", "Jump Start"];
 
-                            // Tampilkan modal
-                            $("#editServicingModal").modal("show");
-                        });
-                    });
+        // Dynamically add fields for each service based on the available balance
+        services.forEach(service => {
+            const div = document.createElement('div');
+            div.classList.add('form-group');
+            div.innerHTML = `
+                <label for="service-${service.replace(/\s+/g, '')}">${service}</label>
+                <input type="number" class="form-control" id="service-${service.replace(/\s+/g, '')}" min="0" value="${balance[service] || 0}">
+            `;
+            servicingForm.appendChild(div);
+        });
 
-                    document.getElementById("saveServicingBtn").addEventListener("click", async () => {
-                        const userId = document.getElementById("saveServicingBtn").getAttribute("data-userid");
+        // Set the userId for the Save button to be used later
+        document.getElementById("saveServicingBtn").setAttribute("data-userid", userId);
 
-                        const newBalance = {};
-                        ["Pre-Inspection", "Roadside Assist", "Towing", "Top-Up AC", "Car Servicing"].forEach(service => {
-                            const val = parseInt(document.getElementById(`service-${service.replace(/\s+/g, '')}`).value, 10);
-                            newBalance[service] = isNaN(val) ? 0 : val;
-                        });
+        // Show the modal
+        $("#editServicingModal").modal("show");
+    });
+});
 
-                        try {
-                            await updateDoc(doc(db, "Users", userId), {
-                                servicingBalance: newBalance
-                            });
+document.getElementById("saveServicingBtn").addEventListener("click", async () => {
+    const userId = document.getElementById("saveServicingBtn").getAttribute("data-userid");
 
-                            Swal.fire("✅ Success", "Servicing balance updated!", "success");
-                            $("#editServicingModal").modal("hide");
-                            loadAllUsers();  // refresh tabel
-                        } catch (error) {
-                            Swal.fire("❌ Error", error.message, "error");
-                        }
-                    });
+    const newBalance = {};
+    const services = ["Pre-Inspection", "Roadside Assist", "Towing", "Top-Up AC", "Car Servicing", "Breakdown Assist", "Jump Start"];
+
+    // Collect all the values from the inputs
+    services.forEach(service => {
+        const val = parseInt(document.getElementById(`service-${service.replace(/\s+/g, '')}`).value, 10);
+        newBalance[service] = isNaN(val) ? 0 : val;
+    });
+
+    try {
+        // Update the Firestore document for the user
+        await updateDoc(doc(db, "Users", userId), {
+            servicingBalance: newBalance
+        });
+
+        Swal.fire("✅ Success", "Servicing balance updated!", "success");
+        $("#editServicingModal").modal("hide");
+        loadAllUsers();  // refresh the table to reflect changes
+    } catch (error) {
+        Swal.fire("❌ Error", error.message, "error");
+    }
+});
 
 
                     document.querySelectorAll('.editCarBtn').forEach(button => {
@@ -1177,7 +1193,9 @@
                             "Roadside Assist": 0,
                             "Towing": 0,
                             "Top-Up AC": 0,
-                            "Car Servicing": 0
+                            "Car Servicing": 0,
+                            "Breakdown Assist": 0,
+                            "Jump Start": 0
                         };
 
                         let html = `<div style="margin-top:5px; font-size:12px;" id="servicing-${userId}">
@@ -1837,12 +1855,15 @@
                         "Roadside Assist": 0,
                         "Towing": 0,
                         "Top-Up AC": 0,
-                        "Car Servicing": 0
+                        "Car Servicing": 0,
+                        "Jump Start": 0,
+                        "Breakdown Assist": 0
                     };
 
                     if (selectedMembership === "Towing Package") {
                         servicingBalance["Towing"] = 3;
-                        servicingBalance["Roadside Assist"] = 3;  // untuk Jump Start
+                        servicingBalance["Jump Start"] = 3;
+                        servicingBalance["Breakdown Assist"] = 1;  // untuk Jump Start
                     } else {
                         if (!selectedMembership.includes("basic")) {
                             servicingBalance["Top-Up AC"] = 1;

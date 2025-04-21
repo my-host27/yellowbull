@@ -1,0 +1,120 @@
+@font-face {
+    font-family: "Montserrat-Medium";
+    src: url("https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Montserrat-Bold";
+    src: url("https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap");
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Montserrat-Black";
+    src: url("https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap");
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Montserrat-Light";
+    src: url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300&display=swap");
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Montserrat-Regular";
+    src: url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400&display=swap");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Montserrat-SemiBold";
+    src: url("https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Montserrat-ExtraBold";
+    src: url("https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap");
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Additional direct CSS to ensure Montserrat is loaded */
+body {
+    font-family: 'Montserrat', sans-serif !important;
+}
+
+/* Font sizes */
+.font12 {
+    font-size: max(.75vw, 10.5px);
+    font-family: 'Montserrat', sans-serif;
+}
+
+.font14 {
+    font-size: max(.875vw, 12.25px);
+    font-family: 'Montserrat', sans-serif;
+}
+
+.font16 {
+    font-size: max(1vw, 14px);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+}
+
+.font18 {
+    font-size: max(1.125vw, 15.75px);
+    font-family: 'Montserrat', sans-serif;
+}
+
+.font20 {
+    font-size: max(1.25vw, 17.5px);
+    font-family: 'Montserrat', sans-serif;
+}
+
+.font24 {
+    font-size: max(2.1vw, 18px);
+    font-family: 'Montserrat', sans-serif;
+}
+
+@media screen and (min-width:1000px) {
+    .font24 {
+        font-size: max(1.5vw, 21px);
+    }
+}
+
+.font32 {
+    font-size: max(2.8vw, 21.5px);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bold;
+}
+
+@media screen and (min-width:1000px) {
+    .font32 {
+        font-size: max(2vw, 28px);
+    }
+}
+
+/* Map all Inter classes to Montserrat */
+.Inter-Medium, 
+.Inter-Regular, 
+.Inter-Bold, 
+.Inter-SemiBold, 
+.Inter-ExtraBold, 
+.Inter-Black, 
+.Inter-Light {
+    font-family: 'Montserrat', sans-serif !important;
