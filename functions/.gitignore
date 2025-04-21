@@ -1,2 +1,4 @@
 node_modules/
 *.local
+firebase-debug.log
+index.js
