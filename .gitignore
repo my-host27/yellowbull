@@ -1,3 +1,4 @@
+functions/
 config.js
 server.js
 .env
@@ -8,5 +9,6 @@ public/secrets.js
 .wrangler/
 flask-secret-server/
 public/
-functions/
+
+
 
