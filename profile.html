@@ -30,6 +30,22 @@
             z-index: 99;
         }
 
+        .sticky-nav {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            background-color: white;
+            padding: 10px 0;
+        }
+
+        .btn.btn-sm.btn-warning.editCarBtn {
+            width: 100%;
+            text-align: center;
+            /* Align text in the center */
+            white-space: nowrap;
+            /* Prevent button text from breaking into multiple lines */
+        }
+
         .table th {
             text-align: center !important;
             vertical-align: middle !important;
@@ -41,13 +57,18 @@
 
 
         .table th:nth-child(2),
-            .table td:nth-child(2) {
-                max-width: 150px;
-                /* Batasi lebar kolom email */
-                word-wrap: break-word;
-                overflow-wrap: break-word;
-                white-space: normal;
-            }
+        .table td:nth-child(2) {
+            max-width: 150px;
+            /* Batasi lebar kolom email */
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+
+        .table th:nth-child(8),
+        .table td:nth-child(8) {
+            font-size: 14px;
+        }
 
         .custom-alert {
             position: fixed;
@@ -135,6 +156,15 @@
                 /* Ukuran teks di tabel lebih kecil */
             }
 
+            .table th:nth-child(8),
+            .table td:nth-child(8) {
+                max-width: 250px;
+                font-size: 12px;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                white-space: normal;
+            }
+
             .btn {
                 font-size: 14px;
                 /* Ukuran tombol lebih kecil */
@@ -152,6 +182,7 @@
                 font-size: 14px;
                 /* Ukuran teks dalam modal lebih kecil */
             }
+
 
 
             .alert-warning {
@@ -192,7 +223,7 @@
 
     <script type="module">
         import {
-            auth, db, onAuthStateChanged, doc, getDoc, updateDoc, collection, Timestamp, getDocs, onSnapshot,
+            auth, db, onAuthStateChanged, doc, getDoc, updateDoc, collection, sendEmailReminder, Timestamp, getDocs, onSnapshot, setDoc, query, where, deleteDoc, functions, httpsCallable, deleteField,
             sendEmailVerification, updateEmail, reauthenticateWithCredential, EmailAuthProvider, verifyBeforeUpdateEmail, logoutUser, storage, ref, uploadBytes, getDownloadURL, resetPassword
         } from "./firebase-config.js";
 
@@ -212,6 +243,8 @@
         document.addEventListener("DOMContentLoaded", function () {
             const userTable = document.getElementById("userTableBody");
 
+
+
             // ✅ Pastikan `auth` sudah terinisialisasi sebelum menjalankan listener
             const checkAuth = setInterval(() => {
                 if (auth) {
@@ -222,27 +255,27 @@
 
             const logoutBtn = document.getElementById("logoutBtn");
 
-// Check if the logout button exists
-if (logoutBtn) {
-    logoutBtn.addEventListener("click", function (event) {
-        event.preventDefault();  // Prevent default behavior of the button
-        Swal.fire({
-            title: "Are you sure?",
-            text: "You will be logged out.",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#ff4444",
-            cancelButtonColor: "#ccc",
-            confirmButtonText: "Yes, log out"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                logoutUser();  // Perform logout action
+            // Check if the logout button exists
+            if (logoutBtn) {
+                logoutBtn.addEventListener("click", function (event) {
+                    event.preventDefault();  // Prevent default behavior of the button
+                    Swal.fire({
+                        title: "Are you sure?",
+                        text: "You will be logged out.",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#ff4444",
+                        cancelButtonColor: "#ccc",
+                        confirmButtonText: "Yes, log out"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            logoutUser();  // Perform logout action
+                        }
+                    });
+                });
+            } else {
+                console.log("Logout button not found");
             }
-        });
-    });
-} else {
-    console.log("Logout button not found");
-}
             function setupAuthListener() {
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
@@ -252,6 +285,8 @@ if (logoutBtn) {
 
                         if (docSnap.exists()) {
                             const userData = docSnap.data();
+
+
                             document.getElementById("username").innerText = userData.userName || "User";
                             document.getElementById("vehicle_no").innerText = userData.carPlate || "Not Available";
                             document.getElementById("currentEmail").innerText = user.email || "Not Available";
@@ -263,8 +298,8 @@ if (logoutBtn) {
 
                                 if (carSnap.exists()) {
                                     const carData = carSnap.data();
-                                    document.getElementById("car_model").innerText = 
-    carData.carModel + (carData.carModelDescription ? " (" + carData.carModelDescription + ")" : "") || "Not Available";
+                                    document.getElementById("car_model").innerText =
+                                        carData.carModel + (carData.carModelDescription ? " (" + carData.carModelDescription + ")" : "") || "Not Available";
 
                                     document.getElementById("car_brand").innerText = carData.carBrand + (carData.carCompanyDescription ? " (" + carData.carCompanyDescription + ")" : "") || "Not Available";
                                 }
@@ -274,7 +309,38 @@ if (logoutBtn) {
 
                             onSnapshot(userRef, (docSnap) => {
                                 const userData = docSnap.data();
-                                updateMembershipUI(userData);  // Call UI update function with live data
+                                updateMembershipUI(userData);
+
+                                // Show servicing balance only if user has active membership
+                                const membership = userData.membership;
+                                const servicingBalance = userData.servicingBalance;
+
+                                if (membership && membership !== "None" && membership !== "Expired" && servicingBalance) {
+                                    const servicingCard = document.getElementById("servicingBalanceCard");
+                                    const servicingContent = document.getElementById("servicingBalanceContent");
+
+                                    // Hanya tampilkan layanan dengan balance > 0
+                                    const activeServices = Object.entries(servicingBalance).filter(([_, val]) => val > 0);
+
+                                    if (activeServices.length > 0) {
+                                        let html = "<ul class='list-group'>";
+                                        for (const [key, val] of activeServices) {
+                                            html += `<li class="list-group-item d-flex justify-content-between align-items-center">
+                        ${key}
+                        <span class="badge badge-primary badge-pill">${val}</span>
+                    </li>`;
+                                        }
+                                        html += "</ul>";
+
+                                        servicingContent.innerHTML = html;
+                                        servicingCard.style.display = "block";
+                                    } else {
+                                        // Jika semua balance 0, sembunyikan kartu
+                                        servicingCard.style.display = "none";
+                                    }
+                                }
+
+
                             });
 
 
@@ -409,6 +475,9 @@ if (logoutBtn) {
                 const adminDashboardHTML = `
         <section class="admin-dashboard">
             <div class="container">
+                <div id="loadingIndicator" style="display: none; text-align: center;">
+    <span>Loading...</span> <!-- You can replace this with an actual spinner if you like -->
+</div>
                     <h2>Admin Dashboard</h2>
                 <p>Welcome, Admin!</p>
              <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
@@ -431,7 +500,7 @@ if (logoutBtn) {
   <!-- Search Bar -->
   <div class="form-group mb-2 mb-md-0">
     <label for="searchInput">Search:</label>
-    <input type="text" id="searchInput" class="form-control" placeholder="Search name or email...">
+    <input type="text" id="searchInput" class="form-control" placeholder="Search name email, or about car...">
   </div>
 
   <!-- Buttons for Delete and Download CSV -->
@@ -446,24 +515,24 @@ if (logoutBtn) {
 
 <!-- New summary bar for count and total -->
 <div class="mb-3">
-  <span id="userCount">Total Users: 0</span> |
-  <span id="totalPrice">Total Price: $0</span>
+  <span id="userCount">Total Users: 0</span> 
+  <!--<span id="totalPrice">Total Price: $0</span>-->
 </div>
             
                 <div class="table-responsive">
                     <table class="table table-bordered">
-                        <thead class="thead-dark">
+                        <thead class="thead-dark sticky-nav">
                             <tr>
                            <th style="width: 10%;">Name</th>
                         <th style="width: 17%;">Email</th>
                         <th style="width: 15%;">Membership</th>
                         <th style="width: 10%;">Price</th>
-                        <th style="width: 8%;">Payment Status</th>
+                        <!-- <th style="width: 8%;">Payment Status</th> -->
                         <th style="width: 10%;">Date Active</th>
                         <th style="width: 10%;">Date Inactive</th>
                         <th style="width: 10%;">Payment Method</th> <!-- New column -->
                         <th style="width: 20%;">About Car</th>
-                        <th style="width: 15%;">Upload Payment Proof</th>
+                        <!-- <th style="width: 15%;">Upload Payment Proof</th> -->
                             </tr>
                         </thead>
                         <tbody id="userTableBody"></tbody>
@@ -604,19 +673,40 @@ if (logoutBtn) {
                     <input type="text" class="form-control" id="editCarDescription">
                 </div>
                 <!-- Car Company -->
-                <div class="form-group">
+                  <!-- <div class="form-group">
                     <label for="editCarCompany">Car Company</label>
                     <input type="text" class="form-control" id="editCarCompany">
-                </div>
+                </div> -->
                 <!-- Insurance Expiry Month -->
-                <div class="form-group">
-                    <label for="editInsMonth">Insurance Expiry Month</label>
-                    <input type="text" class="form-control" id="editInsMonth">
-                </div>
+            <!-- Insurance Expiry Month -->
+<div class="form-group">
+    <label for="editInsMonth">Insurance Expiry Date</label>
+    <input type="date" class="form-control" id="editInsMonth">
+</div>
+
+
                 <!-- DOB -->
                 <div class="form-group">
-                    <label for="editDOB">Date of Birth</label>
-                    <input type="text" class="form-control" id="editDOB">
+                    <label for="editDOB">Birthday Month</label>
+	<select id="editDOB" class="form-control " name="dob">
+
+										<option disabled hidden selected>select month</option>
+									
+									<option  value="Jan">Jan</option>
+									<option  value="Feb">Feb</option>
+									<option  value="Mar">Mar</option>
+									<option  value="Apr">Apr</option>
+									<option  value="May">May</option>
+									<option  value="Jun">Jun</option>
+									<option  value="Jul">Jul</option>
+									<option  value="Aug">Aug</option>
+									<option  value="Sep">Sep</option>
+									<option  value="Oct">Oct</option>
+									<option  value="Nov">Nov</option>
+									<option  value="Dec">Dec</option>
+
+
+									</select>
                 </div>
             </div>
             <div class="modal-footer">
@@ -627,6 +717,32 @@ if (logoutBtn) {
     </div>
 </div>
 
+<div class="modal fade" id="editServicingModal" tabindex="-1" role="dialog" aria-labelledby="editServicingModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Servicing Balance</h5>
+        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+      </div>
+      <div class="modal-body">
+        <form id="servicingForm">
+          ${["Pre-Inspection", "Roadside Assist", "Towing", "Top-Up AC", "Car Servicing", "Jump Start", "Breakdown Assist"].map(service => `
+            <div class="form-group">
+              <label>${service}</label>
+              <input type="number" class="form-control" id="service-${service.replace(/\s+/g, '')}" min="0" value="0">
+            </div>
+          `).join("")}
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="saveServicingBtn">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 
     `;
 
@@ -635,19 +751,19 @@ if (logoutBtn) {
                 document.body.insertAdjacentHTML("beforeend", adminDashboardHTML);
 
                 loadAllUsers();
-                
+
                 document.getElementById("membershipFilter").addEventListener("change", () => {
-    loadAllUsers(true); // fetch ulang + filter
-});
+                    loadAllUsers(true); // fetch ulang + filter
+                });
 
-document.getElementById("searchInput").addEventListener("input", () => {
-    loadAllUsers(true); // fetch ulang + filter
-});
-                setTimeout(() => {
-                    checkMembershipExpiration();  // Cek lagi setelah load
-                }, 1000);
+                document.getElementById("searchInput").addEventListener("input", () => {
+                    loadAllUsers(true); // fetch ulang + filter
+                });
+                // setTimeout(() => {
+                //     checkMembershipExpiration();  // Cek lagi setelah load
+                // }, 1000);
 
-
+                checkMembershipExpiration();
 
 
                 setTimeout(() => {
@@ -685,70 +801,111 @@ document.getElementById("searchInput").addEventListener("input", () => {
                     proofImages = [];
 
                     for (const docSnap of querySnapshot.docs) {
-            const user = docSnap.data();
-            let carData = {};  // Initialize carData
+                        const user = docSnap.data();
+                        let carData = {};  // Initialize carData
 
-            // Fetch car data if the carPlate exists
-            if (user.carPlate) {
-                const carRef = doc(db, "carPlates", user.carPlate);
-                const carSnap = await getDoc(carRef);
-                if (carSnap.exists()) {
-                    carData = carSnap.data();
-                }
-            }
+                        // Fetch car data if the carPlate exists
+                        if (user.carPlate) {
+                            const carRef = doc(db, "carPlates", user.carPlate);
+                            const carSnap = await getDoc(carRef);
+                            if (carSnap.exists()) {
+                                carData = carSnap.data();
+                            }
+                        }
 
-            // Skip admin users
-            if (user.role === "admin") continue;
+                        // Skip admin users
+                        if (user.role === "admin") continue;
+                        if (user.emailVerified === false) continue;
 
-            const userId = docSnap.id;
-            const paymentMethod = user.paymentMethod || "Not Selected";
-            const membershipStart = user.membershipStart 
-                ? user.membershipStart.toDate().toLocaleDateString('en-GB', {
-                    day: 'numeric', 
-                    month: 'long', 
-                    year: 'numeric'
-                })
-                : "Not Available";
+                        const userId = docSnap.id;
+                        const paymentMethod = user.paymentMethod || "Not Selected";
+                        const membershipStart = user.membershipStart
+                            ? user.membershipStart.toDate().toLocaleDateString('en-GB', {
+                                day: 'numeric',
+                                month: 'long',
+                                year: 'numeric'
+                            })
+                            : "Not Available";
 
-            const membershipEnd = user.membershipEnd 
-                ? user.membershipEnd.toDate().toLocaleDateString('en-GB', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric'
-                })
-                : "Not Available";
+                        const membershipEnd = user.membershipEnd
+                            ? user.membershipEnd.toDate().toLocaleDateString('en-GB', {
+                                day: 'numeric',
+                                month: 'long',
+                                year: 'numeric'
+                            })
+                            : "Not Available";
 
-            const aboutCar = `
-                Plate: ${user.carPlate || "N/A"}<br>
-                Brand: ${carData.carBrand || "Other"}<br>
-                Model: ${carData.carModel || "Other"}<br>
-                Description: ${carData.carModelDescription || "Other"}<br>
-                Company: ${carData.carCompanyDescription || "Other"}<br>
-                Insurance Expiry: ${carData.InsExpMonth || "N/A"}<br>
-                DOB: ${user.dob || "N/A"}
-            `;
 
-            // Store user data in local storage
-            localStorage.setItem(`userData-${docSnap.id}`, JSON.stringify({
-                membershipEnd: user.membershipEnd ? user.membershipEnd.toDate() : null,
-                membership: user.membership ? user.membership.toLowerCase() : null
-            }));
 
-            const membership = user.membership || "None";
-            const paymentStatus = user.paymentStatus || "Not Paid";
-            const paymentDescription = user.paymentDescription;
-            const proofImage = user.proofImage
-                ? `<img src="${user.proofImage}" alt="Proof" style="width: 50px; height: 50px; cursor: pointer;">`
-                : "No Image";
 
-            const price = membershipPriceMap[membership] || "-";
-            updatePaymentMethodUI(userId, paymentMethod, paymentDescription);
+                        const insuranceExpiry = user.InsExpMonth;
+                        console.log("Insurance Expiry:", insuranceExpiry);
+                        console.log("Type of Insurance Expiry:", typeof insuranceExpiry);
 
-            // Add user data to the table
-            userListHTML += `
+                        let formattedExpiryDate = "N/A"; // Default if no date is available
+
+                        if (insuranceExpiry) {
+                            let expiryDate;
+
+                            if (typeof insuranceExpiry === 'string') {
+                                // If only month is given (e.g., "May"), show the month directly
+                                formattedExpiryDate = insuranceExpiry;  // Display the month as a string
+                            } else if (insuranceExpiry instanceof Date) {
+                                expiryDate = insuranceExpiry;  // If it's already a Date object
+                            } else if (insuranceExpiry.toDate) {
+                                // Handle Firestore Timestamp format
+                                expiryDate = insuranceExpiry.toDate();  // Convert Firestore timestamp to Date
+                            }
+
+                            // If a valid Date object is found, format it as a full date
+                            if (expiryDate instanceof Date && !isNaN(expiryDate)) {
+                                formattedExpiryDate = expiryDate.toLocaleDateString('en-GB', {
+                                    day: 'numeric',
+                                    month: 'long',
+                                    year: 'numeric'
+                                });
+                            }
+                        } else {
+                            formattedExpiryDate = "N/A"; // If no value is provided, set it as "N/A"
+                        }
+
+                        console.log("Formatted Insurance Expiry:", formattedExpiryDate);
+
+                        const aboutCar = `
+    Plate: ${user.carPlate || "N/A"}<br>
+    Brand: ${carData.carBrand || "Other"}<br>
+    Model: ${carData.carModel || "Other"}<br>
+    Description: ${carData.carModelDescription || "Other"}<br>
+    Company: ${carData.carCompanyDescription || "Other"}<br>
+    Insurance Expiry: ${formattedExpiryDate}<br>
+    Birthday Month: ${user.dob || "N/A"}
+`;
+
+                        // Store user data in local storage
+                        localStorage.setItem(`userData-${docSnap.id}`, JSON.stringify({
+                            membershipEnd: user.membershipEnd ? user.membershipEnd.toDate() : null,
+                            membership: user.membership ? user.membership.toLowerCase() : null
+                        }));
+
+                        const membership = user.membership || "None";
+                        const paymentStatus = user.paymentStatus || "Not Paid";
+                        const paymentDescription = user.paymentDescription;
+                        const proofImage = user.proofImage
+                            ? `<img src="${user.proofImage}" alt="Proof" style="width: 50px; height: 50px; cursor: pointer;">`
+                            : "No Image";
+
+                        const price = membershipPriceMap[membership] || "-";
+                        updatePaymentMethodUI(userId, paymentMethod, paymentDescription);
+
+                        // Add user data to the table
+                        userListHTML += `
                 <tr id="user-${docSnap.id}" data-price="${price.replace(/[^\d]/g, '')}">
                     <td>${user.userName || "Unknown"}</td>
-                    <td>${user.email || "No Email"}</td>
+<td>
+  ${user.email || "No Email"}
+ ${generateServicingBalanceHTML(user, docSnap.id)}
+</td>
+
                     <td class="membership-actions">
                         <button class="btn btn-${membership === "Expired" ? "danger" : "info"} btn-sm selectMembership" data-userid="${docSnap.id}">
                             ${membership}
@@ -760,7 +917,7 @@ document.getElementById("searchInput").addEventListener("input", () => {
                             </button>` : ''}
                     </td>
                     <td>${price}</td>
-                    <td>${user.paymentStatus || "Not Paid"}</td>
+                    <!-- <td>${user.paymentStatus || "Not Paid"}</td> -->
                     <td>${membershipStart}</td>
                     <td>${membershipEnd}</td>
                     <td>
@@ -768,24 +925,29 @@ document.getElementById("searchInput").addEventListener("input", () => {
                             ${paymentMethod === "Not Selected" ? "Select Payment Method" : paymentMethod}
                         </button>
                         ${paymentMethod === "Other" && paymentDescription && paymentDescription.trim() !== ""
-                            ? `<p style="font-size: 12px; color: #555; margin-top: 5px;">${paymentDescription}</p>`
-                            : ''}
+                                ? `<p style="font-size: 12px; color: #555; margin-top: 5px;">${paymentDescription}</p>`
+                                : ''}
                     </td>
                     <td>${aboutCar} <br><button class="btn btn-sm btn-warning editCarBtn" data-userid="${userId}">Edit</button></td>
-                    <td>
+                    <!--<td>
                         ${proofImage}
                         <input type="file" class="form-control-file uploadProof" data-userid="${docSnap.id}">
-                    </td>
+                    </td>-->
                 </tr>
             `;
-        }
+                    }
                     document.getElementById("userTableBody").innerHTML = userListHTML;
                     assignMembershipListeners();  // Pastikan tombol bisa diklik
                     console.log("Filtering... Value:", document.getElementById("membershipFilter").value);
+
+
                     filterTable();
                     if (applyFilter) {
-            filterTable(); // Now filter after fetch
-        }
+                        document.querySelectorAll(".membership-actions").forEach(actions => {
+                            actions.dataset.renewShown = "false";
+                        });
+                        filterTable(); // Now filter after fetch
+                    }
 
 
                     $('#proofCarousel').carousel({
@@ -796,72 +958,191 @@ document.getElementById("searchInput").addEventListener("input", () => {
 
                     $('#proofCarousel').carousel(0);  // Reset ke slide pertama
 
-                    
+
                     document.querySelectorAll(".uploadProof").forEach(uploadProofHandler);
 
-                    document.querySelectorAll('.editCarBtn').forEach(button => {
-    button.addEventListener('click', async () => {
-        const userId = button.dataset.userid;
+
+                    document.querySelectorAll(".editServicingBtn").forEach(button => {
+    button.addEventListener("click", async (event) => {
+        const userId = event.target.dataset.userid;
         const userRef = doc(db, "Users", userId);
         const userSnap = await getDoc(userRef);
         const userData = userSnap.data();
+        const balance = userData.servicingBalance || {};
 
-        // Fetch car data from the "carPlates" collection using the user's carPlate
-        let carData = {};
-        if (userData.carPlate) {
-            const carRef = doc(db, "carPlates", userData.carPlate);
-            const carSnap = await getDoc(carRef);
-            if (carSnap.exists()) {
-                carData = carSnap.data();
-            }
-        }
+        // Clear existing form fields before adding the correct fields based on the membership
+        const servicingForm = document.getElementById("servicingForm");
+        servicingForm.innerHTML = '';
 
-        // Populate the modal fields with user data and car data
-        document.getElementById("editCarPlate").value = userData.carPlate || "";
-        document.getElementById("editCarBrand").value = carData.carBrand || ""; // From carPlates collection
-        document.getElementById("editCarModel").value = carData.carModel || ""; // From carPlates collection
-        document.getElementById("editCarDescription").value = carData.carModelDescription || "";
-        document.getElementById("editCarCompany").value = carData.carCompanyDescription || "";
-        document.getElementById("editInsMonth").value = userData.InsExpMonth || "";
-        document.getElementById("editDOB").value = userData.dob || "";
+        // Define all possible services
+        const services = ["Pre-Inspection", "Roadside Assist", "Towing", "Top-Up AC", "Car Servicing", "Breakdown Assist", "Jump Start"];
+
+        // Dynamically add fields for each service based on the available balance
+        services.forEach(service => {
+            const div = document.createElement('div');
+            div.classList.add('form-group');
+            div.innerHTML = `
+                <label for="service-${service.replace(/\s+/g, '')}">${service}</label>
+                <input type="number" class="form-control" id="service-${service.replace(/\s+/g, '')}" min="0" value="${balance[service] || 0}">
+            `;
+            servicingForm.appendChild(div);
+        });
+
+        // Set the userId for the Save button to be used later
+        document.getElementById("saveServicingBtn").setAttribute("data-userid", userId);
 
         // Show the modal
-        $('#editCarModal').modal('show');
-
-        // Handle saving the changes
-        document.getElementById('saveCarDetails').onclick = async () => {
-            const updatedPlate = document.getElementById("editCarPlate").value.trim();
-            const updatedBrand = document.getElementById("editCarBrand").value.trim();
-            const updatedModel = document.getElementById("editCarModel").value.trim();
-            const updatedDescription = document.getElementById("editCarDescription").value.trim();
-            const updatedCompany = document.getElementById("editCarCompany").value.trim();
-            const updatedIns = document.getElementById("editInsMonth").value.trim();
-            const updatedDOB = document.getElementById("editDOB").value.trim();
-
-            // Update the user's car details in the Users collection
-            await updateDoc(userRef, {
-                carPlate: updatedPlate,
-                InsExpMonth: updatedIns,
-                dob: updatedDOB
-            });
-
-            // If the car data was updated, update the carPlates collection as well
-            if (updatedPlate) {
-                const carRef = doc(db, "carPlates", updatedPlate);
-                await updateDoc(carRef, {
-                    carBrand: updatedBrand,
-                    carModel: updatedModel,
-                    carModelDescription: updatedDescription,
-                    carCompanyDescription: updatedCompany
-                });
-            }
-
-            // Close the modal and refresh the users list
-            $('#editCarModal').modal('hide');
-            loadAllUsers(); // Refresh the table with updated data
-        };
+        $("#editServicingModal").modal("show");
     });
 });
+
+document.getElementById("saveServicingBtn").addEventListener("click", async () => {
+    const userId = document.getElementById("saveServicingBtn").getAttribute("data-userid");
+
+    const newBalance = {};
+    const services = ["Pre-Inspection", "Roadside Assist", "Towing", "Top-Up AC", "Car Servicing", "Breakdown Assist", "Jump Start"];
+
+    // Collect all the values from the inputs
+    services.forEach(service => {
+        const val = parseInt(document.getElementById(`service-${service.replace(/\s+/g, '')}`).value, 10);
+        newBalance[service] = isNaN(val) ? 0 : val;
+    });
+
+    try {
+        // Update the Firestore document for the user
+        await updateDoc(doc(db, "Users", userId), {
+            servicingBalance: newBalance
+        });
+
+        Swal.fire("✅ Success", "Servicing balance updated!", "success");
+        $("#editServicingModal").modal("hide");
+        loadAllUsers();  // refresh the table to reflect changes
+    } catch (error) {
+        Swal.fire("❌ Error", error.message, "error");
+    }
+});
+
+
+                    document.querySelectorAll('.editCarBtn').forEach(button => {
+                        button.addEventListener('click', async () => {
+                            const userId = button.dataset.userid;
+                            const userRef = doc(db, "Users", userId);
+                            const userSnap = await getDoc(userRef);
+                            const userData = userSnap.data();
+
+                            // Fetch car data from the "carPlates" collection using the user's carPlate
+                            let carData = {};
+                            if (userData.carPlate) {
+                                const carRef = doc(db, "carPlates", userData.carPlate);
+                                const carSnap = await getDoc(carRef);
+                                if (carSnap.exists()) {
+                                    carData = carSnap.data();
+                                }
+                            }
+
+                            // Populate the modal fields with user data and car data
+                            document.getElementById("editCarPlate").value = userData.carPlate || "";
+                            document.getElementById("editCarBrand").value = carData.carBrand || ""; // From carPlates collection
+                            document.getElementById("editCarModel").value = carData.carModel || ""; // From carPlates collection
+                            document.getElementById("editCarDescription").value = carData.carModelDescription || "";
+                            document.getElementById("editDOB").value = userData.dob || "";
+
+                            // Handle Insurance Expiry Date
+                            if (userData.InsExpMonth) {
+                                let formattedDate = "";
+
+                                if (userData.InsExpMonth && userData.InsExpMonth.toDate) {
+                                    const insDate = userData.InsExpMonth.toDate();
+                                    const year = insDate.getFullYear();
+                                    const month = ("0" + (insDate.getMonth() + 1)).slice(-2);
+                                    const day = ("0" + insDate.getDate()).slice(-2);
+                                    formattedDate = `${year}-${month}-${day}`;
+                                } else if (typeof userData.InsExpMonth === "string") {
+                                    const dateStr = `1 ${userData.InsExpMonth} 2025`;
+                                    const tempDate = new Date(dateStr);
+                                    const year = tempDate.getFullYear();
+                                    const month = ("0" + (tempDate.getMonth() + 1)).slice(-2);
+                                    const day = ("0" + tempDate.getDate()).slice(-2);
+                                    formattedDate = `${year}-${month}-${day}`;
+                                }
+
+
+
+                                // Set the formatted date in the input field
+                                document.getElementById("editInsMonth").value = formattedDate;
+                            } else {
+                                document.getElementById("editInsMonth").value = "";  // Handle if empty or "N/A"
+                            }
+
+                            // Show the modal
+                            $('#editCarModal').modal('show');
+
+
+
+                            document.getElementById('saveCarDetails').onclick = async () => {
+                                const updatedPlate = document.getElementById("editCarPlate").value.trim();
+                                const updatedBrand = document.getElementById("editCarBrand").value.trim();
+                                const updatedModel = document.getElementById("editCarModel").value.trim();
+                                const updatedDescription = document.getElementById("editCarDescription").value.trim();
+                                const updatedIns = document.getElementById("editInsMonth").value.trim();
+                                const updatedDOB = document.getElementById("editDOB").value.trim();
+
+                                let insuranceExpiryDate = null;
+                                if (updatedIns) {
+                                    insuranceExpiryDate = new Date(updatedIns);
+                                }
+
+                                const oldPlate = userData.carPlate;
+
+                                try {
+                                    const userRef = doc(db, "Users", userId);
+
+                                    // 1. Update data user di koleksi Users
+                                    await updateDoc(userRef, {
+                                        carPlate: updatedPlate,
+                                        InsExpMonth: insuranceExpiryDate,
+                                        dob: updatedDOB
+                                    });
+
+                                    // 2. Cek semua carPlates dengan userID yang sama
+                                    const carPlatesRef = collection(db, "carPlates");
+                                    const q = query(carPlatesRef, where("userID", "==", userId));
+                                    const snapshot = await getDocs(q);
+
+                                    let oldData = null;
+
+                                    for (const docSnap of snapshot.docs) {
+                                        if (docSnap.id !== updatedPlate) {
+                                            oldData = docSnap.data();  // Simpan data lama
+                                            await deleteDoc(doc(db, "carPlates", docSnap.id));  // Hapus dokumen duplikat
+                                        }
+                                    }
+
+                                    // 3. Gabungkan data lama (jika ada) dengan data baru
+                                    const newData = {
+                                        carBrand: updatedBrand || oldData?.carBrand || "",
+                                        carModel: updatedModel || oldData?.carModel || "",
+                                        carModelDescription: updatedDescription || oldData?.carModelDescription || "",
+                                        carPlate: updatedPlate,
+                                        userID: userId,
+                                        InsExpMonth: insuranceExpiryDate || oldData?.InsExpMonth || ""
+                                    };
+
+                                    // 4. Simpan dokumen baru ke carPlates (dengan ID = plat baru)
+                                    const carRef = doc(db, "carPlates", updatedPlate);
+                                    await setDoc(carRef, newData, { merge: true });
+
+                                    Swal.fire("✅ Success", "Car details updated!", "success");
+                                    $('#editCarModal').modal('hide');
+                                    loadAllUsers();
+
+                                } catch (error) {
+                                    console.error("Error updating car details:", error);
+                                    Swal.fire("❌ Error", error.message, "error");
+                                }
+                            };
+                        });
+                    });
 
                     // Listen for the modal to open and set default values
                     document.querySelectorAll('.selectPaymentMethod').forEach(button => {
@@ -906,7 +1187,25 @@ document.getElementById("searchInput").addEventListener("input", () => {
                         });
                     });
 
+                    function generateServicingBalanceHTML(user, userId) {
+                        const balance = user.servicingBalance || {
+                            "Pre-Inspection": 0,
+                            "Roadside Assist": 0,
+                            "Towing": 0,
+                            "Top-Up AC": 0,
+                            "Car Servicing": 0,
+                            "Breakdown Assist": 0,
+                            "Jump Start": 0
+                        };
 
+                        let html = `<div style="margin-top:5px; font-size:12px;" id="servicing-${userId}">
+      🔧 <b>Servicing Balance:</b><br>`;
+                        for (const [key, val] of Object.entries(balance)) {
+                            html += `${key}: ${val}<br>`;
+                        }
+                        html += `<button class="btn btn-sm btn-secondary mt-1 editServicingBtn" data-userid="${userId}">Edit</button></div>`;
+                        return html;
+                    }
 
                     async function savePaymentMethodToFirestore(userId, paymentMethod, description) {
                         const userRef = doc(db, "Users", userId);
@@ -971,7 +1270,15 @@ document.getElementById("searchInput").addEventListener("input", () => {
                                     paymentStatus: "Not Paid",  // Update payment status
                                     membershipStart: null,  // Clear start date
                                     membershipEnd: null,  // Clear end date
+                                    servicingBalance: {
+                                        "Pre-Inspection": 0,
+                                        "Roadside Assist": 0,
+                                        "Towing": 0,
+                                        "Top-Up AC": 0,
+                                        "Car Servicing": 0
+                                    }
                                 });
+
 
                                 // Update UI without removing the row
                                 const userRow = document.getElementById(`user-${userId}`);
@@ -1063,6 +1370,9 @@ document.getElementById("searchInput").addEventListener("input", () => {
                                 if (user.role && user.role === "admin") {
                                     continue; // Skip the current iteration if the role is 'admin'
                                 }
+                                if (user.emailVerified === false) {
+                                    continue; // Skip the current iteration if the role is 'admin'
+                                }
 
                                 // Add a check to ensure `carPlate` exists before querying carPlates
                                 let carData = {};
@@ -1072,17 +1382,31 @@ document.getElementById("searchInput").addEventListener("input", () => {
                                     carData = carSnap.exists() ? carSnap.data() : {};
                                 }
 
+                                // Format Insurance Expiry Month
+                                let formattedIns = "Not Available";
+                                if (user.InsExpMonth) {
+                                    if (typeof user.InsExpMonth === "string") {
+                                        formattedIns = user.InsExpMonth;
+                                    } else if (user.InsExpMonth?.toDate) {
+                                        const insDate = user.InsExpMonth.toDate();
+                                        formattedIns = insDate.toLocaleDateString('en-GB', {
+                                            day: '2-digit', month: 'short', year: 'numeric'
+                                        });
+                                    }
+                                }
+
                                 const userData = [
-                                    rowNumber++, // Increment row number for each user
-                                    user.userName || "Unknown", // Name
-                                    user.userContact || "Not Available", // Handphone
-                                    user.carPlate || "Not Available", // Car Plate
-                                    user.email || "Not Available", // Email
-                                    user.dob || "Not Available", // Birthday Month
-                                    user.InsExpMonth || "Not Available", // Insurance Expiry Month
-                                    carData.carBrand || "Not Available", // Car Make
-                                    carData.carModel || "Not Available" // Car Model
+                                    rowNumber++,                                  // No.
+                                    user.userName || "Unknown",                   // Name
+                                    user.userContact || "Not Available",          // Handphone
+                                    user.carPlate || "Not Available",             // Car Plate
+                                    user.email || "Not Available",                // Email
+                                    user.dob || "Not Available",                  // Birthday Month
+                                    formattedIns,                                 // Insurance Expiry Month
+                                    carData.carBrand || "Not Available",          // Car Make
+                                    carData.carModel || "Not Available"           // Car Model
                                 ];
+
 
                                 // Add row data to the data array
                                 data.push(userData);
@@ -1227,10 +1551,10 @@ document.getElementById("searchInput").addEventListener("input", () => {
 
                     });
 
-              
-                    
+
+
                     document.getElementById("deleteExpiredBtn").addEventListener("click", deleteExpiredMembers);
-                  
+
                     async function deleteExpiredMembers() {
                         const confirm = await Swal.fire({
                             title: "Delete All Expired?",
@@ -1338,62 +1662,70 @@ document.getElementById("searchInput").addEventListener("input", () => {
                 }
             }
 
-
             function filterTable() {
-    const filterValue = document.getElementById("membershipFilter").value.toLowerCase();
-    const searchValue = document.getElementById("searchInput").value.toLowerCase();
-    const rows = document.querySelectorAll("#userTableBody tr");
+                const filterValue = document.getElementById("membershipFilter").value.toLowerCase();
+                const searchValue = document.getElementById("searchInput").value.toLowerCase();
+                const rows = document.querySelectorAll("#userTableBody tr");
 
-    checkMembershipExpiration()
-    assignMembershipListeners()
-    let visibleCount = 0;
-    let totalPrice = 0;
-    const now = new Date();
-    const sevenDays = 7 * 24 * 60 * 60 * 1000;
+                assignMembershipListeners(); // Tetap perlu
+                // Jangan panggil checkMembershipExpiration() di sini!
 
-    rows.forEach(row => {
-        const name = row.querySelector("td:nth-child(1)").innerText.toLowerCase();
-        const email = row.querySelector("td:nth-child(2)").innerText.toLowerCase();
-        const membershipButton = row.querySelector("td:nth-child(3) button");
-        const membership = membershipButton.innerText.toLowerCase();
+                let visibleCount = 0;
+                let totalPrice = 0;
+                const now = new Date();
+                const sevenDays = 7 * 24 * 60 * 60 * 1000;
 
-        let showRow = false;
+                rows.forEach(row => {
+                    const name = row.querySelector("td:nth-child(1)").innerText.toLowerCase();
+                    const email = row.querySelector("td:nth-child(2)").innerText.toLowerCase();
+                    const membershipButton = row.querySelector("td:nth-child(3) button");
+                    const membership = membershipButton.innerText.toLowerCase();
+                    const aboutCar = row.querySelector("td:nth-child(8)").innerText.toLowerCase();
+                    const carPlateMatch = aboutCar.includes(searchValue);
 
-        if (filterValue === "all") {
-            showRow = true;
-        } else if (filterValue === "renew") {
-            const userId = row.id.replace("user-", "");
-            const userData = JSON.parse(localStorage.getItem(`userData-${userId}`));
-            if (userData && userData.membershipEnd && userData.membership !== "expired") {
-                const endDate = new Date(userData.membershipEnd);
-                const timeLeft = endDate - now;
-                if (timeLeft > 0 && timeLeft <= sevenDays) {
-                    showRow = true;
-                }
+                    let showRow = false;
+
+                    const userId = row.id.replace("user-", "");
+                    const userData = JSON.parse(localStorage.getItem(`userData-${userId}`));
+                    if (!userData) return;
+
+                    if (userData.role === "admin" || userData.emailVerified === false) return;
+
+                    const endDate = new Date(userData.membershipEnd);
+                    const timeLeft = endDate - now;
+
+                    // 🔥 Munculkan tombol Renew kalau kurang dari 7 hari dan belum expired
+                    if (timeLeft > 0 && timeLeft <= sevenDays && membership !== "expired") {
+
+                    }
+
+                    // Tentukan baris ditampilkan atau tidak
+                    if (filterValue === "all") {
+                        showRow = true;
+                    } else if (filterValue === "renew") {
+                        showRow = (timeLeft > 0 && timeLeft <= sevenDays && membership !== "expired");
+                    } else {
+                        showRow = membership === filterValue;
+                    }
+
+                    // 🔍 Filter berdasarkan search bar
+                    const matchSearch = name.includes(searchValue) || email.includes(searchValue) || carPlateMatch;
+
+                    if (showRow && matchSearch) {
+                        row.style.display = "";
+                        visibleCount++;
+                        const priceStr = row.getAttribute("data-price");
+                        const priceNum = parseFloat(priceStr);
+                        if (!isNaN(priceNum)) totalPrice += priceNum;
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+
+                document.getElementById("userCount").innerText = `Total Users: ${visibleCount}`;
+                // checkMembershipExpiration();  // ⬅️ Tambahkan ini
+
             }
-        } else {
-            showRow = membership === filterValue;
-        }
-
-        const matchSearch = name.includes(searchValue) || email.includes(searchValue);
-
-        if (showRow && matchSearch) {
-            row.style.display = "";
-            visibleCount++;
-            const priceStr = row.getAttribute("data-price");
-            const priceNum = parseFloat(priceStr);
-            if (!isNaN(priceNum)) {
-                totalPrice += priceNum;
-            }
-        } else {
-            row.style.display = "none";
-        }
-    });
-
-    document.getElementById("userCount").innerText = `Total Users: ${visibleCount}`;
-    document.getElementById("totalPrice").innerText = `Total Price: $${totalPrice}`;
-}
-
 
             $(document).on("click", "#infoIcon", function () {
                 Swal.fire({
@@ -1467,58 +1799,98 @@ document.getElementById("searchInput").addEventListener("input", () => {
                 });
             });
 
+            const servicingBalanceMap = {
+                "4 Liters Mega Oil basic": 2,
+                "4 Liters Mega Oil": 2,
+                "5 Liters Mega Oil": 2,
+                "4 Liters Castrol Oil": 2,
+                "5 Liters Castrol Oil": 2,
+                "Towing Package": 0,
+            };
 
 
- 
+
+
+
             function openMembershipModal(userId) {
                 $("#membershipModal").modal("show");
 
                 document.getElementById("saveMembership").onclick = async function () {
-    const selectedMembership = document.getElementById("membershipSelect").value;
-    const startDate = document.getElementById("membershipStartDate").value;  // Get the selected start date
+                    const selectedMembership = document.getElementById("membershipSelect").value;
+                    const startDate = document.getElementById("membershipStartDate").value;  // Get the selected start date
 
-    // Convert startDate to a Date object (local time)
-    const localStartDate = new Date(startDate);
-    
-    // Adjust for local time: Get the local time based on the system time zone.
-    const localStartDateAdjusted = new Date(localStartDate.getTime() - localStartDate.getTimezoneOffset() * 60000);
+                    // Convert startDate to a Date object (local time)
+                    const localStartDate = new Date(startDate);
 
-    // Calculate the end date (1 year from start date) in local time.
-    const endDate = new Date(localStartDateAdjusted);
-    endDate.setFullYear(endDate.getFullYear() + 1);
+                    // Adjust for local time: Get the local time based on the system time zone.
+                    const localStartDateAdjusted = new Date(localStartDate.getTime() - localStartDate.getTimezoneOffset() * 60000);
 
-    // Adjust the end date to local time as well
-    const localEndDate = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000);
+                    // Calculate the end date (1 year from start date) in local time.
+                    const endDate = new Date(localStartDateAdjusted);
+                    endDate.setFullYear(endDate.getFullYear() + 1);
 
-    const selectedPrice = membershipPriceMap[selectedMembership];
+                    // Adjust the end date to local time as well
+                    const localEndDate = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000);
 
-    // Validate start date
-    if (!startDate) {
-        Swal.fire({
-            title: "❌ Start date is required",
-            text: "Please select a start date for the membership.",
-            icon: "error",
-            confirmButtonColor: "#ff4444"
-        });
-        return;
-    }
+                    const selectedPrice = membershipPriceMap[selectedMembership];
 
-    // Convert local start and end dates to Firestore Timestamps (keeping them in local time)
-    const localStartDateTimestamp = Timestamp.fromDate(localStartDateAdjusted);
-    const localEndDateTimestamp = Timestamp.fromDate(localEndDate);
+                    // Validate start date
+                    if (!startDate) {
+                        Swal.fire({
+                            title: "❌ Start date is required",
+                            text: "Please select a start date for the membership.",
+                            icon: "error",
+                            confirmButtonColor: "#ff4444"
+                        });
+                        return;
+                    }
 
-    // Save membership data to Firestore
-    await updateDoc(doc(db, "Users", userId), {
-        membership: selectedMembership,
-        paymentStatus: "Done",
-        membershipPrice: selectedPrice,
-        membershipStart: localStartDateTimestamp,  // Save local start date
-        membershipEnd: localEndDateTimestamp,  // Save local end date
-    });
+                    // Convert local start and end dates to Firestore Timestamps (keeping them in local time)
+                    const localStartDateTimestamp = Timestamp.fromDate(localStartDateAdjusted);
+                    const localEndDateTimestamp = Timestamp.fromDate(localEndDate);
 
-    $("#membershipModal").modal("hide");
-    loadAllUsers();
-};
+                    // Save membership data to Firestore
+                    const servicingBalance = {
+                        "Pre-Inspection": 0,
+                        "Roadside Assist": 0,
+                        "Towing": 0,
+                        "Top-Up AC": 0,
+                        "Car Servicing": 0,
+                        "Jump Start": 0,
+                        "Breakdown Assist": 0
+                    };
+
+                    if (selectedMembership === "Towing Package") {
+                        servicingBalance["Towing"] = 3;
+                        servicingBalance["Jump Start"] = 3;
+                        servicingBalance["Breakdown Assist"] = 1;  // untuk Jump Start
+                    } else {
+                        if (!selectedMembership.includes("basic")) {
+                            servicingBalance["Top-Up AC"] = 1;
+                        }
+                        if (selectedMembership.includes("Mega Oil") || selectedMembership.includes("Castrol")) {
+                            servicingBalance["Pre-Inspection"] = 2;
+                            servicingBalance["Roadside Assist"] = 2;
+                            servicingBalance["Towing"] = 2;
+                            servicingBalance["Car Servicing"] = 2;
+
+                        }
+                    }
+
+                    // Simpan ke Firestore:
+                    await updateDoc(doc(db, "Users", userId), {
+                        membership: selectedMembership,
+                        paymentStatus: "Done",
+                        membershipPrice: selectedPrice,
+                        membershipStart: localStartDateTimestamp,
+                        membershipEnd: localEndDateTimestamp,
+                        servicingBalance: servicingBalance
+                    });
+
+
+                    $("#membershipModal").modal("hide");
+                    loadAllUsers();
+                };
             }
             // Fungsi untuk assign ulang listener setiap kali tombol membership di-reload
             function assignMembershipListeners() {
@@ -1563,8 +1935,10 @@ document.getElementById("searchInput").addEventListener("input", () => {
                         if (!userRow) return;
 
                         const membershipActions = userRow.querySelector(".membership-actions");
-                        if (!membershipActions) return;
 
+                        if (!membershipActions) return;
+                        if (membershipActions.getAttribute("data-renew-shown") === "true") return;
+                        membershipActions.setAttribute("data-renew-shown", "true");
                         if (membershipStatus === "Expired") {
                             membershipActions.innerHTML = `
     <button class="btn btn-${membershipStatus === "Expired" ? "danger" : "info"} btn-sm selectMembership" data-userid="${userId}">
@@ -1574,12 +1948,17 @@ document.getElementById("searchInput").addEventListener("input", () => {
                             assignMembershipListeners();
 
                         } else {
+                            const renewAlreadyShown = membershipActions.dataset.renewShown === "true";
                             membershipActions.innerHTML = `
                     <button class="btn btn-info btn-sm selectMembership" data-userid="${userId}">
                         ${membershipStatus}
                     </button>
                 `;
-                        }
+                if (renewAlreadyShown) {
+    membershipActions.dataset.renewShown = "true";
+}
+           
+            }
 
                         // 🔥 Jika membership kurang dari 2 menit, munculkan tombol Renew
                         if (membershipEnd) {
@@ -1593,9 +1972,13 @@ document.getElementById("searchInput").addEventListener("input", () => {
                                     paymentStatus: "Not Paid",
                                 });
                             } else if (timeLeft <= sevenDays) {
+                                const membershipActions = userRow.querySelector(".membership-actions");
 
-                                showRenewButton(userId);
+                                if (!membershipActions.querySelector(".renew-btn")) {
+                                    showRenewButton(userId);
+                                }
                             }
+
                         }
                     });
                 });
@@ -1655,8 +2038,8 @@ document.getElementById("searchInput").addEventListener("input", () => {
             }
 
             if (document.getElementById("userTableBody")) {
-        loadAllUsers(true);  // ⬅️ fetch + langsung filter "All"
-    }
+                loadAllUsers(true);  // ⬅️ fetch + langsung filter "All"
+            }
             // 🔹 Function to remove the "Renew" button after clicking it
             function removeRenewButton(userId) {
                 const userRow = document.getElementById(`user-${userId}`);
@@ -1672,14 +2055,15 @@ document.getElementById("searchInput").addEventListener("input", () => {
             }
 
             // **Cek setiap 1 menit apakah ada membership yang expired**
-            setInterval(async () => {
-                await checkMembershipExpiration();
-            }, 60 * 1000);
+            // setInterval(async () => {
+            //     await checkMembershipExpiration();
+            // }, 60 * 1000);
             async function checkMembershipExpiration() {
-
                 const usersRef = collection(db, "Users");
                 const querySnapshot = await getDocs(usersRef);
                 const now = new Date();
+
+                const oneWeek = 7 * 24 * 60 * 60 * 1000;
 
                 querySnapshot.forEach(async (docSnap) => {
                     const userData = docSnap.data();
@@ -1688,49 +2072,95 @@ document.getElementById("searchInput").addEventListener("input", () => {
                     if (userData.membershipEnd && userData.membershipEnd.toDate) {
                         const membershipEndDate = userData.membershipEnd.toDate();
                         const timeLeft = membershipEndDate - now;
-                        const oneWeek = 7 * 24 * 60 * 60 * 1000;  // 🔥 1 minggu dalam milidetik
-                        if (timeLeft <= 0) {
 
+                        if (timeLeft <= 0) {
                             await updateDoc(doc(db, "Users", userId), {
                                 membership: "Expired",
                                 paymentStatus: "Not Paid",
+                                servicingBalance: {
+                                    "Pre-Inspection": 0,
+                                    "Roadside Assist": 0,
+                                    "Towing": 0,
+                                    "Top-Up AC": 0,
+                                    "Car Servicing": 0
+                                }
                             });
 
                             listenForMembershipUpdates();
+                        } else if (timeLeft > oneWeek && userData.lastReminderSent) {
+                            await updateDoc(doc(db, "Users", userId), {
+                                lastReminderSent: deleteField()
+                            });
                         } else if (timeLeft <= oneWeek) {
-                            showRenewButton(userId);
+
+
+                            const userRow = document.getElementById(`user-${userId}`);
+                            if (!userRow) return;
+
+                            const membershipActions = userRow.querySelector(".membership-actions");
+                            if (!membershipActions) return;
+
+                            const existingRenewBtn = membershipActions.querySelector(".renew-btn");
+
+                            // ✅ Jika tombol sudah ada, jangan panggil showRenewButton lagi
+                            if (!existingRenewBtn) {
+                                showRenewButton(userId);
+                            }
                         }
                     }
                 });
 
-                setTimeout(checkMembershipExpiration, 60 * 1000);
+                setTimeout(checkMembershipExpiration, 1000);
             }
 
             // 🔹 Function to show the renew button
-            function showRenewButton(userId) {
-                const userRow = document.getElementById(`user-${userId}`);
-                if (!userRow) return;
+            async function showRenewButton(userId) {
+    const userRow = document.getElementById(`user-${userId}`);
+    if (!userRow) return;
 
-                const membershipActions = userRow.querySelector(".membership-actions");
-                if (!membershipActions) return;
+    const membershipActions = userRow.querySelector(".membership-actions");
+    if (!membershipActions) return;
 
-                if (!membershipActions.querySelector(".renew-btn")) {
-                    const renewButton = document.createElement("button");
-                    renewButton.classList.add("btn", "btn-warning", "btn-sm", "renew-btn");
-                    renewButton.innerText = "Renew";
-                    renewButton.onclick = () => renewMembership(userId);
+    // ✅ Cegah duplikasi: jika sudah pernah ditambahkan
+    if (membershipActions.dataset.renewShown === "true") return;
 
-                    membershipActions.appendChild(renewButton);
-                }
-            }
+    const userRef = doc(db, "Users", userId);
+    const userSnap = await getDoc(userRef);
+    const userData = userSnap.data();
 
-            // 🔄 Run this check every 1 minute
-            setInterval(async () => {
-                await checkMembershipExpiration();
-            }, 60 * 1000);
+    if (!userData?.email || !userData?.userName) return;
+    if (userData.membership === "Expired") return;
+
+    const lastSent = userData.lastReminderSent?.toDate();
+    const now = new Date();
+    const oneDay = 24 * 60 * 60 * 1000;
+
+    membershipActions.dataset.renewShown = "true"; // ✅ tandai sudah dibuat
+
+    if (!lastSent || (now - lastSent > oneDay)) {
+        console.log(`📧 Sending email reminder to ${userData.email}`);
+        await sendEmailReminder(userData.email, userData.userName);
+        await updateDoc(userRef, {
+            lastReminderSent: Timestamp.now()
+        });
+    }
+
+    const renewButton = document.createElement("button");
+    renewButton.classList.add("btn", "btn-warning", "btn-sm", "renew-btn");
+    renewButton.innerText = "Renew";
+    renewButton.onclick = () => renewMembership(userId);
+
+    membershipActions.appendChild(renewButton);
+   
+}
+
+            // // 🔄 Run this check every 1 minute
+            // setInterval(async () => {
+            //     await checkMembershipExpiration();
+            // }, 60 * 1000);
 
             document.addEventListener("DOMContentLoaded", async () => {
-                await checkMembershipExpiration();
+                // await checkMembershipExpiration();
                 if (document.getElementById("userTableBody")) {
                     await loadAllUsers();
                 }
@@ -2084,6 +2514,15 @@ z-index: 9999;">
 
 
             <a href="/plans" class="btn btn-purchase">Purchase Plan</a>
+            <div id="servicingBalanceCard" class="card mt-4" style="display:none;">
+                <div class="card-header bg-warning text-white font-weight-bold">
+                    Servicing Balance
+                </div>
+                <div class="card-body" id="servicingBalanceContent">
+                    <!-- Dynamic content here -->
+                </div>
+            </div>
+
         </div>
 
         <div class="modal fade" id="editProfileModal" tabindex="-1" role="dialog"

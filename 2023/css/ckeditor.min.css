@@ -1,0 +1,444 @@
+@font-face {
+    font-family: "Montserrat-Medium";
+    src: url("https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Montserrat-Bold";
+    src: url("https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap");
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Montserrat-Black";
+    src: url("https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap");
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Montserrat-Light";
+    src: url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300&display=swap");
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Montserrat-Regular";
+    src: url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400&display=swap");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Montserrat-SemiBold";
+    src: url("https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Montserrat-ExtraBold";
+    src: url("https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap");
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+.cke_editable {
+    max-width: max(51.875vw, 726.25px);
+}
+
+.cke_editable a {
+    color: #5484a7;
+}
+
+.cke_editable a:hover {
+    color: #880a28;
+}
+
+.cke_editable p {
+    margin: 0;
+    color: #000;
+    word-break: break-word;
+    font-size: max(1vw, 14px);
+    font-family: "Montserrat";
+}
+
+.cke_editable ul,
+.cke_editable ol {
+    margin: 0;
+    color: #000;
+    position: relative;
+    font-size: max(1vw, 14px);
+    font-family: "Montserrat";
+}
+
+.cke_editable ul li,
+.cke_editable ol li {
+    position: relative;
+    margin-bottom: max(.5vw, 7px);
+}
+
+.cke_editable ul li:last-child,
+.cke_editable ol li:last-child {
+    margin-bottom: 0;
+}
+
+.cke_editable ul {
+    padding: 0;
+    list-style-type: none;
+}
+
+.cke_editable ul li {
+    padding-left: max(1.375vw, 19.25px);
+}
+
+.cke_editable ul li::before,
+.cke_editable ul li:before {
+    left: 0;
+    content: "";
+    position: absolute;
+    top: max(.313vw, 5px);
+    width: max(.75vw, 10.5px);
+    height: max(.75vw, 10.5px);
+    background: url(../images/bulletpoint.svg) center no-repeat;
+    background-size: 100%;
+}
+
+.cke_editable ol {
+    padding-left: max(1.375vw, 19.25px);
+}
+
+.cke_editable img {
+    display: block;
+    max-width: 50%;
+    border-radius: 1.2em;
+    width: auto !important;
+    height: auto !important;
+    box-shadow: 0 .188vw .375vw rgba(0, 0, 0, .11);
+}
+
+.cke_editable img.full {
+    width: 100% !important;
+    max-width: 100%;
+}
+
+.cke_editable table {
+    width: 100%;
+    font-size: 17px;
+    overflow: hidden;
+    border-spacing: 0;
+    border-radius: 50px;
+    line-height: initial;
+    letter-spacing: initial;
+    background-color: #fafcfc;
+    font-family: "Montserrat";
+}
+
+.cke_editable table td {
+    color: #555;
+    padding: 25px 35px;
+    position: relative;
+    border-right: 1px solid #e5e5e5;
+}
+
+.cke_editable table td:first-child {
+    padding: 25px 25px 25px 35px;
+}
+
+.cke_editable table td:last-child {
+    border-right: 0;
+}
+
+.cke_editable table img {
+    max-width: inherit;
+    width: 100% !important;
+    height: auto !important;
+}
+
+.cke_editable .header {
+    color: #000;
+    font-family: "Montserrat";
+    font-weight: 700;
+    font-size: max(1.925vw, 18.25px);
+    margin-bottom: max(1.25vw, 17.5px);
+}
+
+@media screen and (min-width:1000px) {
+    .cke_editable .header {
+        font-size: max(1.375vw, 19.25px);
+    }
+}
+
+.cke_editable .layout {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+@media screen and (max-width:599px) {
+    .cke_editable .layout {
+        flex-direction: column;
+    }
+}
+
+.cke_editable .layout.reverse {
+    flex-direction: row-reverse;
+}
+
+@media screen and (max-width:599px) {
+    .cke_editable .layout.reverse {
+        flex-direction: column;
+    }
+}
+
+.cke_editable .layout.reverse.column img {
+    margin: 0 auto 25px;
+}
+
+@media screen and (min-width:1600px) {
+    .cke_editable .layout.reverse.column img {
+        margin: 0 auto 1.563vw;
+    }
+}
+
+.cke_editable .layout.column {
+    display: block;
+}
+
+.cke_editable .layout.column img {
+    width: 100% !important;
+    margin: 25px auto 0;
+}
+
+@media screen and (min-width:1600px) {
+    .cke_editable .layout.column img {
+        margin: 1.563vw auto 0;
+    }
+}
+
+.cke_editable .layout img {
+    width: 100% !important;
+}
+
+@media screen and (max-width:599px) {
+    .cke_editable .layout img {
+        margin-bottom: 25px;
+    }
+}
+
+@media screen and (min-width:1000px) {
+    .cke_editable .layout img {
+        width: 49.158% !important;
+    }
+}
+
+.cke_editable .layout .w391 {
+    width: 100%;
+}
+
+@media screen and (min-width:1000px) {
+    .cke_editable .layout .w391 {
+        width: 47.11%;
+    }
+}
+
+@media screen and (max-width:1023px) {
+    .cke_editable table {
+        border-radius: 0;
+    }
+    .cke_editable table thead {
+        border: 0;
+        display: none;
+    }
+    .cke_editable table tbody tr.m0 {
+        margin-bottom: 0;
+    }
+    .cke_editable table tbody tr.m0 th {
+        display: none;
+    }
+    .cke_editable table tbody tr.m0 td::before,
+    .cke_editable table tbody tr.m0 td:before {
+        color: #fa8d26;
+    }
+    .cke_editable table tbody th {
+        border: 0;
+        padding: 15px;
+        color: #fa8d26;
+        display: block;
+        font-weight: 400;
+        text-align: center;
+    }
+    .cke_editable table tr {
+        display: block;
+        margin-bottom: 30px;
+        border: 1px solid #e5e5e5;
+    }
+    .cke_editable table th {
+        display: none;
+    }
+    .cke_editable table td {
+        padding: 0;
+        font-size: 0;
+        display: flex;
+        border-right: 0;
+        justify-content: center;
+        border-bottom: 1px solid #e5e5e5;
+    }
+    .cke_editable table td .desc {
+        width: 60%;
+        padding: 15px;
+        min-width: 50%;
+        font-size: 16px;
+        align-items: center;
+        box-sizing: border-box;
+        background-color: #f9f3ee;
+    }
+    .cke_editable table td::before,
+    .cke_editable table td:before {
+        width: 40%;
+        display: flex;
+        padding: 15px;
+        color: #fa8d26;
+        min-width: 40%;
+        font-size: 16px;
+        align-items: center;
+        box-sizing: border-box;
+        content: attr(data-title);
+        border-right: 1px solid #e5e5e5;
+    }
+    .cke_editable table td:first-child {
+        padding: 0;
+    }
+    .cke_editable table td:last-child {
+        border-bottom: 0;
+    }
+    .cke_editable table.none {
+        border-radius: 0;
+    }
+    .cke_editable table.none tbody tr:nth-child(odd) {
+        background-color: #f9f3ee;
+    }
+    .cke_editable table.none tr {
+        margin-bottom: 0;
+        border-bottom: 0;
+    }
+    .cke_editable table.none td {
+        padding: 25px !important;
+        font-size: 16px;
+    }
+    .cke_editable table.none td::before,
+    .cke_editable table.none td:before {
+        display: none;
+    }
+}
+
+@media screen and (min-width:1024px) {
+    .cke_editable table {
+        padding: 20px 0 10px;
+        table-layout: fixed;
+    }
+    .cke_editable table tbody tr:nth-child(odd) {
+        background-color: #f9f3ee;
+    }
+    .cke_editable table th {
+        color: #fa8d26;
+        text-align: left;
+        font-weight: 400;
+        padding: 15px 15px 30px;
+        border-right: 1px solid #e5e5e5;
+    }
+    .cke_editable table th:first-child {
+        padding: 25px 25px 30px 35px;
+    }
+    .cke_editable table th:last-child {
+        border-right: 0;
+    }
+    .cke_editable table td {
+        color: #555;
+        padding: 25px 35px;
+        position: relative;
+        border-right: 1px solid #e5e5e5;
+    }
+    .cke_editable table td:first-child {
+        padding: 25px 25px 25px 35px;
+    }
+    .cke_editable table td:last-child {
+        border-right: 0;
+    }
+    .cke_editable table.none {
+        padding: 0;
+        margin: 20px 0 10px;
+    }
+}
+
+@media screen and (min-width:1600px) {
+    .cke_editable table {
+        font-size: 1.063vw;
+        border-radius: 3.125vw;
+        padding: 1.25vw 0 .625vw;
+        box-shadow: 0 .25vw 4.563vw rgba(34, 38, 41, .1);
+    }
+    .cke_editable table td {
+        padding: 1.563vw 2.188vw;
+        border-right: .063vw solid #e5e5e5;
+    }
+    .cke_editable table td:first-child {
+        padding: 1.563vw 1.563vw 1.563vw 2.188vw;
+    }
+    .cke_editable table.none {
+        margin: 1.25vw 0 .625vw;
+    }
+}
+
+#TnC {
+    box-sizing: border-box;
+    padding-top: max(.5vw, 8px);
+    padding-left: max(1.063vw, 17px);
+    padding-bottom: max(.813vw, 13px);
+    max-width: max(59.375vw, 831.25px);
+    border-left: max(.188vw, 3px) solid #880a28;
+}
+
+#TnC p,
+#TnC ul,
+#TnC ol {
+    font-family: "Montserrat";
+    font-size: max(.875vw, 12.25px);
+}
+
+#TnC ul li::before,
+#TnC ul li:before {
+    top: max(.188vw, 3px);
+}
+
+#FAQ {
+    box-sizing: border-box;
+    padding-top: max(.5vw, 8px);
+    padding-left: max(1.063vw, 17px);
+    padding-bottom: max(.813vw, 13px);
+    max-width: max(59.375vw, 831.25px);
+    border-left: max(.188vw, 3px) solid #880a28;
+}
+
+#FAQ p,
+#FAQ ul,
+#FAQ ol {
+    color: #555;
+    font-family: "Montserrat";
+    font-size: max(.875vw, 12.25px);
+}
+
+#FAQ ul li::before,
+#FAQ ul li:before {
+    top: max(.188vw, 3px);
+}
