@@ -13,6 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <!-- Bootstrap & FontAwesome -->
     <link rel="stylesheet" href="https://www.yellowbull.app/assets/css/stylesheet.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -126,7 +127,9 @@
         }
 
 
-
+        .btn-dark {
+            font-size: 20px; /* Adjust the font size for small screens */
+        }
 
 
 
@@ -150,6 +153,9 @@
                 /* Ukuran teks paragraf lebih kecil */
             }
 
+            .btn-dark {
+            font-size: 16px; /* Adjust the font size for small screens */
+        }
             .table th,
             .table td {
                 font-size: 14px;
@@ -296,6 +302,33 @@
                             document.getElementById("currentEmail").innerText = user.email || "Not Available";
                             document.getElementById("editUsername").value = userData.userName || "";
                             document.getElementById("editEmail").value = user.email || "";
+                            document.getElementById("editdateofbirth").value = userData.dob || "";
+                            document.getElementById("editPhoneNumber").value = userData.userContact || "";
+                            document.getElementById("insexpdt").innerText = userData.InsExpMonth || "";
+                            document.getElementById("editCarPl").value = userData.carPlate || "";
+                            document.getElementById("editInsuranceExpi").value = "";  // Clear field initially
+
+                            if (userData.InsExpMonth) {
+    let formattedDate = "";
+
+    // Check if it's a Firestore timestamp (has the toDate() method)
+    if (userData.InsExpMonth && userData.InsExpMonth.toDate) {
+        const insDate = userData.InsExpMonth.toDate();
+        const year = insDate.getFullYear();
+        const month = ("0" + (insDate.getMonth() + 1)).slice(-2); // Ensure 2-digit format
+        const day = ("0" + insDate.getDate()).slice(-2); // Ensure 2-digit format
+        formattedDate = `${year}-${month}-${day}`; // Format as yyyy-mm-dd
+    } else if (typeof userData.InsExpMonth === "string") {
+        // If it's a string in yyyy-mm-dd format, use it directly
+        formattedDate = userData.InsExpMonth; // Assuming it's in valid format
+    }
+
+    // Set the formatted date in the input field for Insurance Expiry Date
+    document.getElementById("editInsuranceExpi").value = formattedDate || "";
+} else {
+    document.getElementById("editInsuranceExpi").value = ""; // If no date is available
+}
+
                             if (userData.carPlate) {
                                 const carRef = doc(db, "carPlates", userData.carPlate);
                                 const carSnap = await getDoc(carRef);
@@ -304,10 +337,20 @@
                                     const carData = carSnap.data();
                                     document.getElementById("car_model").innerText =
                                         carData.carModel + (carData.carModelDescription ? " (" + carData.carModelDescription + ")" : "") || "Not Available";
-
+                                        document.getElementById("editCarMo").value = carData.carModel ;
+                                    document.getElementById("editCarBr").value =
+                                        carData.carBrand ;
+                                
+                                    
                                     document.getElementById("car_brand").innerText = carData.carBrand + (carData.carCompanyDescription ? " (" + carData.carCompanyDescription + ")" : "") || "Not Available";
                                 }
+                             
                             }
+
+                            // Assuming userData.InsExpMonth is a string in the format "November 11, 2025 at 7:00:00 AM UTC+7"
+                          
+
+
 
                             const purchaseBtn = document.querySelector(".btn-purchase");
 
@@ -7011,6 +7054,7 @@
                         try {
                             // Start loading screen (optional)
 
+
                             // Get all users from Firestore
                             const usersRef = collection(db, "Users");
                             const querySnapshot = await getDocs(usersRef);
@@ -7925,84 +7969,188 @@ function toggleOtherCarCompany() {
                 }
             });
 
+            const checkEditForm2 = setInterval(() => {
+    const editForm = document.getElementById("editCarForm");
+
+    if (editForm) {
+        clearInterval(checkEditForm2);
+
+        editForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const newCarPlate = document.getElementById("editCarPl").value.trim();
+            const newCarBrand = document.getElementById("editCarBr").value.trim();
+            const newCarModel = document.getElementById("editCarMo").value.trim();
+            const newInsuranceExpiry = document.getElementById("editInsuranceExpi").value.trim(); // Get date from input field
+            const newCarDescription = document.getElementById("editCarDescription").value.trim();
+            
+            let formattedExpiryDate = "";
+
+            // Check if the date is in dd/mm/yyyy format and convert to Firestore format (yyyy-mm-dd)
+            if (newInsuranceExpiry) {
+                const dateParts = newInsuranceExpiry.split('/');
+                if (dateParts.length === 3) {
+                    const day = dateParts[0].padStart(2, '0');
+                    const month = dateParts[1].padStart(2, '0');
+                    const year = dateParts[2];
+                    formattedExpiryDate = `${year}-${month}-${day}`; // Convert to yyyy-mm-dd
+                }
+            }
+
+            const userRef = doc(db, "Users", user.uid);
+            const carRef = doc(db, "carPlates", newCarPlate); 
+
+            try {
+                // Update data in the Users collection
+                await updateDoc(userRef, {
+                    carPlate: newCarPlate,
+                    carBrand: newCarBrand,
+                    carModel: newCarModel,
+                    InsExpMonth: formattedExpiryDate // Use formatted expiry date
+                });
+
+                // Update data in the carPlates collection
+                await updateDoc(carRef, {
+                    carBrand: newCarBrand,
+                    carModel: newCarModel,
+                    InsExpMonth: formattedExpiryDate // Update expiry date
+                });
+
+                // Update the UI with the new car information
+                document.getElementById("vehicle_no").innerText = newCarPlate || "Not Available";
+                document.getElementById("car_brand").innerText = newCarBrand || "Not Available";
+                document.getElementById("car_model").innerText = newCarModel || "Not Available";
+                document.getElementById("insexpdt").innerText = formattedExpiryDate || "Not Available";
+
+                Swal.fire({
+                    title: "✅ Car Information Updated!",
+                    icon: "success",
+                    confirmButtonColor: "#44cc44"
+                });
+
+                $('#editCarModal').modal('hide'); // Close the modal
+            } catch (error) {
+                Swal.fire({
+                    title: "❌ Failed to update car information.",
+                    text: error.message,
+                    icon: "error",
+                    confirmButtonColor: "#ff4444"
+                });
+            }
+        });
+    } else {
+        console.log("Edit form not found.");
+    }
+}, 500);
+
+// Format the insurance expiry date in dd/mm/yyyy format
+function formatDate(dateString) {
+    const date = new Date(dateString); // Convert to Date object
+    const day = String(date.getDate()).padStart(2, '0'); // Add leading zero if needed
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Get month and add leading zero if needed
+    const year = date.getFullYear(); // Get full year
+    return `${day}/${month}/${year}`; // Return formatted date
+}
+
+
+
             // ✅ Pastikan `editProfileForm` sudah ada sebelum menambahkan event listener
             const checkEditForm = setInterval(() => {
-                const editForm = document.getElementById("editProfileForm");
+    const editForm = document.getElementById("editProfileForm");
 
-                if (editForm) {
-                    clearInterval(checkEditForm);
+    if (editForm) {
+        clearInterval(checkEditForm);
 
-                    editForm.addEventListener("submit", async (event) => {
-                        event.preventDefault();
-                        const user = auth.currentUser;
-                        if (!user) return;
+ 
 
-                        const newUsername = document.getElementById("editUsername").value;
-                        const newEmail = document.getElementById("editEmail").value.trim();
-                        const currentEmail = user.email;
+        // Handling form submission
+        editForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const user = auth.currentUser;
+            if (!user) return;
 
-                        const userRef = doc(db, "Users", user.uid);
+            const newUsername = document.getElementById("editUsername").value;
+            const newEmail = document.getElementById("editEmail").value.trim();
+            const birthdayMonth = document.getElementById("editdateofbirth").value.trim(); // Getting the DOB value
+            const phoneNumber = document.getElementById("editPhoneNumber").value.trim(); // Getting the phone number value
+            const currentEmail = user.email;
 
-                        try {
-                            const updateData = { userName: newUsername };
+            const userRef = doc(db, "Users", user.uid);
 
-                            if (newEmail && newEmail !== currentEmail) {
-                                const password = prompt("🔒 Please enter your password to confirm email update:");
-                                if (!password) {
-                                    return Swal.fire({
-                                        title: "❌ Email update cancelled.",
-                                        icon: "error",
-                                        background: "#ffcccc",
-                                        color: "#000",
-                                        confirmButtonColor: "#ff4444"
-                                    });
-                                }
+            try {
+                // Update data to include dob and userContact
+                const updateData = {
+                    userName: newUsername,
+                    dob: birthdayMonth,
+                    userContact: phoneNumber
+                };
 
-                                const credential = EmailAuthProvider.credential(user.email, password);
-                                await reauthenticateWithCredential(user, credential);
-                                await verifyBeforeUpdateEmail(user, newEmail);
-                                Swal.fire({
-                                    title: "📧 A verification email has been sent!",
-                                    text: "Please verify it before logging in again.",
-                                    icon: "info",
-                                    background: "#fffa90",
-                                    color: "#000",
-                                    confirmButtonColor: "#ffcc00"
-                                });
+                // Handling email update if changed
+                if (newEmail && newEmail !== currentEmail) {
+                    const password = prompt("🔒 Please enter your password to confirm email update:");
+                    if (!password) {
+                        return Swal.fire({
+                            title: "❌ Email update cancelled.",
+                            icon: "error",
+                            background: "#ffcccc",
+                            color: "#000",
+                            confirmButtonColor: "#ff4444"
+                        });
+                    }
 
-                                await updateDoc(userRef, { pendingEmail: newEmail });
-
-                                logoutUser();
-                                return;
-                            }
-
-                            await updateDoc(userRef, updateData);
-
-                            document.getElementById("username").innerText = newUsername || "User";
-                            Swal.fire({
-                                title: "✅ Profile updated successfully!",
-                                icon: "success",
-                                background: "#ccffcc",
-                                color: "#000",
-                                confirmButtonColor: "#44cc44"
-                            });
-
-                            $('#editProfileModal').modal('hide');
-                        } catch (error) {
-                            Swal.fire({
-                                title: "❌ Failed to update profile.",
-                                text: error.message,
-                                icon: "error",
-                                background: "#ffcccc",
-                                color: "#000",
-                                confirmButtonColor: "#ff4444"
-                            });
-                        }
+                    const credential = EmailAuthProvider.credential(user.email, password);
+                    await reauthenticateWithCredential(user, credential);
+                    await verifyBeforeUpdateEmail(user, newEmail);
+                    Swal.fire({
+                        title: "📧 A verification email has been sent!",
+                        text: "Please verify it before logging in again.",
+                        icon: "info",
+                        background: "#fffa90",
+                        color: "#000",
+                        confirmButtonColor: "#ffcc00"
                     });
-                } else {
 
+                    await updateDoc(userRef, { pendingEmail: newEmail });
+
+                    logoutUser();
+                    return;
                 }
-            }, 500);
+
+                // Update the user profile with the new data
+                await updateDoc(userRef, updateData);
+
+                // Update the UI with the new username
+                document.getElementById("username").innerText = newUsername || "User";
+
+                // Show success message
+                Swal.fire({
+                    title: "✅ Profile updated successfully!",
+                    icon: "success",
+                    background: "#ccffcc",
+                    color: "#000",
+                    confirmButtonColor: "#44cc44"
+                });
+
+                // Close the modal after update
+                $('#editProfileModal').modal('hide');
+            } catch (error) {
+                console.error("Error during form submission: ", error);
+                Swal.fire({
+                    title: "❌ Failed to update profile.",
+                    text: error.message,
+                    icon: "error",
+                    background: "#ffcccc",
+                    color: "#000",
+                    confirmButtonColor: "#ff4444"
+                });
+            }
+        });
+    } else {
+        console.log("Edit form not found.");
+    }
+}, 500);
 
             // ✅ Pastikan logoutBtn sudah ada sebelum menambahkan event listener
             const checkLogoutBtn = setInterval(() => {
@@ -8193,53 +8341,132 @@ z-index: 9999;">
     <section class="wallet_wrap">
         <div class="container">
             <div class="row">
-                <div class="wallet_head">
+                <!-- Left Side: Greeting and Username -->
+                <div class="col-6 d-flex justify-content-start align-items-center">
                     <h4 style="font-weight:600">Hi, <span id="username">Loading...</span></h4>
                 </div>
+            
+                <!-- Right Side: Edit Profile Button -->
+                <div class="col-6 d-flex justify-content-end align-items-center">
+                    <button class="btn btn-dark btn-sm ml-2 mt-1 mt-sm-0" data-toggle="modal"
+                            data-target="#editProfileModal" style="margin-left: auto; padding-left: 10px; padding-right:10px; margin-right: 20px;">
+                        <i class="fas fa-user-circle mr-2"></i> Edit Profile
+                    </button>
+                </div>
             </div>
+            
+            
+            
+            
+           <!-- Car Information Section -->
+           <div style="border-top:1px solid lightgrey; padding-top: 10px;">
+            <!-- Car Information Section with underlined text instead of button -->
+            <div style="display: flex; align-items: center;">
+                <p style="margin-right: 10px; font-size: 18px;color: black; margin-bottom: 10px; background-color: #ffc107 ;padding-left: 10px;padding-right: 10px;border-radius: 30px;">
+                    Car Information
+                </p>
+                <a href="#editCarModal" data-toggle="modal" data-target="#editCarModal" style="cursor: pointer;">
+                    <i class="fas fa-pencil-alt" style="color: #ffc107; font-size: 18px;"></i>
+                </a>
+            </div>
+        
+            <!-- Car Details -->
+            <div><b>Car Plate</b>: <span id="vehicle_no">Loading...</span></div>
+            <div><b>Car Brand</b>: <span id="car_brand">Loading...</span></div>
+            <div><b>Car Model</b>: <span id="car_model">Loading...</span></div>
+            <div style="margin-bottom: 20px;"><b>Insurance Expiry Date</b>: <span id="insexpdt">Loading...</span></div>
+        
+            <!-- Hidden Email Section (optional) -->
+            <div style="display:none;">
+                <div class="alert alert-warning p-2 mb-0 d-flex flex-wrap align-items-center" role="alert">
+                    <div class="flex-grow-1 text-break">
+                        <span id="currentEmail" style="display:none;">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+        
+        <ul class="nav nav-tabs" id="carInfoTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="car-service-plan-tab" data-toggle="tab" href="#car-service-plan" role="tab" aria-controls="car-service-plan" aria-selected="true">
+                    Car Service Plan
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="car-invoice-tab" data-toggle="tab" href="#car-invoice" role="tab" aria-controls="car-invoice" aria-selected="false">
+                    Car Invoice
+                </a>
+            </li>
+        </ul>
+        
+        <!-- Tab Content Below the Tabs -->
+        <div class="tab-content" id="carInfoTabsContent">
+            <!-- Car Service Plan Tab Content -->
+            <div class="tab-pane fade show active" id="car-service-plan" role="tabpanel" aria-labelledby="car-service-plan-tab">
+                <div style="margin-top: 20px;"></div>
+                <a href="/plans" class="btn btn-purchase">Purchase Plan</a>
+                <div id="servicingBalanceCard" class="card mt-4" style="display:none;">
+                    <div class="card-header bg-warning text-white font-weight-bold">
+                        Servicing Balance
+                    </div>
+                    <div class="card-body" id="servicingBalanceContent">
+                        <!-- Dynamic content here -->
+                    </div>
+                </div>
+            </div>
+        
+            <!-- Car Invoice Tab Content -->
+            <div class="tab-pane fade" id="car-invoice" role="tabpanel" aria-labelledby="car-invoice-tab">
+                <div><b>Invoice Number:</b> 12345</div>
+                <div><b>Invoice Date:</b> October 15, 2025</div>
+                <div><b>Amount Due:</b> $300</div>
+            </div>
+        </div>
 
-            <table class="table table-borderless table-responsive-sm" style="border-top:1px solid lightgrey">
-                <tbody>
-                    <tr>
-                        <td><b>Car Model</b></td>
-                        <td><b>Vehicle Number</b></td>
-                    </tr>
-                    <tr>
-                        <td><span id="car_model">Loading...</span></td>
-                        <td><span id="vehicle_no">Loading...</span></td>
-                    </tr>
-                    <tr>
-                        <td><b>Car Brand</b></td>
-                        <td><b>Personal Information</b></td>
-                    </tr>
-                    <tr>
-                        <td><span id="car_brand">Loading...</span></td>
-                        <td>
-                            <div class="alert alert-warning p-2 mb-0 d-flex flex-wrap align-items-center" role="alert">
-                                <div class="flex-grow-1 text-break">
-                                    <span id="currentEmail">Loading...</span>
+            
+            <!-- Modal for Editing Car Information -->
+            <div class="modal fade" id="editCarModal" tabindex="-1" role="dialog" aria-labelledby="editCarModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editCarModalLabel">Edit Car Information</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Form to Edit Car Information -->
+                            <form id="editCarForm">
+                                <div class="form-group">
+                                    <label for="editCarPl">Car Plate</label>
+                                    <input type="text" id="editCarPl" class="form-control">
                                 </div>
-                                <button class="btn btn-dark btn-sm ml-2 mt-1 mt-sm-0" data-toggle="modal"
-                                    data-target="#editProfileModal">
-                                    Edit
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                </tbody>
-            </table>
-
-
-            <a href="/plans" class="btn btn-purchase">Purchase Plan</a>
-            <div id="servicingBalanceCard" class="card mt-4" style="display:none;">
-                <div class="card-header bg-warning text-white font-weight-bold">
-                    Servicing Balance
-                </div>
-                <div class="card-body" id="servicingBalanceContent">
-                    <!-- Dynamic content here -->
+                                <div class="form-group">
+                                    <label for="editCarBr">Car Brand</label>
+                                    <input type="text" id="editCarBr" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="editCarMo">Car Model</label>
+                                    <input type="text" id="editCarMo" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="editInsuranceExpi">Insurance Expiry Date</label>
+                                    <input type="date" id="editInsuranceExpi" class="form-control">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
+            
+        
+            
+
+
+          
 
         </div>
 
@@ -8260,19 +8487,49 @@ z-index: 9999;">
                                 <input type="text" id="editUsername" class="form-control">
                             </div>
 
+
+                            <div class="form-group">
+                                <label for="editdateofbirth">Date of Birth</label>
+                                <select id="editdateofbirth" class="form-control">
+                                    <option value="">Select Month</option>
+                                    <option value="Jan">January</option>
+                                    <option value="Feb">February</option>
+                                    <option value="Mar">March</option>
+                                    <option value="Apr">April</option>
+                                    <option value="May">May</option>
+                                    <option value="Jun">June</option>
+                                    <option value="Jul">July</option>
+                                    <option value="Aug">August</option>
+                                    <option value="Sep">September</option>
+                                    <option value="Oct">October</option>
+                                    <option value="Nov">November</option>
+                                    <option value="Dec">December</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Added Phone Number Field -->
+                            <div class="form-group">
+                                <label for="editPhoneNumber">Hand Phone Number</label>
+                                <input type="text" id="editPhoneNumber" class="form-control">
+                            </div>
+                        
                             <div class="form-group">
                                 <label for="editEmail">Email</label>
                                 <input type="email" id="editEmail" class="form-control">
                             </div>
+                        
+                            <!-- Added DOB Field -->
+                          
+                        
                             <div class="form-group d-flex justify-content-start">
                                 <!-- Reset Password Button -->
-                                <button type="button" id="resetPasswordBtn" class="btn btn-danger"
-                                    style="margin-right:10px;">Reset Password</button>
-
+                                <button type="button" id="resetPasswordBtn" class="btn btn-danger" style="margin-right:10px;">Reset Password</button>
+                        
                                 <!-- Update Profile Button -->
                                 <button type="submit" class="btn btn-primary">Update Profile</button>
                             </div>
                         </form>
+                        
                     </div>
                 </div>
             </div>
