@@ -321,6 +321,29 @@
     } else if (typeof userData.InsExpMonth === "string") {
         // If it's a string in yyyy-mm-dd format, use it directly
         formattedDate = userData.InsExpMonth; // Assuming it's in valid format
+    } else if (/^[a-zA-Z]+$/.test(userData.InsExpMonth)) {
+        // If the month is in text format like "May", assume 01 as the day and 2025 as the year
+        const monthStr = userData.InsExpMonth.trim();
+        const monthNames = {
+            "January": "01",
+            "February": "02",
+            "March": "03",
+            "April": "04",
+            "May": "05",
+            "June": "06",
+            "July": "07",
+            "August": "08",
+            "September": "09",
+            "October": "10",
+            "November": "11",
+            "December": "12"
+        };
+
+        // If month is valid, use the format: 2025-MM-01
+        if (monthNames[monthStr]) {
+            const month = monthNames[monthStr];
+            formattedDate = `2025-${month}-01`; // Assume 01 as the day
+        }
     }
 
     // Set the formatted date in the input field for Insurance Expiry Date
@@ -328,6 +351,7 @@
 } else {
     document.getElementById("editInsuranceExpi").value = ""; // If no date is available
 }
+
 
                             if (userData.carPlate) {
                                 const carRef = doc(db, "carPlates", userData.carPlate);
@@ -6489,14 +6513,36 @@
                             let expiryDate;
 
                             if (typeof insuranceExpiry === 'string') {
-                                // If only month is given (e.g., "May"), show the month directly
-                                formattedExpiryDate = insuranceExpiry;  // Display the month as a string
-                            } else if (insuranceExpiry instanceof Date) {
-                                expiryDate = insuranceExpiry;  // If it's already a Date object
-                            } else if (insuranceExpiry.toDate) {
-                                // Handle Firestore Timestamp format
-                                expiryDate = insuranceExpiry.toDate();  // Convert Firestore timestamp to Date
-                            }
+    // If the string is in the "yyyy-mm-dd" format, convert it to "dd month yyyy"
+    const dateParts = insuranceExpiry.split("-");
+    if (dateParts.length === 3) {
+        const day = dateParts[2];
+        const month = getMonthName(dateParts[1]); // Get the full month name
+        const year = dateParts[0];
+        formattedExpiryDate = `${day} ${month} ${year}`; // Format as dd month yyyy (e.g., 11 November 2025)
+    }
+} else if (insuranceExpiry instanceof Date) {
+    const year = insuranceExpiry.getFullYear();
+    const month = ("0" + (insuranceExpiry.getMonth() + 1)).slice(-2);
+    const day = ("0" + insuranceExpiry.getDate()).slice(-2);
+    formattedExpiryDate = `${day} ${getMonthName(month)} ${year}`; // Convert Date object into "dd month yyyy"
+} else if (insuranceExpiry.toDate) {
+    // Handle Firestore Timestamp format
+    const expiryDate = insuranceExpiry.toDate();  // Convert Firestore timestamp to Date
+    const year = expiryDate.getFullYear();
+    const month = ("0" + (expiryDate.getMonth() + 1)).slice(-2);
+    const day = ("0" + expiryDate.getDate()).slice(-2);
+    formattedExpiryDate = `${day} ${getMonthName(month)} ${year}`; // Format the Firestore date
+}
+
+// Helper function to get the full month name from a numeric month value
+function getMonthName(monthNumber) {
+    const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+    return monthNames[parseInt(monthNumber, 10) - 1]; // Map numeric month to month name
+}
 
                             // If a valid Date object is found, format it as a full date
                             if (expiryDate instanceof Date && !isNaN(expiryDate)) {
@@ -6754,20 +6800,42 @@
                             if (userData.InsExpMonth) {
                                 let formattedDate = "";
 
-                                if (userData.InsExpMonth && userData.InsExpMonth.toDate) {
-                                    const insDate = userData.InsExpMonth.toDate();
-                                    const year = insDate.getFullYear();
-                                    const month = ("0" + (insDate.getMonth() + 1)).slice(-2);
-                                    const day = ("0" + insDate.getDate()).slice(-2);
-                                    formattedDate = `${year}-${month}-${day}`;
-                                } else if (typeof userData.InsExpMonth === "string") {
-                                    const dateStr = `1 ${userData.InsExpMonth} 2025`;
-                                    const tempDate = new Date(dateStr);
-                                    const year = tempDate.getFullYear();
-                                    const month = ("0" + (tempDate.getMonth() + 1)).slice(-2);
-                                    const day = ("0" + tempDate.getDate()).slice(-2);
-                                    formattedDate = `${year}-${month}-${day}`;
-                                }
+// Check if it's a Firestore timestamp (has the toDate() method)
+if (userData.InsExpMonth && userData.InsExpMonth.toDate) {
+    const insDate = userData.InsExpMonth.toDate();
+    const year = insDate.getFullYear();
+    const month = ("0" + (insDate.getMonth() + 1)).slice(-2); // Ensure 2-digit format
+    const day = ("0" + insDate.getDate()).slice(-2); // Ensure 2-digit format
+    formattedDate = `${year}-${month}-${day}`; // Format as yyyy-mm-dd
+} else if (typeof userData.InsExpMonth === "string") {
+    // If it's a string in yyyy-mm-dd format, use it directly
+    formattedDate = userData.InsExpMonth; // Assuming it's in valid format
+} else if (/^[a-zA-Z]{3}$/.test(userData.InsExpMonth)) {
+        // If the month is a 3-letter string (like "May")
+        const monthStr = userData.InsExpMonth.trim().toLowerCase(); // Convert to lowercase to handle case insensitivity
+        const monthNames = {
+            "jan": "01",
+            "feb": "02",
+            "mar": "03",
+            "apr": "04",
+            "May": "05",
+            "jun": "06",
+            "jul": "07",
+            "aug": "08",
+            "sep": "09",
+            "oct": "10",
+            "nov": "11",
+            "dec": "12"
+        };
+
+        // If month is valid, use the format: 2025-MM-01
+        if (monthNames[monthStr]) {
+            const month = monthNames[monthStr];
+            formattedDate = `2025-${month}-01`; // Assume 01 as the day
+        }
+ // Assuming it's in valid format
+}
+
 
 
 
