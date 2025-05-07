@@ -309,7 +309,7 @@
                             document.getElementById("editInsuranceExpi").value = "";  // Clear field initially
 
                             if (userData.InsExpMonth) {
-    let formattedDate = "";
+    let formattedDate2 = "";
 
     // Check if it's a Firestore timestamp (has the toDate() method)
     if (userData.InsExpMonth && userData.InsExpMonth.toDate) {
@@ -317,37 +317,15 @@
         const year = insDate.getFullYear();
         const month = ("0" + (insDate.getMonth() + 1)).slice(-2); // Ensure 2-digit format
         const day = ("0" + insDate.getDate()).slice(-2); // Ensure 2-digit format
-        formattedDate = `${year}-${month}-${day}`; // Format as yyyy-mm-dd
+        formattedDate2 = `${year}-${month}-${day}`; // Format as yyyy-mm-dd
     } else if (typeof userData.InsExpMonth === "string") {
         // If it's a string in yyyy-mm-dd format, use it directly
-        formattedDate = userData.InsExpMonth; // Assuming it's in valid format
-    } else if (/^[a-zA-Z]+$/.test(userData.InsExpMonth)) {
-        // If the month is in text format like "May", assume 01 as the day and 2025 as the year
-        const monthStr = userData.InsExpMonth.trim();
-        const monthNames = {
-            "January": "01",
-            "February": "02",
-            "March": "03",
-            "April": "04",
-            "May": "05",
-            "June": "06",
-            "July": "07",
-            "August": "08",
-            "September": "09",
-            "October": "10",
-            "November": "11",
-            "December": "12"
-        };
-
-        // If month is valid, use the format: 2025-MM-01
-        if (monthNames[monthStr]) {
-            const month = monthNames[monthStr];
-            formattedDate = `2025-${month}-01`; // Assume 01 as the day
-        }
+        formattedDate2 = userData.InsExpMonth; // Assuming it's in valid format
+    
     }
 
     // Set the formatted date in the input field for Insurance Expiry Date
-    document.getElementById("editInsuranceExpi").value = formattedDate || "";
+    document.getElementById("editInsuranceExpi").value = formattedDate2 || "";
 } else {
     document.getElementById("editInsuranceExpi").value = ""; // If no date is available
 }
@@ -6512,7 +6490,7 @@
                         if (insuranceExpiry) {
                             let expiryDate;
 
-                            if (typeof insuranceExpiry === 'string') {
+                   if (typeof insuranceExpiry === 'string') {
     // If the string is in the "yyyy-mm-dd" format, convert it to "dd month yyyy"
     const dateParts = insuranceExpiry.split("-");
     if (dateParts.length === 3) {
@@ -8052,9 +8030,10 @@ function toggleOtherCarCompany() {
             const newCarBrand = document.getElementById("editCarBr").value.trim();
             const newCarModel = document.getElementById("editCarMo").value.trim();
             const newInsuranceExpiry = document.getElementById("editInsuranceExpi").value.trim(); // Get date from input field
-            const newCarDescription = document.getElementById("editCarDescription").value.trim();
-            
-            let formattedExpiryDate = "";
+
+            console.log("New Insurance Expiry:", newInsuranceExpiry); // Log the input value for debugging
+
+            let formattedExpiryDate2 = "";
 
             // Check if the date is in dd/mm/yyyy format and convert to Firestore format (yyyy-mm-dd)
             if (newInsuranceExpiry) {
@@ -8063,34 +8042,47 @@ function toggleOtherCarCompany() {
                     const day = dateParts[0].padStart(2, '0');
                     const month = dateParts[1].padStart(2, '0');
                     const year = dateParts[2];
-                    formattedExpiryDate = `${year}-${month}-${day}`; // Convert to yyyy-mm-dd
+                    formattedExpiryDate2 = `${year}-${month}-${day}`; // Format as yyyy-mm-dd
+                } else {
+                    // Handle if the date is in other formats like yyyy-mm-dd
+                    formattedExpiryDate2 = newInsuranceExpiry; // Assuming it is in correct format
                 }
             }
 
+            console.log("Formatted Expiry Date:", formattedExpiryDate2); // Log the formatted date for debugging
+
+            if (!formattedExpiryDate2) {
+                Swal.fire({
+                    title: "❌ Invalid Insurance Expiry Date",
+                    text: "The insurance expiry date provided is invalid. Please check the format.",
+                    icon: "error",
+                    confirmButtonColor: "#ff4444"
+                });
+                return; // Exit the function if the date is invalid
+            }
+
             const userRef = doc(db, "Users", user.uid);
-            const carRef = doc(db, "carPlates", newCarPlate); 
+            const carRef = doc(db, "carPlates", newCarPlate);
 
             try {
                 // Update data in the Users collection
                 await updateDoc(userRef, {
                     carPlate: newCarPlate,
-                    carBrand: newCarBrand,
-                    carModel: newCarModel,
-                    InsExpMonth: formattedExpiryDate // Use formatted expiry date
+                    InsExpMonth: formattedExpiryDate2 // Store in yyyy-mm-dd format
                 });
 
                 // Update data in the carPlates collection
                 await updateDoc(carRef, {
                     carBrand: newCarBrand,
                     carModel: newCarModel,
-                    InsExpMonth: formattedExpiryDate // Update expiry date
+                    InsExpMonth: formattedExpiryDate2 // Store in yyyy-mm-dd format
                 });
 
                 // Update the UI with the new car information
                 document.getElementById("vehicle_no").innerText = newCarPlate || "Not Available";
                 document.getElementById("car_brand").innerText = newCarBrand || "Not Available";
                 document.getElementById("car_model").innerText = newCarModel || "Not Available";
-                document.getElementById("insexpdt").innerText = formattedExpiryDate || "Not Available";
+                document.getElementById("insexpdt").innerText = formattedExpiryDate2 || "Not Available"; // Display in the same format
 
                 Swal.fire({
                     title: "✅ Car Information Updated!",
@@ -8100,6 +8092,7 @@ function toggleOtherCarCompany() {
 
                 $('#editCarModal').modal('hide'); // Close the modal
             } catch (error) {
+                console.error("Error updating car information:", error);
                 Swal.fire({
                     title: "❌ Failed to update car information.",
                     text: error.message,
