@@ -128,7 +128,8 @@
 
 
         .btn-dark {
-            font-size: 20px; /* Adjust the font size for small screens */
+            font-size: 20px;
+            /* Adjust the font size for small screens */
         }
 
 
@@ -154,8 +155,10 @@
             }
 
             .btn-dark {
-            font-size: 16px; /* Adjust the font size for small screens */
-        }
+                font-size: 16px;
+                /* Adjust the font size for small screens */
+            }
+
             .table th,
             .table td {
                 font-size: 14px;
@@ -309,26 +312,26 @@
                             document.getElementById("editInsuranceExpi").value = "";  // Clear field initially
 
                             if (userData.InsExpMonth) {
-    let formattedDate2 = "";
+                                let formattedDate2 = "";
 
-    // Check if it's a Firestore timestamp (has the toDate() method)
-    if (userData.InsExpMonth && userData.InsExpMonth.toDate) {
-        const insDate = userData.InsExpMonth.toDate();
-        const year = insDate.getFullYear();
-        const month = ("0" + (insDate.getMonth() + 1)).slice(-2); // Ensure 2-digit format
-        const day = ("0" + insDate.getDate()).slice(-2); // Ensure 2-digit format
-        formattedDate2 = `${year}-${month}-${day}`; // Format as yyyy-mm-dd
-    } else if (typeof userData.InsExpMonth === "string") {
-        // If it's a string in yyyy-mm-dd format, use it directly
-        formattedDate2 = userData.InsExpMonth; // Assuming it's in valid format
-    
-    }
+                                // Check if it's a Firestore timestamp (has the toDate() method)
+                                if (userData.InsExpMonth && userData.InsExpMonth.toDate) {
+                                    const insDate = userData.InsExpMonth.toDate();
+                                    const year = insDate.getFullYear();
+                                    const month = ("0" + (insDate.getMonth() + 1)).slice(-2); // Ensure 2-digit format
+                                    const day = ("0" + insDate.getDate()).slice(-2); // Ensure 2-digit format
+                                    formattedDate2 = `${year}-${month}-${day}`; // Format as yyyy-mm-dd
+                                } else if (typeof userData.InsExpMonth === "string") {
+                                    // If it's a string in yyyy-mm-dd format, use it directly
+                                    formattedDate2 = userData.InsExpMonth; // Assuming it's in valid format
 
-    // Set the formatted date in the input field for Insurance Expiry Date
-    document.getElementById("editInsuranceExpi").value = formattedDate2 || "";
-} else {
-    document.getElementById("editInsuranceExpi").value = ""; // If no date is available
-}
+                                }
+
+                                // Set the formatted date in the input field for Insurance Expiry Date
+                                document.getElementById("editInsuranceExpi").value = formattedDate2 || "";
+                            } else {
+                                document.getElementById("editInsuranceExpi").value = ""; // If no date is available
+                            }
 
 
                             if (userData.carPlate) {
@@ -339,18 +342,18 @@
                                     const carData = carSnap.data();
                                     document.getElementById("car_model").innerText =
                                         carData.carModel + (carData.carModelDescription ? " (" + carData.carModelDescription + ")" : "") || "Not Available";
-                                        document.getElementById("editCarMo").value = carData.carModel ;
+                                    document.getElementById("editCarMo").value = carData.carModel;
                                     document.getElementById("editCarBr").value =
-                                        carData.carBrand ;
-                                
-                                    
+                                        carData.carBrand;
+
+
                                     document.getElementById("car_brand").innerText = carData.carBrand + (carData.carCompanyDescription ? " (" + carData.carCompanyDescription + ")" : "") || "Not Available";
                                 }
-                             
+
                             }
 
                             // Assuming userData.InsExpMonth is a string in the format "November 11, 2025 at 7:00:00 AM UTC+7"
-                          
+
 
 
 
@@ -440,6 +443,9 @@
                     }
                 });
             }
+
+
+
             function updateMembershipUI(userData) {
                 const purchaseBtn = document.querySelector(".btn-purchase, .btn-success");
                 if (!purchaseBtn) return;  // ✅ Jika tombol tidak ditemukan, stop fungsi
@@ -6490,37 +6496,37 @@
                         if (insuranceExpiry) {
                             let expiryDate;
 
-                   if (typeof insuranceExpiry === 'string') {
-    // If the string is in the "yyyy-mm-dd" format, convert it to "dd month yyyy"
-    const dateParts = insuranceExpiry.split("-");
-    if (dateParts.length === 3) {
-        const day = dateParts[2];
-        const month = getMonthName(dateParts[1]); // Get the full month name
-        const year = dateParts[0];
-        formattedExpiryDate = `${day} ${month} ${year}`; // Format as dd month yyyy (e.g., 11 November 2025)
-    }
-} else if (insuranceExpiry instanceof Date) {
-    const year = insuranceExpiry.getFullYear();
-    const month = ("0" + (insuranceExpiry.getMonth() + 1)).slice(-2);
-    const day = ("0" + insuranceExpiry.getDate()).slice(-2);
-    formattedExpiryDate = `${day} ${getMonthName(month)} ${year}`; // Convert Date object into "dd month yyyy"
-} else if (insuranceExpiry.toDate) {
-    // Handle Firestore Timestamp format
-    const expiryDate = insuranceExpiry.toDate();  // Convert Firestore timestamp to Date
-    const year = expiryDate.getFullYear();
-    const month = ("0" + (expiryDate.getMonth() + 1)).slice(-2);
-    const day = ("0" + expiryDate.getDate()).slice(-2);
-    formattedExpiryDate = `${day} ${getMonthName(month)} ${year}`; // Format the Firestore date
-}
+                            if (typeof insuranceExpiry === 'string') {
+                                // If the string is in the "yyyy-mm-dd" format, convert it to "dd month yyyy"
+                                const dateParts = insuranceExpiry.split("-");
+                                if (dateParts.length === 3) {
+                                    const day = dateParts[2];
+                                    const month = getMonthName(dateParts[1]); // Get the full month name
+                                    const year = dateParts[0];
+                                    formattedExpiryDate = `${day} ${month} ${year}`; // Format as dd month yyyy (e.g., 11 November 2025)
+                                }
+                            } else if (insuranceExpiry instanceof Date) {
+                                const year = insuranceExpiry.getFullYear();
+                                const month = ("0" + (insuranceExpiry.getMonth() + 1)).slice(-2);
+                                const day = ("0" + insuranceExpiry.getDate()).slice(-2);
+                                formattedExpiryDate = `${day} ${getMonthName(month)} ${year}`; // Convert Date object into "dd month yyyy"
+                            } else if (insuranceExpiry.toDate) {
+                                // Handle Firestore Timestamp format
+                                const expiryDate = insuranceExpiry.toDate();  // Convert Firestore timestamp to Date
+                                const year = expiryDate.getFullYear();
+                                const month = ("0" + (expiryDate.getMonth() + 1)).slice(-2);
+                                const day = ("0" + expiryDate.getDate()).slice(-2);
+                                formattedExpiryDate = `${day} ${getMonthName(month)} ${year}`; // Format the Firestore date
+                            }
 
-// Helper function to get the full month name from a numeric month value
-function getMonthName(monthNumber) {
-    const monthNames = [
-        "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
-    ];
-    return monthNames[parseInt(monthNumber, 10) - 1]; // Map numeric month to month name
-}
+                            // Helper function to get the full month name from a numeric month value
+                            function getMonthName(monthNumber) {
+                                const monthNames = [
+                                    "January", "February", "March", "April", "May", "June",
+                                    "July", "August", "September", "October", "November", "December"
+                                ];
+                                return monthNames[parseInt(monthNumber, 10) - 1]; // Map numeric month to month name
+                            }
 
                             // If a valid Date object is found, format it as a full date
                             if (expiryDate instanceof Date && !isNaN(expiryDate)) {
@@ -6687,88 +6693,88 @@ function getMonthName(monthNumber) {
                         }
                     });
 
-                    
+
 
                     document.querySelectorAll('.editCarBtn').forEach(button => {
                         button.addEventListener('click', async () => {
                             function get_model() {
-            const car_make = document.getElementById("car_company").value;
-            const safeClass = car_make.replace(/[^a-zA-Z0-9]/g, '');
-            console.log("Getting models for brand:", safeClass);
+                                const car_make = document.getElementById("car_company").value;
+                                const safeClass = car_make.replace(/[^a-zA-Z0-9]/g, '');
+                                console.log("Getting models for brand:", safeClass);
 
-            document.querySelectorAll('.carmodelnew').forEach(option => {
-                option.style.display = 'none';
-            });
+                                document.querySelectorAll('.carmodelnew').forEach(option => {
+                                    option.style.display = 'none';
+                                });
 
-            const matchingOptions = document.querySelectorAll(`.${safeClass}.carmodelnew`);
-            matchingOptions.forEach(option => {
-                option.style.display = 'block';
-            });
+                                const matchingOptions = document.querySelectorAll(`.${safeClass}.carmodelnew`);
+                                matchingOptions.forEach(option => {
+                                    option.style.display = 'block';
+                                });
 
-            if (matchingOptions.length === 0) {
-                document.querySelectorAll(`.Other.carmodelnew`).forEach(option => {
-                    option.style.display = 'block';
-                });
-            }
-        }
+                                if (matchingOptions.length === 0) {
+                                    document.querySelectorAll(`.Other.carmodelnew`).forEach(option => {
+                                        option.style.display = 'block';
+                                    });
+                                }
+                            }
 
-        function showOtherCarDescription() {
-            const carCompanySelect = document.getElementById("car_company");
-            const otherCarCompany = document.getElementById("otherCarCompany");
+                            function showOtherCarDescription() {
+                                const carCompanySelect = document.getElementById("car_company");
+                                const otherCarCompany = document.getElementById("otherCarCompany");
 
-            if (carCompanySelect.value === "Other") {
-                otherCarCompany.style.display = "block";
-            } else {
-                otherCarCompany.style.display = "none";
-                otherCarCompany.value = "";
-            }
-        }
+                                if (carCompanySelect.value === "Other") {
+                                    otherCarCompany.style.display = "block";
+                                } else {
+                                    otherCarCompany.style.display = "none";
+                                    otherCarCompany.value = "";
+                                }
+                            }
 
-        // --- AMBIL DATA ---
-        const userId = button.dataset.userid;
-        const userRef = doc(db, "Users", userId);
-        const userSnap = await getDoc(userRef);
-        const userData = userSnap.data();
+                            // --- AMBIL DATA ---
+                            const userId = button.dataset.userid;
+                            const userRef = doc(db, "Users", userId);
+                            const userSnap = await getDoc(userRef);
+                            const userData = userSnap.data();
 
-        let carData = {};
-        if (userData.carPlate) {
-            const carRef = doc(db, "carPlates", userData.carPlate);
-            const carSnap = await getDoc(carRef);
-            if (carSnap.exists()) {
-                carData = carSnap.data();
-            }
-        }
+                            let carData = {};
+                            if (userData.carPlate) {
+                                const carRef = doc(db, "carPlates", userData.carPlate);
+                                const carSnap = await getDoc(carRef);
+                                if (carSnap.exists()) {
+                                    carData = carSnap.data();
+                                }
+                            }
 
-        // --- ISI FORM ---
-        document.getElementById("editCarPlate").value = userData.carPlate || "";
+                            // --- ISI FORM ---
+                            document.getElementById("editCarPlate").value = userData.carPlate || "";
 
-        const brandSelect = document.getElementById("car_company");
-        const otherTextarea = document.getElementById("otherCarCompany");
-        const carBrand = carData.carBrand || "";
+                            const brandSelect = document.getElementById("car_company");
+                            const otherTextarea = document.getElementById("otherCarCompany");
+                            const carBrand = carData.carBrand || "";
 
-        const isListed = Array.from(brandSelect.options).some(option => option.value === carBrand);
+                            const isListed = Array.from(brandSelect.options).some(option => option.value === carBrand);
 
-        if (isListed) {
-            brandSelect.value = carBrand;
-            get_model(); // panggil setelah value di-set
-            setTimeout(() => {
-                document.getElementById("editCarModel").value = carData.carModel || "";
-            }, 0);
-            otherTextarea.style.display = "none";
-            otherTextarea.value = "";
-        } else {
-            brandSelect.value = "Other";
-            otherTextarea.style.display = "block";
-            otherTextarea.value = carData.carCompanyDescription || carBrand || "";
-        }
+                            if (isListed) {
+                                brandSelect.value = carBrand;
+                                get_model(); // panggil setelah value di-set
+                                setTimeout(() => {
+                                    document.getElementById("editCarModel").value = carData.carModel || "";
+                                }, 0);
+                                otherTextarea.style.display = "none";
+                                otherTextarea.value = "";
+                            } else {
+                                brandSelect.value = "Other";
+                                otherTextarea.style.display = "block";
+                                otherTextarea.value = carData.carCompanyDescription || carBrand || "";
+                            }
 
-        // update dynamic onchange
-        brandSelect.removeEventListener("change", showOtherCarDescription);
-        brandSelect.addEventListener("change", () => {
-            showOtherCarDescription();
-            get_model();
-        });
-        showOtherCarDescription();
+                            // update dynamic onchange
+                            brandSelect.removeEventListener("change", showOtherCarDescription);
+                            brandSelect.addEventListener("change", () => {
+                                showOtherCarDescription();
+                                get_model();
+                            });
+                            showOtherCarDescription();
 
                             document.getElementById("editCarModel").value = carData.carModel || ""; // From carPlates collection
                             document.getElementById("editCarDescription").value = carData.carModelDescription || "";
@@ -6778,41 +6784,41 @@ function getMonthName(monthNumber) {
                             if (userData.InsExpMonth) {
                                 let formattedDate = "";
 
-// Check if it's a Firestore timestamp (has the toDate() method)
-if (userData.InsExpMonth && userData.InsExpMonth.toDate) {
-    const insDate = userData.InsExpMonth.toDate();
-    const year = insDate.getFullYear();
-    const month = ("0" + (insDate.getMonth() + 1)).slice(-2); // Ensure 2-digit format
-    const day = ("0" + insDate.getDate()).slice(-2); // Ensure 2-digit format
-    formattedDate = `${year}-${month}-${day}`; // Format as yyyy-mm-dd
-} else if (typeof userData.InsExpMonth === "string") {
-    // If it's a string in yyyy-mm-dd format, use it directly
-    formattedDate = userData.InsExpMonth; // Assuming it's in valid format
-} else if (/^[a-zA-Z]{3}$/.test(userData.InsExpMonth)) {
-        // If the month is a 3-letter string (like "May")
-        const monthStr = userData.InsExpMonth.trim().toLowerCase(); // Convert to lowercase to handle case insensitivity
-        const monthNames = {
-            "jan": "01",
-            "feb": "02",
-            "mar": "03",
-            "apr": "04",
-            "May": "05",
-            "jun": "06",
-            "jul": "07",
-            "aug": "08",
-            "sep": "09",
-            "oct": "10",
-            "nov": "11",
-            "dec": "12"
-        };
+                                // Check if it's a Firestore timestamp (has the toDate() method)
+                                if (userData.InsExpMonth && userData.InsExpMonth.toDate) {
+                                    const insDate = userData.InsExpMonth.toDate();
+                                    const year = insDate.getFullYear();
+                                    const month = ("0" + (insDate.getMonth() + 1)).slice(-2); // Ensure 2-digit format
+                                    const day = ("0" + insDate.getDate()).slice(-2); // Ensure 2-digit format
+                                    formattedDate = `${year}-${month}-${day}`; // Format as yyyy-mm-dd
+                                } else if (typeof userData.InsExpMonth === "string") {
+                                    // If it's a string in yyyy-mm-dd format, use it directly
+                                    formattedDate = userData.InsExpMonth; // Assuming it's in valid format
+                                } else if (/^[a-zA-Z]{3}$/.test(userData.InsExpMonth)) {
+                                    // If the month is a 3-letter string (like "May")
+                                    const monthStr = userData.InsExpMonth.trim().toLowerCase(); // Convert to lowercase to handle case insensitivity
+                                    const monthNames = {
+                                        "jan": "01",
+                                        "feb": "02",
+                                        "mar": "03",
+                                        "apr": "04",
+                                        "May": "05",
+                                        "jun": "06",
+                                        "jul": "07",
+                                        "aug": "08",
+                                        "sep": "09",
+                                        "oct": "10",
+                                        "nov": "11",
+                                        "dec": "12"
+                                    };
 
-        // If month is valid, use the format: 2025-MM-01
-        if (monthNames[monthStr]) {
-            const month = monthNames[monthStr];
-            formattedDate = `2025-${month}-01`; // Assume 01 as the day
-        }
- // Assuming it's in valid format
-}
+                                    // If month is valid, use the format: 2025-MM-01
+                                    if (monthNames[monthStr]) {
+                                        const month = monthNames[monthStr];
+                                        formattedDate = `2025-${month}-01`; // Assume 01 as the day
+                                    }
+                                    // Assuming it's in valid format
+                                }
 
 
 
@@ -6876,8 +6882,8 @@ if (userData.InsExpMonth && userData.InsExpMonth.toDate) {
                                         userID: userId,
                                         InsExpMonth: insuranceExpiryDate || oldData?.InsExpMonth || "",
                                         carCompanyDescription: (document.getElementById("car_company").value === "Other")
-        ? document.getElementById("otherCarCompany").value.trim()
-        : ""  // Kosongkan jika bukan Other
+                                            ? document.getElementById("otherCarCompany").value.trim()
+                                            : ""  // Kosongkan jika bukan Other
                                     };
 
                                     // 4. Simpan dokumen baru ke carPlates (dengan ID = plat baru)
@@ -7136,18 +7142,18 @@ if (userData.InsExpMonth && userData.InsExpMonth.toDate) {
                                 }
 
                                 // Format Created At
-let createdAtFormatted = "Not Available";
-if (user.createdAt) {
-    if (typeof user.createdAt === "string") {
-        createdAtFormatted = user.createdAt;
-    } else if (user.createdAt?.toDate) {
-        const created = user.createdAt.toDate();
-        createdAtFormatted = created.toLocaleDateString('en-GB', {
-            day: '2-digit', month: 'short', year: 'numeric',
-            hour: '2-digit', minute: '2-digit'
-        });
-    }
-}
+                                let createdAtFormatted = "Not Available";
+                                if (user.createdAt) {
+                                    if (typeof user.createdAt === "string") {
+                                        createdAtFormatted = user.createdAt;
+                                    } else if (user.createdAt?.toDate) {
+                                        const created = user.createdAt.toDate();
+                                        createdAtFormatted = created.toLocaleDateString('en-GB', {
+                                            day: '2-digit', month: 'short', year: 'numeric',
+                                            hour: '2-digit', minute: '2-digit'
+                                        });
+                                    }
+                                }
 
 
                                 // Format Insurance Expiry Month
@@ -7434,39 +7440,39 @@ if (user.createdAt) {
 
 
             function setupPagination(totalUsers) {
-    const totalPages = Math.ceil(totalUsers / rowsPerPage);
-    const pagination = document.getElementById("pagination");
+                const totalPages = Math.ceil(totalUsers / rowsPerPage);
+                const pagination = document.getElementById("pagination");
 
-    // ⛔️ Sembunyikan pagination kalau cuma 1 halaman atau tidak cukup data untuk paging
-    if (totalPages <= 1) {
-        pagination.style.display = "none";
-        return;
-    } else {
-        pagination.style.display = "flex"; // Tampilkan kembali jika lebih dari 1 halaman
-    }
+                // ⛔️ Sembunyikan pagination kalau cuma 1 halaman atau tidak cukup data untuk paging
+                if (totalPages <= 1) {
+                    pagination.style.display = "none";
+                    return;
+                } else {
+                    pagination.style.display = "flex"; // Tampilkan kembali jika lebih dari 1 halaman
+                }
 
-    pagination.innerHTML = "";
+                pagination.innerHTML = "";
 
-    for (let i = 1; i <= totalPages; i++) {
-        const li = document.createElement("li");
-        li.classList.add("page-item", ...(i === currentPage ? ["active"] : []));
-        li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                for (let i = 1; i <= totalPages; i++) {
+                    const li = document.createElement("li");
+                    li.classList.add("page-item", ...(i === currentPage ? ["active"] : []));
+                    li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
 
-        li.addEventListener("click", (e) => {
-            e.preventDefault();
-            currentPage = i;
-            loadAllUsers(true, currentPage); // Gunakan page yang baru dipilih
-        });
+                    li.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        currentPage = i;
+                        loadAllUsers(true, currentPage); // Gunakan page yang baru dipilih
+                    });
 
-        pagination.appendChild(li);
-    }
-}
+                    pagination.appendChild(li);
+                }
+            }
 
-function toggleOtherCarCompany() {
-    const select = document.getElementById("car_company");
-    const textarea = document.getElementById("otherCarCompany");
-    textarea.style.display = select.value === "Other" ? "block" : "none";
-}
+            function toggleOtherCarCompany() {
+                const select = document.getElementById("car_company");
+                const textarea = document.getElementById("otherCarCompany");
+                textarea.style.display = select.value === "Other" ? "block" : "none";
+            }
 
             function filterTable() {
                 const filterValue = document.getElementById("membershipFilter").value.toLowerCase();
@@ -7616,7 +7622,7 @@ function toggleOtherCarCompany() {
             };
 
 
-            
+
 
 
 
@@ -7796,9 +7802,7 @@ function toggleOtherCarCompany() {
             document.addEventListener("DOMContentLoaded", async () => {
                 listenForMembershipUpdates();
             });
-
-
-
+          
             async function renewMembership(userId) {
                 const confirm = await Swal.fire({
                     title: "Are you sure?",
@@ -8015,6 +8019,7 @@ function toggleOtherCarCompany() {
                 }
             });
 
+      
             const checkEditForm2 = setInterval(() => {
     const editForm = document.getElementById("editCarForm");
 
@@ -8030,8 +8035,6 @@ function toggleOtherCarCompany() {
             const newCarBrand = document.getElementById("editCarBr").value.trim();
             const newCarModel = document.getElementById("editCarMo").value.trim();
             const newInsuranceExpiry = document.getElementById("editInsuranceExpi").value.trim(); // Get date from input field
-
-            console.log("New Insurance Expiry:", newInsuranceExpiry); // Log the input value for debugging
 
             let formattedExpiryDate2 = "";
 
@@ -8049,8 +8052,6 @@ function toggleOtherCarCompany() {
                 }
             }
 
-            console.log("Formatted Expiry Date:", formattedExpiryDate2); // Log the formatted date for debugging
-
             if (!formattedExpiryDate2) {
                 Swal.fire({
                     title: "❌ Invalid Insurance Expiry Date",
@@ -8062,35 +8063,90 @@ function toggleOtherCarCompany() {
             }
 
             const userRef = doc(db, "Users", user.uid);
-            const carRef = doc(db, "carPlates", newCarPlate);
+            const userDoc = await getDoc(userRef);
+            const oldCarPlate = userDoc.exists() ? userDoc.data().carPlate : '';  // Ambil plat lama dari Firestore
+
+            const carRef = doc(db, "carPlates", newCarPlate); // Referensi untuk plat baru
 
             try {
-                // Update data in the Users collection
-                await updateDoc(userRef, {
-                    carPlate: newCarPlate,
-                    InsExpMonth: formattedExpiryDate2 // Store in yyyy-mm-dd format
-                });
+                // Jika plat nomor lama dan baru berbeda, buat dokumen baru dan hapus dokumen lama di carPlates
+                if (oldCarPlate !== newCarPlate) {
+                    console.log("Car plate has changed. Creating a new car plate document.");
 
-                // Update data in the carPlates collection
-                await updateDoc(carRef, {
-                    carBrand: newCarBrand,
-                    carModel: newCarModel,
-                    InsExpMonth: formattedExpiryDate2 // Store in yyyy-mm-dd format
-                });
+                    // Membuat data baru untuk dokumen carPlates
+                    const newCarData = {
+                        carPlate: newCarPlate,
+                        carBrand: newCarBrand,
+                        carModel: newCarModel,
+                        InsExpMonth: formattedExpiryDate2, // Menyimpan dalam format yyyy-mm-dd
+                        userID: user.uid
+                    };
 
-                // Update the UI with the new car information
-                document.getElementById("vehicle_no").innerText = newCarPlate || "Not Available";
-                document.getElementById("car_brand").innerText = newCarBrand || "Not Available";
-                document.getElementById("car_model").innerText = newCarModel || "Not Available";
-                document.getElementById("insexpdt").innerText = formattedExpiryDate2 || "Not Available"; // Display in the same format
+                    // Menggunakan setDoc untuk membuat dokumen baru (ID berdasarkan plat nomor baru)
+                    await setDoc(carRef, newCarData);
 
-                Swal.fire({
-                    title: "✅ Car Information Updated!",
-                    icon: "success",
-                    confirmButtonColor: "#44cc44"
-                });
+                    // Hapus dokumen lama di carPlates jika plat nomor lama ada
+                    if (oldCarPlate) {
+                        const oldCarRef = doc(db, "carPlates", oldCarPlate); // Referensi untuk dokumen plat lama
+                        await deleteDoc(oldCarRef); // Hapus dokumen plat lama
+                        console.log("Old car plate document deleted.");
+                    }
 
-                $('#editCarModal').modal('hide'); // Close the modal
+                    // Update data pengguna di koleksi Users
+                    await updateDoc(userRef, {
+                        carPlate: newCarPlate, // Ganti plat nomor dengan yang baru
+                        carBrand: newCarBrand,
+                        carModel: newCarModel,
+                        InsExpMonth: formattedExpiryDate2 // Menggunakan expiry date yang benar
+                    });
+
+                    // Update UI dengan data mobil baru
+                    document.getElementById("vehicle_no").innerText = newCarPlate || "Not Available";
+                    document.getElementById("car_brand").innerText = newCarBrand || "Not Available";
+                    document.getElementById("car_model").innerText = newCarModel || "Not Available";
+                    document.getElementById("insexpdt").innerText = formattedExpiryDate2 || "Not Available";
+
+                    Swal.fire({
+                        title: "✅ Car Information Updated!",
+                        icon: "success",
+                        confirmButtonColor: "#44cc44"
+                    });
+
+                    $('#editCarModal').modal('hide'); // Menutup modal
+
+                } else {
+                    console.log("Car plate has not changed. Updating the existing car plate document.");
+
+                    // Update dokumen carPlates yang sudah ada
+                    await setDoc(carRef, {
+                        carBrand: newCarBrand,
+                        carModel: newCarModel,
+                        InsExpMonth: formattedExpiryDate2 // Update expiry date
+                    }, { merge: true });
+
+                    // Update data pengguna di koleksi Users
+                    await updateDoc(userRef, {
+                        carPlate: newCarPlate,
+                        carBrand: newCarBrand,
+                        carModel: newCarModel,
+                        InsExpMonth: formattedExpiryDate2 // Gunakan expiry date yang benar
+                    });
+
+                    // Update UI
+                    document.getElementById("vehicle_no").innerText = newCarPlate || "Not Available";
+                    document.getElementById("car_brand").innerText = newCarBrand || "Not Available";
+                    document.getElementById("car_model").innerText = newCarModel || "Not Available";
+                    document.getElementById("insexpdt").innerText = formattedExpiryDate2 || "Not Available";
+
+                    Swal.fire({
+                        title: "✅ Car Information Updated!",
+                        icon: "success",
+                        confirmButtonColor: "#44cc44"
+                    });
+
+                    $('#editCarModal').modal('hide');
+                }
+
             } catch (error) {
                 console.error("Error updating car information:", error);
                 Swal.fire({
@@ -8115,103 +8171,104 @@ function formatDate(dateString) {
     return `${day}/${month}/${year}`; // Return formatted date
 }
 
+         
 
 
             // ✅ Pastikan `editProfileForm` sudah ada sebelum menambahkan event listener
             const checkEditForm = setInterval(() => {
-    const editForm = document.getElementById("editProfileForm");
+                const editForm = document.getElementById("editProfileForm");
 
-    if (editForm) {
-        clearInterval(checkEditForm);
+                if (editForm) {
+                    clearInterval(checkEditForm);
 
- 
 
-        // Handling form submission
-        editForm.addEventListener("submit", async (event) => {
-            event.preventDefault();
-            const user = auth.currentUser;
-            if (!user) return;
 
-            const newUsername = document.getElementById("editUsername").value;
-            const newEmail = document.getElementById("editEmail").value.trim();
-            const birthdayMonth = document.getElementById("editdateofbirth").value.trim(); // Getting the DOB value
-            const phoneNumber = document.getElementById("editPhoneNumber").value.trim(); // Getting the phone number value
-            const currentEmail = user.email;
+                    // Handling form submission
+                    editForm.addEventListener("submit", async (event) => {
+                        event.preventDefault();
+                        const user = auth.currentUser;
+                        if (!user) return;
 
-            const userRef = doc(db, "Users", user.uid);
+                        const newUsername = document.getElementById("editUsername").value;
+                        const newEmail = document.getElementById("editEmail").value.trim();
+                        const birthdayMonth = document.getElementById("editdateofbirth").value.trim(); // Getting the DOB value
+                        const phoneNumber = document.getElementById("editPhoneNumber").value.trim(); // Getting the phone number value
+                        const currentEmail = user.email;
 
-            try {
-                // Update data to include dob and userContact
-                const updateData = {
-                    userName: newUsername,
-                    dob: birthdayMonth,
-                    userContact: phoneNumber
-                };
+                        const userRef = doc(db, "Users", user.uid);
 
-                // Handling email update if changed
-                if (newEmail && newEmail !== currentEmail) {
-                    const password = prompt("🔒 Please enter your password to confirm email update:");
-                    if (!password) {
-                        return Swal.fire({
-                            title: "❌ Email update cancelled.",
-                            icon: "error",
-                            background: "#ffcccc",
-                            color: "#000",
-                            confirmButtonColor: "#ff4444"
-                        });
-                    }
+                        try {
+                            // Update data to include dob and userContact
+                            const updateData = {
+                                userName: newUsername,
+                                dob: birthdayMonth,
+                                userContact: phoneNumber
+                            };
 
-                    const credential = EmailAuthProvider.credential(user.email, password);
-                    await reauthenticateWithCredential(user, credential);
-                    await verifyBeforeUpdateEmail(user, newEmail);
-                    Swal.fire({
-                        title: "📧 A verification email has been sent!",
-                        text: "Please verify it before logging in again.",
-                        icon: "info",
-                        background: "#fffa90",
-                        color: "#000",
-                        confirmButtonColor: "#ffcc00"
+                            // Handling email update if changed
+                            if (newEmail && newEmail !== currentEmail) {
+                                const password = prompt("🔒 Please enter your password to confirm email update:");
+                                if (!password) {
+                                    return Swal.fire({
+                                        title: "❌ Email update cancelled.",
+                                        icon: "error",
+                                        background: "#ffcccc",
+                                        color: "#000",
+                                        confirmButtonColor: "#ff4444"
+                                    });
+                                }
+
+                                const credential = EmailAuthProvider.credential(user.email, password);
+                                await reauthenticateWithCredential(user, credential);
+                                await verifyBeforeUpdateEmail(user, newEmail);
+                                Swal.fire({
+                                    title: "📧 A verification email has been sent!",
+                                    text: "Please verify it before logging in again.",
+                                    icon: "info",
+                                    background: "#fffa90",
+                                    color: "#000",
+                                    confirmButtonColor: "#ffcc00"
+                                });
+
+                                await updateDoc(userRef, { pendingEmail: newEmail });
+
+                                logoutUser();
+                                return;
+                            }
+
+                            // Update the user profile with the new data
+                            await updateDoc(userRef, updateData);
+
+                            // Update the UI with the new username
+                            document.getElementById("username").innerText = newUsername || "User";
+
+                            // Show success message
+                            Swal.fire({
+                                title: "✅ Profile updated successfully!",
+                                icon: "success",
+                                background: "#ccffcc",
+                                color: "#000",
+                                confirmButtonColor: "#44cc44"
+                            });
+
+                            // Close the modal after update
+                            $('#editProfileModal').modal('hide');
+                        } catch (error) {
+                            console.error("Error during form submission: ", error);
+                            Swal.fire({
+                                title: "❌ Failed to update profile.",
+                                text: error.message,
+                                icon: "error",
+                                background: "#ffcccc",
+                                color: "#000",
+                                confirmButtonColor: "#ff4444"
+                            });
+                        }
                     });
-
-                    await updateDoc(userRef, { pendingEmail: newEmail });
-
-                    logoutUser();
-                    return;
+                } else {
+                    console.log("Edit form not found.");
                 }
-
-                // Update the user profile with the new data
-                await updateDoc(userRef, updateData);
-
-                // Update the UI with the new username
-                document.getElementById("username").innerText = newUsername || "User";
-
-                // Show success message
-                Swal.fire({
-                    title: "✅ Profile updated successfully!",
-                    icon: "success",
-                    background: "#ccffcc",
-                    color: "#000",
-                    confirmButtonColor: "#44cc44"
-                });
-
-                // Close the modal after update
-                $('#editProfileModal').modal('hide');
-            } catch (error) {
-                console.error("Error during form submission: ", error);
-                Swal.fire({
-                    title: "❌ Failed to update profile.",
-                    text: error.message,
-                    icon: "error",
-                    background: "#ffcccc",
-                    color: "#000",
-                    confirmButtonColor: "#ff4444"
-                });
-            }
-        });
-    } else {
-        console.log("Edit form not found.");
-    }
-}, 500);
+            }, 500);
 
             // ✅ Pastikan logoutBtn sudah ada sebelum menambahkan event listener
             const checkLogoutBtn = setInterval(() => {
@@ -8268,6 +8325,8 @@ function formatDate(dateString) {
             }, 500);
 
         });
+
+
     </script>
 
 
@@ -8406,89 +8465,96 @@ z-index: 9999;">
                 <div class="col-6 d-flex justify-content-start align-items-center">
                     <h4 style="font-weight:600">Hi, <span id="username">Loading...</span></h4>
                 </div>
-            
+
                 <!-- Right Side: Edit Profile Button -->
                 <div class="col-6 d-flex justify-content-end align-items-center">
                     <button class="btn btn-dark btn-sm ml-2 mt-1 mt-sm-0" data-toggle="modal"
-                            data-target="#editProfileModal" style="margin-left: auto; padding-left: 10px; padding-right:10px; margin-right: 20px;">
+                        data-target="#editProfileModal"
+                        style="margin-left: auto; padding-left: 10px; padding-right:10px; margin-right: 20px;">
                         <i class="fas fa-user-circle mr-2"></i> Edit Profile
                     </button>
                 </div>
             </div>
-            
-            
-            
-            
-           <!-- Car Information Section -->
-           <div style="border-top:1px solid lightgrey; padding-top: 10px;">
-            <!-- Car Information Section with underlined text instead of button -->
-            <div style="display: flex; align-items: center;">
-                <p style="margin-right: 10px; font-size: 18px;color: black; margin-bottom: 10px; background-color: #ffc107 ;padding-left: 10px;padding-right: 10px;border-radius: 30px;">
-                    Car Information
-                </p>
-                <a href="#editCarModal" data-toggle="modal" data-target="#editCarModal" style="cursor: pointer;">
-                    <i class="fas fa-pencil-alt" style="color: #ffc107; font-size: 18px;"></i>
-                </a>
-            </div>
-        
-            <!-- Car Details -->
-            <div><b>Car Plate</b>: <span id="vehicle_no">Loading...</span></div>
-            <div><b>Car Brand</b>: <span id="car_brand">Loading...</span></div>
-            <div><b>Car Model</b>: <span id="car_model">Loading...</span></div>
-            <div style="margin-bottom: 20px;"><b>Insurance Expiry Date</b>: <span id="insexpdt">Loading...</span></div>
-        
-            <!-- Hidden Email Section (optional) -->
-            <div style="display:none;">
-                <div class="alert alert-warning p-2 mb-0 d-flex flex-wrap align-items-center" role="alert">
-                    <div class="flex-grow-1 text-break">
-                        <span id="currentEmail" style="display:none;">Loading...</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        
-        
-        <ul class="nav nav-tabs" id="carInfoTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <a class="nav-link active" id="car-service-plan-tab" data-toggle="tab" href="#car-service-plan" role="tab" aria-controls="car-service-plan" aria-selected="true">
-                    Car Service Plan
-                </a>
-            </li>
-            <li class="nav-item" role="presentation">
-                <a class="nav-link" id="car-invoice-tab" data-toggle="tab" href="#car-invoice" role="tab" aria-controls="car-invoice" aria-selected="false">
-                    Car Invoice
-                </a>
-            </li>
-        </ul>
-        
-        <!-- Tab Content Below the Tabs -->
-        <div class="tab-content" id="carInfoTabsContent">
-            <!-- Car Service Plan Tab Content -->
-            <div class="tab-pane fade show active" id="car-service-plan" role="tabpanel" aria-labelledby="car-service-plan-tab">
-                <div style="margin-top: 20px;"></div>
-                <a href="/plans" class="btn btn-purchase">Purchase Plan</a>
-                <div id="servicingBalanceCard" class="card mt-4" style="display:none;">
-                    <div class="card-header bg-warning text-white font-weight-bold">
-                        Servicing Balance
-                    </div>
-                    <div class="card-body" id="servicingBalanceContent">
-                        <!-- Dynamic content here -->
-                    </div>
-                </div>
-            </div>
-        
-            <!-- Car Invoice Tab Content -->
-            <div class="tab-pane fade" id="car-invoice" role="tabpanel" aria-labelledby="car-invoice-tab">
-                <div><b>Invoice Number:</b> 12345</div>
-                <div><b>Invoice Date:</b> October 15, 2025</div>
-                <div><b>Amount Due:</b> $300</div>
-            </div>
-        </div>
 
-            
+
+
+
+            <!-- Car Information Section -->
+            <div style="border-top:1px solid lightgrey; padding-top: 10px;">
+                <!-- Car Information Section with underlined text instead of button -->
+                <div style="display: flex; align-items: center;">
+                    <p
+                        style="margin-right: 10px; font-size: 18px;color: black; margin-bottom: 10px; background-color: #ffc107 ;padding-left: 10px;padding-right: 10px;border-radius: 30px;">
+                        Car Information
+                    </p>
+                    <a href="#editCarModal" data-toggle="modal" data-target="#editCarModal" style="cursor: pointer;">
+                        <i class="fas fa-pencil-alt" style="color: #ffc107; font-size: 18px;"></i>
+                    </a>
+                </div>
+
+                <!-- Car Details -->
+                <div><b>Car Plate</b>: <span id="vehicle_no">Loading...</span></div>
+                <div><b>Car Brand</b>: <span id="car_brand">Loading...</span></div>
+                <div><b>Car Model</b>: <span id="car_model">Loading...</span></div>
+                <div style="margin-bottom: 20px;"><b>Insurance Expiry Date</b>: <span id="insexpdt">Loading...</span>
+                </div>
+
+                <!-- Hidden Email Section (optional) -->
+                <div style="display:none;">
+                    <div class="alert alert-warning p-2 mb-0 d-flex flex-wrap align-items-center" role="alert">
+                        <div class="flex-grow-1 text-break">
+                            <span id="currentEmail" style="display:none;">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <ul class="nav nav-tabs" id="carInfoTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link active" id="car-service-plan-tab" data-toggle="tab" href="#car-service-plan"
+                        role="tab" aria-controls="car-service-plan" aria-selected="true">
+                        Car Service Plan
+                    </a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="car-invoice-tab" data-toggle="tab" href="#car-invoice" role="tab"
+                        aria-controls="car-invoice" aria-selected="false">
+                        Car Invoice
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Tab Content Below the Tabs -->
+            <div class="tab-content" id="carInfoTabsContent">
+                <!-- Car Service Plan Tab Content -->
+                <div class="tab-pane fade show active" id="car-service-plan" role="tabpanel"
+                    aria-labelledby="car-service-plan-tab">
+                    <div style="margin-top: 20px;"></div>
+                    <a href="/plans" class="btn btn-purchase">Purchase Plan</a>
+                    <div id="servicingBalanceCard" class="card mt-4" style="display:none;">
+                        <div class="card-header bg-warning text-white font-weight-bold">
+                            Servicing Balance
+                        </div>
+                        <div class="card-body" id="servicingBalanceContent">
+                            <!-- Dynamic content here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Car Invoice Tab Content -->
+                <div class="tab-pane fade" id="car-invoice" role="tabpanel" aria-labelledby="car-invoice-tab">
+                    <div><b>Invoice Number:</b> 12345</div>
+                    <div><b>Invoice Date:</b> October 15, 2025</div>
+                    <div><b>Amount Due:</b> $300</div>
+                </div>
+            </div>
+
+
             <!-- Modal for Editing Car Information -->
-            <div class="modal fade" id="editCarModal" tabindex="-1" role="dialog" aria-labelledby="editCarModalLabel" aria-hidden="true">
+            <div class="modal fade" id="editCarModal" tabindex="-1" role="dialog" aria-labelledby="editCarModalLabel"
+                aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -8522,12 +8588,12 @@ z-index: 9999;">
                     </div>
                 </div>
             </div>
-            
-        
-            
 
 
-          
+
+
+
+
 
         </div>
 
@@ -8567,30 +8633,31 @@ z-index: 9999;">
                                     <option value="Dec">December</option>
                                 </select>
                             </div>
-                        
+
                             <!-- Added Phone Number Field -->
                             <div class="form-group">
                                 <label for="editPhoneNumber">Hand Phone Number</label>
                                 <input type="text" id="editPhoneNumber" class="form-control">
                             </div>
-                        
+
                             <div class="form-group">
                                 <label for="editEmail">Email</label>
                                 <input type="email" id="editEmail" class="form-control">
                             </div>
-                        
+
                             <!-- Added DOB Field -->
-                          
-                        
+
+
                             <div class="form-group d-flex justify-content-start">
                                 <!-- Reset Password Button -->
-                                <button type="button" id="resetPasswordBtn" class="btn btn-danger" style="margin-right:10px;">Reset Password</button>
-                        
+                                <button type="button" id="resetPasswordBtn" class="btn btn-danger"
+                                    style="margin-right:10px;">Reset Password</button>
+
                                 <!-- Update Profile Button -->
                                 <button type="submit" class="btn btn-primary">Update Profile</button>
                             </div>
                         </form>
-                        
+
                     </div>
                 </div>
             </div>
