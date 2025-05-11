@@ -24,6 +24,104 @@
             font-family: 'Poppins', sans-serif;
         }
 
+        .custom-btn {
+    background-color: black; /* Set your custom background color */
+    color: white; /* Set text color */
+    border: 2px solid #ffbc13 ; /* Optional: Remove border */
+}
+
+.custom-btn:hover {
+    background-color: grey; /* Set custom hover color */
+    color: white;
+}
+
+
+        .nav-pills .nav-item .nav-link {
+    border-radius: 0;  /* Optional: Remove the border radius */
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    background-color: white; /* Change background color for the pill */
+    border: 2px solid #ffc107;
+    color: black; /* Change text color */
+    padding: 10px 20px; /* Optional: Adjust padding for pill buttons */
+    
+}
+
+        .nav-pills .nav-item .nav-link.active {
+    border-radius: 0;  /* Optional: Remove the border radius */
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    background-color: #ffc107; /* Change background color for the pill */
+    border: 2px solid #ffc107;
+    color: black; /* Change text color */
+    padding: 10px 20px; /* Optional: Adjust padding for pill buttons */
+    
+}
+
+        /* Custom Styles for the Nav Pills */
+#carInfoTabs .nav-pills .nav-item .nav-link {
+    border-radius: 0; /* Remove rounded corners */
+    padding: 10px 20px; /* Padding to make tabs larger */
+    font-weight: bold; /* Make text bold */
+}
+
+/* Active Tab Styles */
+#carInfoTabs .nav-pills .nav-item .nav-link.active {
+    background-color: #E9C46A; /* Yellow background for active tab */
+    color: #fff; /* White text */
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px ;
+    border: 3px solid #F4A261; /* Border color matching */
+}
+
+/* Non-active Tab Styles */
+#carInfoTabs .nav-pills .nav-item .nav-link {
+    color: #EF476F; /* Red color for non-active tabs */
+    background-color: #fff; /* White background */
+    border: 3px solid transparent; /* Transparent border for inactive tabs */
+}
+
+/* Hover Effect for Non-active Tabs */
+#carInfoTabs .nav-pills .nav-item .nav-link:hover {
+    background-color: #F4A261; /* Light orange when hovering over inactive tabs */
+    color: white;
+}
+
+/* Custom Colors for Different Tabs */
+#carInfoTabs .nav-pills .nav-item .adopt-tab {
+    background-color: #EF476F; /* Red color for the "adopt" tab */
+}
+
+#carInfoTabs .nav-pills .nav-item .donate-tab {
+    background-color: #FF6663; /* Lighter red color for the "donate" tab */
+}
+
+#carInfoTabs .nav-pills .nav-item .join-tab {
+    background-color: #FFD166; /* Yellow color for the "join" tab */
+}
+
+/* Tab Content Styling */
+#carInfoTabsContent .tab-pane {
+    padding: 20px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px ;
+    background-color: #FFEDD5; /* Light background color for content */
+}
+
+/* Button Styling */
+.btn-purchase {
+    background-color: #F4A261; /* Button background */
+    color: white;
+    border-radius: 5px;
+    padding: 10px 20px;
+    border: none;
+}
+
+.btn-purchase:hover {
+    background-color: #EF476F; /* Change button color when hovering */
+    color: white;
+}
+
         .whatsapp-chat {
             position: fixed;
             bottom: 30px;
@@ -233,7 +331,7 @@
     <script type="module">
         import {
             auth, db, onAuthStateChanged, doc, getDoc, updateDoc, collection, sendEmailReminder, Timestamp, getDocs, onSnapshot, setDoc, query, where, deleteDoc, functions, httpsCallable, deleteField,
-            sendEmailVerification, updateEmail, reauthenticateWithCredential, EmailAuthProvider, verifyBeforeUpdateEmail, logoutUser, storage, ref, uploadBytes, getDownloadURL, resetPassword
+            sendEmailVerification, updateEmail, reauthenticateWithCredential, EmailAuthProvider, verifyBeforeUpdateEmail, logoutUser, storage, ref, uploadBytes, getDownloadURL, resetPassword, getInvoicesData, previewInvoiceData
         } from "./firebase-config.js";
 
         let currentPage = 1;
@@ -332,6 +430,80 @@ if (userData.InsExpMonth && userData.InsExpMonth.seconds) {
 // Update UI with formatted expiry date
 document.getElementById("insexpdt").innerText = formattedExpiryDate2 || "Not Available";
 
+const referenceValue = document.getElementById("vehicle_no").innerText.trim() || "DefaultReference";
+
+// Fetch invoices using the new custom function getInvoicesData
+getInvoicesData(referenceValue)
+    .then(data => {
+        const invoiceTable = document.getElementById('invoiceTable').getElementsByTagName('tbody')[0];
+        const invoiceTableHeader = document.getElementById('invoiceTable').getElementsByTagName('thead')[0];  // Get the table header
+
+        const emptyImage = document.getElementById("emptyImage");
+        // Hide the empty image initially
+        emptyImage.style.display = "none";
+
+        // Check if invoices exist in the data
+        if (data && data.Invoices && Array.isArray(data.Invoices)) {
+            // Filter invoices to only include "ACCREC" type and matching reference value
+            const filteredInvoices = data.Invoices.filter(invoice => 
+                invoice.Type === "ACCREC" &&  invoice.Reference && invoice.Reference.includes(referenceValue)
+            );
+
+            // If no invoices match, show the empty image
+            if (filteredInvoices.length === 0) {
+                emptyImage.style.display = "block";  // Show empty image
+                invoiceTable.style.display = "none";  
+                invoiceTableHeader.style.display = "none";  
+
+                return;  // Exit function
+            } else {
+                emptyImage.style.display = "none";  // Hide empty image if there are matching invoices
+            }
+
+            // Loop through the filtered invoices and populate the table
+            filteredInvoices.forEach(invoice => {
+                // Create a new row in the table
+                const row = invoiceTable.insertRow();
+
+                const invoiceDateCell = row.insertCell(0);
+                const previewCell = row.insertCell(1);  // New cell for Preview Link
+
+                // Populate the cells with data
+                invoiceDateCell.textContent = new Date(invoice.DateString).toLocaleDateString() || 'N/A';  // Format date as needed
+                invoiceDateCell.style.textAlign = "center";  // Center-align the date cell
+
+                // Fetch the preview URL dynamically using the invoice's InvoiceID
+                const previewUrl = `/invoice/preview/${invoice.InvoiceID}`;  // API endpoint to fetch the preview URL
+
+                // Fetch preview URL using previewInvoiceData
+                previewInvoiceData(invoice.InvoiceID)  // Pass InvoiceID to fetch the preview link
+                    .then(previewData => {
+                        const previewLink = document.createElement('a');
+
+                        if (previewData.previewUrl) {
+                            previewLink.href = previewData.previewUrl;
+                            previewLink.textContent = `${previewData.previewUrl}`;
+                            previewLink.style.color = "black";  // Set text color to black
+                            previewLink.style.fontSize = "16px";  // Set font size to 16px
+                            previewLink.target = "_blank";  // Open in a new tab
+                        } else {
+                            previewLink.textContent = "Preview Unavailable";
+                            previewLink.href = "#";  // Disable the link if no preview is available
+                        }
+
+                        // Append the preview link to the preview cell
+                        previewCell.appendChild(previewLink);
+                    })
+                    .catch(error => {
+                        console.error("Error fetching preview link:", error);
+                        previewCell.textContent = "Error fetching preview";
+                    });
+            });
+        } else {
+            console.error("No invoices found or incorrect format.");
+        }
+    })
+    .catch(error => console.error("Error fetching invoices:", error));
 
                             if (userData.InsExpMonth) {
                                 let formattedDate2 = "";
@@ -487,7 +659,7 @@ document.getElementById("insexpdt").innerText = formattedExpiryDate2 || "Not Ava
                 if (userData.membership && userData.membership !== "Expired") {
                     purchaseBtn.innerText = userData.membership;
                     purchaseBtn.classList.remove("btn-purchase");
-                    purchaseBtn.classList.add("btn-success");
+                    purchaseBtn.classList.add("custom-btn");
                     purchaseBtn.removeAttribute("href");
                     purchaseBtn.style.cursor = "default";
 
@@ -6724,8 +6896,7 @@ document.getElementById("insexpdt").innerText = formattedExpiryDate2 || "Not Ava
                             function get_model() {
                                 const car_make = document.getElementById("car_company").value;
                                 const safeClass = car_make.replace(/[^a-zA-Z0-9]/g, '');
-                                console.log("Getting models for brand:", safeClass);
-
+                        
                                 document.querySelectorAll('.carmodelnew').forEach(option => {
                                     option.style.display = 'none';
                                 });
@@ -8042,8 +8213,9 @@ document.getElementById("insexpdt").innerText = formattedExpiryDate2 || "Not Ava
                     });
                 }
             });
+        
+   
 
-      
             const checkEditForm2 = setInterval(() => {
     const editForm = document.getElementById("editCarForm");
 
@@ -8208,8 +8380,6 @@ document.getElementById("car_model").innerText = newCarModel === "Other"
         function get_model() {
             const car_make = document.getElementById("editCarBr").value;
             const safeClass = car_make.replace(/[^a-zA-Z0-9]/g, ''); // Ensure the class is safe for matching
-
-            console.log("Getting models for brand:", safeClass);
 
             // Hide all model options
             document.querySelectorAll('.carmodelnew').forEach(option => {
@@ -8622,45 +8792,57 @@ z-index: 9999;">
 
 
 
-            <ul class="nav nav-tabs" id="carInfoTabs" role="tablist">
+            <ul class="nav nav-pills" id="carInfoTabs" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <a class="nav-link active" id="car-service-plan-tab" data-toggle="tab" href="#car-service-plan"
-                        role="tab" aria-controls="car-service-plan" aria-selected="true">
-                        Car Service Plan
-                    </a>
+                  <a class="nav-link active adopt-tab" id="car-service-plan-tab" data-toggle="pill" href="#car-service-plan" role="tab" aria-controls="car-service-plan" aria-selected="true">
+                    Car Service Plan
+                  </a>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <a class="nav-link" id="car-invoice-tab" data-toggle="tab" href="#car-invoice" role="tab"
-                        aria-controls="car-invoice" aria-selected="false">
-                        Car Invoice
-                    </a>
+                  <a class="nav-link donate-tab" id="car-invoice-tab" data-toggle="pill" href="#car-invoice" role="tab" aria-controls="car-invoice" aria-selected="false">
+                    Car Invoice
+                  </a>
                 </li>
-            </ul>
-
-            <!-- Tab Content Below the Tabs -->
-            <div class="tab-content" id="carInfoTabsContent">
+              </ul>
+              
+              <!-- Tab Content Below the Tabs -->
+              <div class="tab-content" id="carInfoTabsContent">
                 <!-- Car Service Plan Tab Content -->
-                <div class="tab-pane fade show active" id="car-service-plan" role="tabpanel"
-                    aria-labelledby="car-service-plan-tab">
-                    <div style="margin-top: 20px;"></div>
-                    <a href="/plans" class="btn btn-purchase">Purchase Plan</a>
-                    <div id="servicingBalanceCard" class="card mt-4" style="display:none;">
-                        <div class="card-header bg-warning text-white font-weight-bold">
-                            Servicing Balance
-                        </div>
-                        <div class="card-body" id="servicingBalanceContent">
-                            <!-- Dynamic content here -->
-                        </div>
+                <div class="tab-pane fade show active" id="car-service-plan" role="tabpanel" aria-labelledby="car-service-plan-tab">
+                  <div style="margin-top: 20px;"></div>
+                  <a href="/plans" class="btn btn-purchase">Purchase Plan</a>
+                  <div id="servicingBalanceCard" class="card mt-4" style="display:none;">
+                    <div class="card-header bg-warning text-white font-weight-bold">
+                      Servicing Balance
                     </div>
+                    <div class="card-body" id="servicingBalanceContent">
+                      <!-- Dynamic content here -->
+                    </div>
+                  </div>
                 </div>
-
+              
                 <!-- Car Invoice Tab Content -->
                 <div class="tab-pane fade" id="car-invoice" role="tabpanel" aria-labelledby="car-invoice-tab">
-                    <div><b>Invoice Number:</b> 12345</div>
-                    <div><b>Invoice Date:</b> October 15, 2025</div>
-                    <div><b>Amount Due:</b> $300</div>
+                                        <img id="emptyImage" src="images/Empty.png" alt="No Invoices Found" style="display: none; max-width: 100%; width: auto; height: auto;">
+ 
+                      
+                    <table id="invoiceTable" class="table table-striped table-bordered" style="table-layout: fixed;">
+                        <thead class="table-light">
+                            <tr>
+                                <!-- Set a fixed width for the Invoice Date column and allow Preview column to take more space -->
+                                <th style="width: 25%; word-wrap: break-word;">Date</th>
+                                <th style="width: 75%; word-wrap: break-word;">Transaction History</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Invoice rows will be added here dynamically -->
+                        </tbody>
+                    </table>
                 </div>
-            </div>
+                
+              </div>
+              
+              
 
 
             <!-- Modal for Editing Car Information -->
@@ -14351,5 +14533,9 @@ z-index: 9999;">
 
 
 </body>
+<script>
+  </script>
+  
+
 
 </html>
