@@ -492,9 +492,16 @@
                                     // Check if invoices exist in the data
                                     if (data && data.Invoices && Array.isArray(data.Invoices)) {
                                         // Filter invoices to only include "ACCREC" type and matching reference value
-                                        const filteredInvoices = data.Invoices.filter(invoice =>
-                                            invoice.Type === "ACCREC" && invoice.Reference && invoice.Reference.includes(referenceValue)
-                                        );
+                                        const filteredInvoices = data.Invoices.filter(invoice => {
+						if (
+							invoice.Type === "ACCREC" &&
+							invoice.Status === "PAID" &&
+							invoice.Reference
+						) {
+							const referenceWords = invoice.Reference.trim().split(" ");
+							return referenceWords[0].toUpperCase() === referenceValue.toUpperCase();
+						}
+					});
 
                                         // If no invoices match, show the empty image
                                         if (filteredInvoices.length === 0) {
