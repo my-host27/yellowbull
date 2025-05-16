@@ -8191,14 +8191,6 @@
 
                 membershipActions.dataset.renewShown = "true"; // ✅ tandai sudah dibuat
 
-                if (!lastSent || (now - lastSent > oneDay)) {
-                    console.log(`📧 Sending email reminder to ${userData.email}`);
-                    await sendEmailReminder(userData.email, userData.userName);
-                    await updateDoc(userRef, {
-                        lastReminderSent: Timestamp.now()
-                    });
-                }
-
                 const renewButton = document.createElement("button");
                 renewButton.classList.add("btn", "btn-warning", "btn-sm", "renew-btn");
                 renewButton.innerText = "Renew";
