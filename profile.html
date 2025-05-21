@@ -719,23 +719,21 @@
                         });
                         membershipStatus.innerText = `✅ Active until ${formattedDate}`;
                     } else {
-                        membershipStatus.innerText = `❌ No Active Membership`;
+			    membershipStatus.innerText = "❌ No Active Membership";
 			purchaseBtn.innerText = "Purchase Plan";
                     	purchaseBtn.setAttribute("href", "/plans");
                     	purchaseBtn.classList.add("btn-purchase");
                     	purchaseBtn.classList.remove("btn-success");
                     	purchaseBtn.style.cursor = "pointer";
-                    	membershipStatus.innerText = "";
                     }
                     if (deleteButton) deleteButton.style.display = "block";
                 } else {
-			membershipStatus.innerText = `❌ No Active Membership`;
+			membershipStatus.innerText = "❌ No Active Membership";
                     purchaseBtn.innerText = "Purchase Plan";
                     purchaseBtn.setAttribute("href", "/plans");
                     purchaseBtn.classList.add("btn-purchase");
                     purchaseBtn.classList.remove("btn-success");
                     purchaseBtn.style.cursor = "pointer";
-                    membershipStatus.innerText = "";
                     if (deleteButton) deleteButton.style.display = "none";
                 }
 
@@ -8925,7 +8923,7 @@ z-index: 9999;">
                 <li class="nav-item" role="presentation">
                     <a class="nav-link donate-tab" id="car-invoice-tab" data-toggle="pill" href="#car-invoice"
                         role="tab" aria-controls="car-invoice" aria-selected="false">
-                        Transaction History/ Servicing
+                        My Transaction History
                     </a>
                 </li>
             </ul>
