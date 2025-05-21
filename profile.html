@@ -6586,7 +6586,7 @@
       </div>
       <div class="modal-body">
         <form id="servicingForm">
-          ${["Pre-Inspection", "Roadside Assist", "Towing", "Top-Up AC", "Car Servicing", "Jump Start", "Breakdown Assist"].map(service => `
+          ${["Pre-Inspection", "Roadside Assistanceance", "Towing", "Top-Up AC", "Car Servicing", "Jump Start", "Breakdown Assistanceance"].map(service => `
             <div class="form-group">
               <label>${service}</label>
               <input type="number" class="form-control" id="service-${service.replace(/\s+/g, '')}" min="0" value="0">
@@ -6889,7 +6889,7 @@
                             servicingForm.innerHTML = '';
 
                             // Define all possible services
-                            const services = ["Pre-Inspection", "Roadside Assist", "Towing", "Top-Up AC", "Car Servicing", "Breakdown Assist", "Jump Start"];
+                            const services = ["Pre-Inspection", "Roadside Assistanceance", "Towing", "Top-Up AC", "Car Servicing", "Breakdown Assistanceance", "Jump Start"];
 
                             // Dynamically add fields for each service based on the available balance
                             services.forEach(service => {
@@ -6914,7 +6914,7 @@
                         const userId = document.getElementById("saveServicingBtn").getAttribute("data-userid");
 
                         const newBalance = {};
-                        const services = ["Pre-Inspection", "Roadside Assist", "Towing", "Top-Up AC", "Car Servicing", "Breakdown Assist", "Jump Start"];
+                        const services = ["Pre-Inspection", "Roadside Assistance", "Towing", "Top-Up AC", "Car Servicing", "Breakdown Assistance", "Jump Start"];
 
                         // Collect all the values from the inputs
                         services.forEach(service => {
@@ -7190,11 +7190,11 @@
                     function generateServicingBalanceHTML(user, userId) {
                         const balance = user.servicingBalance || {
                             "Pre-Inspection": 0,
-                            "Roadside Assist": 0,
+                            "Roadside Assistance": 0,
                             "Towing": 0,
                             "Top-Up AC": 0,
                             "Car Servicing": 0,
-                            "Breakdown Assist": 0,
+                            "Breakdown Assistance": 0,
                             "Jump Start": 0
                         };
 
@@ -7272,7 +7272,7 @@
                                     membershipEnd: null,  // Clear end date
                                     servicingBalance: {
                                         "Pre-Inspection": 0,
-                                        "Roadside Assist": 0,
+                                        "Roadside Assistance": 0,
                                         "Towing": 0,
                                         "Top-Up AC": 0,
                                         "Car Servicing": 0
@@ -7908,25 +7908,25 @@
                     // Save membership data to Firestore
                     const servicingBalance = {
                         "Pre-Inspection": 0,
-                        "Roadside Assist": 0,
+                        "Roadside Assistance": 0,
                         "Towing": 0,
                         "Top-Up AC": 0,
                         "Car Servicing": 0,
                         "Jump Start": 0,
-                        "Breakdown Assist": 0
+                        "Breakdown Assistance": 0
                     };
 
                     if (selectedMembership === "Towing Package") {
                         servicingBalance["Towing"] = 3;
                         servicingBalance["Jump Start"] = 3;
-                        servicingBalance["Breakdown Assist"] = 1;  // untuk Jump Start
+                        servicingBalance["Breakdown Assistance"] = 1;  // untuk Jump Start
                     } else {
                         if (!selectedMembership.includes("basic")) {
                             servicingBalance["Top-Up AC"] = 1;
                         }
                         if (selectedMembership.includes("Mega Oil") || selectedMembership.includes("Castrol")) {
                             servicingBalance["Pre-Inspection"] = 2;
-                            servicingBalance["Roadside Assist"] = 2;
+                            servicingBalance["Roadside Assistance"] = 2;
                             servicingBalance["Towing"] = 2;
                             servicingBalance["Car Servicing"] = 2;
 
@@ -8133,7 +8133,7 @@
                                 paymentStatus: "Not Paid",
                                 servicingBalance: {
                                     "Pre-Inspection": 0,
-                                    "Roadside Assist": 0,
+                                    "Roadside Assistance": 0,
                                     "Towing": 0,
                                     "Top-Up AC": 0,
                                     "Car Servicing": 0
@@ -8882,7 +8882,7 @@ z-index: 9999;">
                 <div style="display: flex; align-items: center;">
                     <p
                         style="margin-right: 10px; font-size: 18px;color: black; margin-bottom: 10px; background-color: #ffc107 ;padding-left: 10px;padding-right: 10px;border-radius: 30px;">
-                        Car Information
+                        Edit Car Information
                     </p>
                     <a href="#editCarModal" data-toggle="modal" data-target="#editCarModal" style="cursor: pointer;">
                         <i class="fas fa-pencil-alt" style="color: #ffc107; font-size: 18px;"></i>
@@ -8912,13 +8912,13 @@ z-index: 9999;">
                 <li class="nav-item" role="presentation">
                     <a class="nav-link active adopt-tab" id="car-service-plan-tab" data-toggle="pill"
                         href="#car-service-plan" role="tab" aria-controls="car-service-plan" aria-selected="true">
-                        Car Service Plan
+                        My Car Service Plan
                     </a>
                 </li>
                 <li class="nav-item" role="presentation">
                     <a class="nav-link donate-tab" id="car-invoice-tab" data-toggle="pill" href="#car-invoice"
                         role="tab" aria-controls="car-invoice" aria-selected="false">
-                        Car Invoice
+                        Transaction History/ Servicing
                     </a>
                 </li>
             </ul>
