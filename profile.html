@@ -493,7 +493,7 @@
                                     if (data && data.Invoices && Array.isArray(data.Invoices)) {
                                         // Filter invoices to only include "ACCREC" type and matching reference value
                                             const filteredInvoices = data.Invoices.filter(invoice =>
-                                            invoice.Type === "ACCREC" && invoice.Reference == referenceValue && invoice.Status === "PAID"
+                                            invoice.Type === "ACCREC" && invoice.Reference && invoice.Reference.toLowerCase() === referenceValue.toLowerCase() && invoice.Status === "PAID"
                                         );
 
                                         // If no invoices match, show the empty image
