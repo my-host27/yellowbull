@@ -719,7 +719,7 @@
                         });
                         membershipStatus.innerText = `✅ Active until ${formattedDate}`;
                     } else {
-			    membershipStatus.innerText = "❌ No Active Membership";
+			    membershipStatus.innerText = "❌ You don't have an active membership";
 			purchaseBtn.innerText = "Purchase Plan";
                     	purchaseBtn.setAttribute("href", "/plans");
                     	purchaseBtn.classList.add("btn-purchase");
@@ -728,7 +728,7 @@
                     }
                     if (deleteButton) deleteButton.style.display = "block";
                 } else {
-			membershipStatus.innerText = "❌ No Active Membership";
+			membershipStatus.innerText = "❌ You don't have an active membership";
                     purchaseBtn.innerText = "Purchase Plan";
                     purchaseBtn.setAttribute("href", "/plans");
                     purchaseBtn.classList.add("btn-purchase");
