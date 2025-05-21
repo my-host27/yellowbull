@@ -477,8 +477,8 @@
                             // Update UI with formatted expiry date
                             document.getElementById("insexpdt").innerText = formattedExpiryDate2 || "Not Available";
 
-                            const referenceValue = document.getElementById("vehicle_no").innerText.trim() || "DefaultReference";
-
+                            const referenceValue = document.getElementById("vehicle_no").innerText.trim().toLowerCase() || "defaultreference";
+				
                             // Fetch invoices using the new custom function getInvoicesData
                             getInvoicesData(referenceValue)
                                 .then(data => {
