@@ -25,22 +25,41 @@
         }
 
         /* Style for the table header columns */
-#invoiceTable thead th:nth-child(0) {
+#invoiceTable thead th:nth-child(1) {
     width: 25%; /* Date column takes up 25% of the width */
 }
 
-#invoiceTable thead th:nth-child(1) {
+#invoiceTable thead th:nth-child(2) {
     width: 75%; /* Transaction History column takes up 75% of the width */
 }
 
-/* Style for the table body columns */
-#invoiceTable tbody td:nth-child(0) {
-    width: 25%; /* Date column */
+/* Lebar kolom tanggal (kolom 1) */
+#invoiceTable tbody td:nth-child(1) {
+    width: 25%;
+    white-space: nowrap;  /* Supaya tanggal tidak terpecah */
+    text-align: center;
 }
 
-#invoiceTable tbody td:nth-child(1) {
-    width: 75%; /* Transaction History column */
-font-size: 0.75rem; 
+/* Lebar kolom transaksi (kolom 2) dan font lebih kecil */
+#invoiceTable tbody td:nth-child(2) {
+    width: 75%;
+    font-size: 0.85rem; /* font lebih kecil */
+    word-wrap: break-word; /* supaya teks panjang bisa pecah ke baris baru */
+    overflow-wrap: break-word;
+    max-width: 300px; /* bisa diubah sesuai kebutuhan */
+}
+
+/* Agar tabel responsif di layar kecil */
+@media (max-width: 600px) {
+    #invoiceTable tbody td:nth-child(1),
+    #invoiceTable tbody td:nth-child(2) {
+        width: auto;
+        display: block;
+        white-space: normal;
+        max-width: 100%;
+        font-size: 0.8rem;
+        padding: 5px 0;
+    }
 }
 
 
