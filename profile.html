@@ -720,15 +720,16 @@
                         membershipStatus.innerText = `✅ Active until ${formattedDate}`;
                     } else {
                         membershipStatus.innerText = `❌ No Active Membership`;
-                    }
-                    if (deleteButton) deleteButton.style.display = "block";
 			purchaseBtn.innerText = "Purchase Plan";
                     	purchaseBtn.setAttribute("href", "/plans");
                     	purchaseBtn.classList.add("btn-purchase");
                     	purchaseBtn.classList.remove("btn-success");
                     	purchaseBtn.style.cursor = "pointer";
                     	membershipStatus.innerText = "";
+                    }
+                    if (deleteButton) deleteButton.style.display = "block";
                 } else {
+			membershipStatus.innerText = `❌ No Active Membership`;
                     purchaseBtn.innerText = "Purchase Plan";
                     purchaseBtn.setAttribute("href", "/plans");
                     purchaseBtn.classList.add("btn-purchase");
@@ -898,12 +899,12 @@
             <div class="modal-body">
                 <label for="membershipSelect">Choose Membership:</label>
                 <select id="membershipSelect" class="form-control">
-                    <option value="4 Liters Mega Oil basic">4 Liters Mega Oil basic</option>
-                    <option value="4 Liters Mega Oil">4 Liters Mega Oil</option>
-                    <option value="5 Liters Mega Oil">5 Liters Mega Oil</option>
-                    <option value="4 Liters Castrol Oil">4 Liters Castrol Oil</option>
-                    <option value="5 Liters Castrol Oil">5 Liters Castrol Oil</option>
-                    <option value="Towing Package">Towing Package</option>
+                    <option value="4 Liters Mega Oil basic">4 Liters Mega Oil basic ($188)</option>
+                    <option value="4 Liters Mega Oil">4 Liters Mega Oil ($208)</option>
+                    <option value="5 Liters Mega Oil">5 Liters Mega Oil ($248)</option>
+                    <option value="4 Liters Castrol Oil">4 Liters Castrol Oil ($268)</option>
+                    <option value="5 Liters Castrol Oil">5 Liters Castrol Oil ($298)</option>
+                    <option value="Towing Package">Towing Package ($108)</option>
                 </select>
 
                 <!-- New input field for selecting the start date of the membership -->
@@ -6592,7 +6593,7 @@
       </div>
       <div class="modal-body">
         <form id="servicingForm">
-          ${["Pre-Inspection", "Roadside Assistanceance", "Towing", "Top-Up AC", "Car Servicing", "Jump Start", "Breakdown Assistanceance"].map(service => `
+          ${["Pre-Inspection", "Roadside Assistance", "Towing", "Top-Up AC", "Car Servicing", "Jump Start", "Breakdown Assistance"].map(service => `
             <div class="form-group">
               <label>${service}</label>
               <input type="number" class="form-control" id="service-${service.replace(/\s+/g, '')}" min="0" value="0">
@@ -6895,7 +6896,7 @@
                             servicingForm.innerHTML = '';
 
                             // Define all possible services
-                            const services = ["Pre-Inspection", "Roadside Assistanceance", "Towing", "Top-Up AC", "Car Servicing", "Breakdown Assistanceance", "Jump Start"];
+                            const services = ["Pre-Inspection", "Roadside Assistance", "Towing", "Top-Up AC", "Car Servicing", "Breakdown Assistance", "Jump Start"];
 
                             // Dynamically add fields for each service based on the available balance
                             services.forEach(service => {
