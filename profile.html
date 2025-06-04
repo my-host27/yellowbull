@@ -519,11 +519,18 @@
 
                                     // Check if invoices exist in the data
                                     if (data && data.Invoices && Array.isArray(data.Invoices)) {
-                                        // Filter invoices to only include "ACCREC" type and matching reference value
-                                        const filteredInvoices = data.Invoices.filter(invoice => {
-                                            const invoiceRefPlate = invoice.Reference ? invoice.Reference.trim().split(" ")[0].toLowerCase() : "";
-                                            return invoice.Type === "ACCREC" && invoiceRefPlate === referenceValue && invoice.Status === "PAID";
-                                        });
+  const filteredInvoices = data.Invoices.filter(invoice => {
+    const invoiceRefPlate = invoice.Reference ? invoice.Reference.trim().split(" ")[0].toLowerCase() : "";
+
+    const validStatuses = ["PAID", "AUTHORISED", "SUBMITTED"]; // hanya ambil yang ini
+
+    return (
+      invoice.Type === "ACCREC" &&
+      validStatuses.includes(invoice.Status) &&
+      invoiceRefPlate === referenceValue
+    );
+  });
+
 
                                         // If no invoices match, show the empty image
                                         if (filteredInvoices.length === 0) {
@@ -8986,6 +8993,8 @@ z-index: 9999;">
 
                     <table id="invoiceTable" class="table table-striped table-bordered"
                         style="table-layout: fixed; width: 100%;">
+			    <caption style="caption-side: top; text-align: left; font-size: 0.9rem; padding-bottom: 0.5rem; color: #6c757d;">
+  <strong>Note:</strong> The payment status shown in each invoice link will be refreshed within 3 working days after payment. </caption>
                         <thead class="table-light">
                             <tr>
                                 <!-- Set a fixed width for the Invoice Date column and allow Preview column to take more space -->
