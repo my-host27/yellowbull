@@ -299,56 +299,51 @@
     <section class="login">
       <div class="container">
         <div class="row">
-          <div class="col-md-6">
-            <div class="login-image">
-              <img src="https://www.yellowbull.app/assets/images/login.png" class="img-fluid">
+          <div class="col-md-6 col-12 mb-4 mb-md-0">
+            <div class="login-image text-center">
+              <img src="images/login.png" class="img-fluid" alt="Login Illustration">
             </div>
           </div>
 
-          <div class="col-md-6>
-            <div class="login-form">
-              <h1 class="mb-3">Welcome Back!</h1>
-              <div class="p-3 bg-light rounded mb-2">
-                <p style="margin: 0; font-size: 1rem;">Don't have an account?</p>
-                <a href="/signup" class="btn w-100 mt-2" style="font-size: 1rem;">Create New Account</a>
+          <div class="col-md-6 col-12>
+            <div class=" login-form">
+            <h1 class="mb-4">Welcome Back!</h1>
+            <div class="p-3 bg-light rounded mb-2">
+              <p style="margin: 0; font-size: 1rem;">Don't have an account?</p>
+              <a href="/signup" class="btn w-100 mt-2" style="font-size: 1rem;">Create New Account</a>
+            </div>
+
+            <p class="login-info mb-2" style="text-align: left; font-size: 1rem;">Already have an account? Please log
+              in below.</p>
+
+            <form method="post" class="login_form" id="login_form" autocomplete="off">
+              <div class="form-group email mb-3">
+                <label for="exampleInputEmail1" style="font-size: 1rem;">Email address</label>
+                <input type="email" class="form-control user_email" id="exampleInputEmail1" name="user_email"
+                  aria-describedby="emailHelp" placeholder="emailaddress@gmail.com" autofill="off" autocomplete="off">
+              </div>
+              <div class="form-group password mb-3">
+                <label for="exampleInputPassword1" style="font-size: 1rem;">Password</label>
+                <input type="password" class="form-control user_password" id="exampleInputPassword1"
+                  name="user_password" placeholder="**************">
               </div>
 
-              <p class="login-info mb-2" style="text-align: left; font-size: 1rem;">Already have an account? Please log
-                in to
-                below.</p>
+              <button type="submit" class="btn w-100 mb-2" id="submitSignIn">Login</button>
+            </form>
 
-              <form method="post" class="login_form" id="login_form" autocomplete="off">
-                <div class="form-group email mb-3">
-                  <label for="exampleInputEmail1" style="font-size: 1rem;">Email address</label>
-                  <input type="email" class="form-control user_email" id="exampleInputEmail1" name="user_email"
-                    aria-describedby="emailHelp" placeholder="emailaddress@gmail.com" autofill="off" autocomplete="off">
-                </div>
-                <div class="form-group password mb-3">
-                  <label for="exampleInputPassword1" style="font-size: 1rem;">Password</label>
-                  <input type="password" class="form-control user_password" id="exampleInputPassword1"
-                    name="user_password" placeholder="**************">
-                </div>
+            <a href="/forgot_password" class="btn w-100 mb-3">Forgot Password</a>
 
-                <button type="submit" class="btn w-100 mb-2" id="submitSignIn">Login</button>
-              </form>
-
-              <a href="/forgot_password" class="btn w-100 mb-3">Forgot Password</a>
-
-              <div style="text-align: center;" class="mb-3">
-                <p style="margin-bottom: 10px;">Or login with</p>
-                <button class="btn google-btn" id="googleSignIn">
-                  <img
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/800px-Google_%22G%22_logo.svg.png"
-                    width="20px" style="margin-right: 8px;">
-                  Sign in with Google
-                </button>
-              </div>
+            <div style="text-align: center;" class="mb-3">
+              <p style="margin-bottom: 10px;">Or login with</p>
+              <button class="btn google-btn" id="googleSignIn">
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/800px-Google_%22G%22_logo.svg.png"
+                  width="20px" style="margin-right: 8px;">
+                Sign in with Google
+              </button>
             </div>
           </div>
-
         </div>
-      </div>
-      </div>
       </div>
     </section>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
