@@ -412,6 +412,7 @@
         let currentPage = 1;
         const rowsPerPage = 10;  // Atur jumlah user per halaman
         let allUsersList = [];   // Simpan semua user
+	let filteredUsers = [];
 
 
         document.getElementById("loadingScreen").style.display = "flex";
@@ -6711,11 +6712,20 @@
                     allUsersList = []
                     proofImages = [];
 
+		    const settingsDoc = await getDoc(doc(db, "urlgetusers", "3PxEpnNDALR9UNhrTz2f")); 
+        	    const apiUrl = settingsDoc.exists() ? settingsDoc.data().apiurl : null;
+
+       		    const verifiedEmailsResponse = await fetch(apiUrl);
+        	    const verifiedUsers = await verifiedEmailsResponse.json();
+        	    const verifiedEmails = verifiedUsers.map(u => u.email); 
+
+        	    filteredUsers = [];
+
                     querySnapshot.forEach(docSnap => {
                         const user = docSnap.data();
-                        if (user.role !== "admin" && user.emailVerified !== false) {
-                            allUsersList.push({ id: docSnap.id, data: user });
-                        }
+                        if (user.role !== "admin" && verifiedEmails.includes(user.email)) {
+        			filteredUsers.push({ id: docSnap.id, data: user });
+    			}
 
                         // Ambil proof image
                         if (user.role !== "admin" && user.proofImage) {
@@ -6731,7 +6741,7 @@
                     // Lakukan PAGINASI setelah semua user dikumpulkan
                     const startIndex = (page - 1) * perPage;
                     const endIndex = startIndex + perPage;
-                    const paginatedUsers = allUsersList.slice(startIndex, endIndex);
+                    const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
 
                     // Sekarang loop `paginatedUsers` dan render tabel
                     for (const { id, data: user } of paginatedUsers) {
@@ -6899,7 +6909,7 @@
                     console.log("Filtering... Value:", document.getElementById("membershipFilter").value);
 
 
-                    setupPagination(allUsersList.length);
+                    setupPagination(filteredUsers.length);
                     filterTable();
                     if (applyFilter) {
                         document.querySelectorAll(".membership-actions").forEach(actions => {
@@ -7821,7 +7831,7 @@
                     }
                 });
 
-                document.getElementById("userCount").innerText = `Displayed Users: ${visibleCount} | Total Users: ${allUsersList.length}`;
+                document.getElementById("userCount").innerText = `Displayed Users: ${visibleCount} | Total Users: ${filteredUsers.length}`;
 
                 // checkMembershipExpiration();  // ⬅️ Tambahkan ini
 
