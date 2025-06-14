@@ -7388,6 +7388,8 @@ async function loadAllUsers(applyFilter = false, page = 1, perPage = rowsPerPage
         for (const docSnap of querySnapshot.docs) {
             const user = docSnap.data();
 
+		
+            if (user.role === "admin") continue;
             // Skip users who are not in the verified emails list
             if (!verifiedEmails.includes(user.email.toLowerCase())) continue;
 
