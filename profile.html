@@ -7356,169 +7356,171 @@ async function loadAllUsers(applyFilter = false, page = 1, perPage = rowsPerPage
                         }
                     }
 
-                    document.getElementById('downloadCSV').addEventListener('click', async function () {
-                        try {
-                            // Start loading screen (optional)
+         document.getElementById('downloadCSV').addEventListener('click', async function () {
+    try {
+        // Fetch API URL to get verified users from Firestore
+        const settingsDoc = await getDoc(doc(db, "urlgetusers", "3PxEpnNDALR9UNhrTz2f"));
+        const apiUrl = settingsDoc.exists() ? settingsDoc.data().apiurl : null;
 
+        // Fetch the verified users list
+        const verifiedEmailsResponse = await fetch(apiUrl);
+        const verifiedUsers = await verifiedEmailsResponse.json();
+        const verifiedEmails = verifiedUsers.map(u => u.email.toLowerCase()); // Use lowercased emails for comparison
 
-                            // Get all users from Firestore
-                            const usersRef = collection(db, "Users");
-                            const querySnapshot = await getDocs(usersRef);
+        // Start loading screen (optional)
 
-                            let data = [];
-                            const headers = [
-                                'No.', 'Name', 'Created At', 'Handphone', 'Car Plate', 'Email', 'Birthday Month',
-                                'Insurance Expiry Month', 'Car Make', 'Car Model'
-                            ];
+        // Get filtered users from the global filteredUsers array
+        const usersRef = collection(db, "Users");
+        const querySnapshot = await getDocs(usersRef);
 
-                            // Add headers to data array
-                            data.push(headers);
+        let data = [];
+        const headers = [
+            'No.', 'Name', 'Created At', 'Handphone', 'Car Plate', 'Email', 'Birthday Month',
+            'Insurance Expiry Month', 'Car Make', 'Car Model'
+        ];
 
-                            // Loop through each document (user data) and collect necessary information
-                            let rowNumber = 1; // Start numbering from 1
-                            for (const docSnap of querySnapshot.docs) {
-                                const user = docSnap.data();
+        // Add headers to data array
+        data.push(headers);
 
-                                // Exclude users with role 'admin'
-                                if (user.role && user.role === "admin") {
-                                    continue; // Skip the current iteration if the role is 'admin'
-                                }
-                                if (user.emailVerified === false) {
-                                    continue; // Skip the current iteration if the role is 'admin'
-                                }
+        let rowNumber = 1; // Start numbering from 1
 
-                                // Add a check to ensure `carPlate` exists before querying carPlates
-                                let carData = {};
-                                if (user.carPlate) {
-                                    const carPlateRef = doc(db, "carPlates", user.carPlate);
-                                    const carSnap = await getDoc(carPlateRef);
-                                    carData = carSnap.exists() ? carSnap.data() : {};
-                                }
+        // Loop through each document (user data) and collect necessary information
+        for (const docSnap of querySnapshot.docs) {
+            const user = docSnap.data();
 
-                                // Format Created At
-                                let createdAtFormatted = "Not Available";
-                                if (user.createdAt) {
-                                    if (typeof user.createdAt === "string") {
-                                        createdAtFormatted = user.createdAt;
-                                    } else if (user.createdAt?.toDate) {
-                                        const created = user.createdAt.toDate();
-                                        createdAtFormatted = created.toLocaleDateString('en-GB', {
-                                            day: '2-digit', month: 'short', year: 'numeric',
-                                            hour: '2-digit', minute: '2-digit'
-                                        });
-                                    }
-                                }
+            // Skip users who are not in the verified emails list
+            if (!verifiedEmails.includes(user.email.toLowerCase())) continue;
 
-
-                                // Format Insurance Expiry Month
-                                let formattedIns = "Not Available";
-                                if (user.InsExpMonth) {
-                                    if (typeof user.InsExpMonth === "string") {
-                                        formattedIns = user.InsExpMonth;
-                                    } else if (user.InsExpMonth?.toDate) {
-                                        const insDate = user.InsExpMonth.toDate();
-                                        formattedIns = insDate.toLocaleDateString('en-GB', {
-                                            day: '2-digit', month: 'short', year: 'numeric'
-                                        });
-                                    }
-                                }
-
-                                const userData = [
-                                    rowNumber++,                                  // No.
-                                    user.userName || "Unknown",                   // Name
-                                    createdAtFormatted,
-                                    user.userContact || "Not Available",          // Handphone
-                                    user.carPlate || "Not Available",             // Car Plate
-                                    user.email || "Not Available",                // Email
-                                    user.dob || "Not Available",                  // Birthday Month
-                                    formattedIns,                                 // Insurance Expiry Month
-                                    carData.carBrand || "Not Available",          // Car Make
-                                    carData.carModel || "Not Available"           // Car Model
-                                ];
-
-
-                                // Add row data to the data array
-                                data.push(userData);
-                            }
-
-                            // Create a new Excel workbook
-                            const workbook = new ExcelJS.Workbook();
-                            const worksheet = workbook.addWorksheet('User Data');
-
-                            // Add columns to the worksheet with auto width for "No."
-                            worksheet.columns = headers.map((header, index) => ({
-                                header: header,
-                                key: header,
-                                width: index === 0 ? 10 : 20  // Set a smaller width for 'No.' and larger for others
-                            }));
-
-                            // Add rows to the worksheet
-                            data.slice(1).forEach(row => {
-                                worksheet.addRow(row);
-                            });
-
-                            // Style headers (set background color, bold, center text, etc.)
-                            worksheet.getRow(1).eachCell((cell) => {
-                                cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true }; // Center the text and wrap text
-                                cell.font = { bold: true, size: 12 }; // Make the font bold and larger
-                                cell.fill = {
-                                    type: 'pattern',
-                                    pattern: 'solid',
-                                    fgColor: { argb: 'BEBEBE' } // Light gray background color
-                                };
-                            });
-
-                            // Apply border around the table and wrap text for all cells
-                            worksheet.eachRow((row) => {
-                                row.eachCell((cell) => {
-                                    cell.border = {
-                                        top: { style: 'thin' },
-                                        left: { style: 'thin' },
-                                        bottom: { style: 'thin' },
-                                        right: { style: 'thin' }
-                                    };
-                                    cell.alignment = { wrapText: true, horizontal: 'center', vertical: 'middle' }; // Enable text wrapping and center alignment for each cell
-                                });
-                            });
-
-                            // Get the current date and time to use in the filename (local time)
-                            const now = new Date();
-                            const dateStr = now.toLocaleString('en-US', {
-                                weekday: 'short',
-                                year: 'numeric',
-                                month: '2-digit',
-                                day: '2-digit',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                second: '2-digit',
-                                hour12: false
-                            }).replace(/[^\w\s]/g, '_'); // Format as: Weekday_YYYY_MM_DD_HH_MM_SS
-
-                            // Set up the response and filename
-                            const buffer = await workbook.xlsx.writeBuffer();
-                            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-
-                            // Create a link element to trigger the download
-                            const link = document.createElement("a");
-                            link.href = URL.createObjectURL(blob);
-                            link.download = `yellowbull_data_${dateStr}.xlsx`; // Filename includes date and time
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-
-                        } catch (error) {
-                            console.error("Error exporting data:", error);
-                            Swal.fire({
-                                title: "❌ Error",
-                                text: "An error occurred while exporting data.",
-                                icon: "error",
-                                confirmButtonColor: "#ff4444"
-                            });
-
-                            // Hide loading screen (optional)
-                            document.getElementById("loadingScreen").style.display = "none";
-                        }
+            // Format Created At
+            let createdAtFormatted = "Not Available";
+            if (user.createdAt) {
+                if (typeof user.createdAt === "string") {
+                    createdAtFormatted = user.createdAt;
+                } else if (user.createdAt?.toDate) {
+                    const created = user.createdAt.toDate();
+                    createdAtFormatted = created.toLocaleDateString('en-GB', {
+                        day: '2-digit', month: 'short', year: 'numeric',
+                        hour: '2-digit', minute: '2-digit'
                     });
+                }
+            }
+
+            // Format Insurance Expiry Month
+            let formattedIns = "Not Available";
+            if (user.InsExpMonth) {
+                if (typeof user.InsExpMonth === "string") {
+                    formattedIns = user.InsExpMonth;
+                } else if (user.InsExpMonth?.toDate) {
+                    const insDate = user.InsExpMonth.toDate();
+                    formattedIns = insDate.toLocaleDateString('en-GB', {
+                        day: '2-digit', month: 'short', year: 'numeric'
+                    });
+                }
+            }
+
+            // Add user data to the row
+            let carData = {};
+            if (user.carPlate) {
+                const carPlateRef = doc(db, "carPlates", user.carPlate);
+                const carSnap = await getDoc(carPlateRef);
+                carData = carSnap.exists() ? carSnap.data() : {};
+            }
+
+            const userData = [
+                rowNumber++,                                  // No.
+                user.userName || "Unknown",                   // Name
+                createdAtFormatted,
+                user.userContact || "Not Available",          // Handphone
+                user.carPlate || "Not Available",             // Car Plate
+                user.email || "Not Available",                // Email
+                user.dob || "Not Available",                  // Birthday Month
+                formattedIns,                                 // Insurance Expiry Month
+                carData.carBrand || "Not Available",          // Car Make
+                carData.carModel || "Not Available"           // Car Model
+            ];
+
+            // Add row data to the data array
+            data.push(userData);
+        }
+
+        // Create a new Excel workbook
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('User Data');
+
+        // Add columns to the worksheet with auto width for "No."
+        worksheet.columns = headers.map((header, index) => ({
+            header: header,
+            key: header,
+            width: index === 0 ? 10 : 20  // Set a smaller width for 'No.' and larger for others
+        }));
+
+        // Add rows to the worksheet
+        data.slice(1).forEach(row => {
+            worksheet.addRow(row);
+        });
+
+        // Style headers (set background color, bold, center text, etc.)
+        worksheet.getRow(1).eachCell((cell) => {
+            cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true }; // Center the text and wrap text
+            cell.font = { bold: true, size: 12 }; // Make the font bold and larger
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'BEBEBE' } // Light gray background color
+            };
+        });
+
+        // Apply border around the table and wrap text for all cells
+        worksheet.eachRow((row) => {
+            row.eachCell((cell) => {
+                cell.border = {
+                    top: { style: 'thin' },
+                    left: { style: 'thin' },
+                    bottom: { style: 'thin' },
+                    right: { style: 'thin' }
+                };
+                cell.alignment = { wrapText: true, horizontal: 'center', vertical: 'middle' }; // Enable text wrapping and center alignment for each cell
+            });
+        });
+
+        // Get the current date and time to use in the filename (local time)
+        const now = new Date();
+        const dateStr = now.toLocaleString('en-US', {
+            weekday: 'short',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        }).replace(/[^\w\s]/g, '_'); // Format as: Weekday_YYYY_MM_DD_HH_MM_SS
+
+        // Set up the response and filename
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+        // Create a link element to trigger the download
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `yellowbull_data_${dateStr}.xlsx`; // Filename includes date and time
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+    } catch (error) {
+        console.error("Error exporting data:", error);
+        Swal.fire({
+            title: "❌ Error",
+            text: "An error occurred while exporting data.",
+            icon: "error",
+            confirmButtonColor: "#ff4444"
+        });
+
+        // Hide loading screen (optional)
+        document.getElementById("loadingScreen").style.display = "none";
+    }
+});
 
                     document.getElementById("paymentMethodSelect").addEventListener("change", function () {
                         const paymentDescriptionInput = document.getElementById("paymentDescriptionInput");
