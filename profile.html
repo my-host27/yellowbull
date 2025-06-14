@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Profile | Yellow Bull</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Yellow Bull</title>
 
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
@@ -18,57 +19,28 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-    <meta
-        content="Singapore&#x27;s fastest — 30 mins — islandwide emergency roadside assistance: Car Towing, on-site Car Battery Replacement, Vehicle Jumpstart, Flat Tyre Assistance, Fuel Delivery and Minor Mechanical Repairs."
-        name="description" />
-    <meta content="Profile | Yellow Bull" property="og:title" />
-    <meta
-        content="Singapore&#x27;s fastest — 30 mins — islandwide emergency roadside assistance: Car Towing, on-site Car Battery Replacement, Vehicle Jumpstart, Flat Tyre Assistance, Fuel Delivery and Minor Mechanical Repairs."
-        property="og:description" />
-    <meta content="https://github.com/my-host27/yellowbull/raw/master/images/YellowRanger-Logo-p-500.png?v=2"
-        property="og:image" />
-    <meta content="Profile | Yellow Bull" property="twitter:title" />
-    <meta
-        content="Singapore&#x27;s fastest — 30 mins — islandwide emergency roadside assistance: Car Towing, on-site Car Battery Replacement, Vehicle Jumpstart, Flat Tyre Assistance, Fuel Delivery and Minor Mechanical Repairs."
-        property="twitter:description" />
-    <meta content="https://github.com/my-host27/yellowbull/raw/master/images/YellowRanger-Logo-p-500.png?v=2"
-        property="twitter:image" />
-    <meta property="og:type" content="website" />
-    <meta content="summary_large_image" name="twitter:card" />
-    <meta content="width=device-width, initial-scale=1" name="viewport" />
-
-    <link href="images/favicon.png" rel="shortcut icon" type="image/x-icon" />
-    <link href="images/webclip.png" rel="apple-touch-icon" />
-    <link href="https://yellowbull.com.sg/" rel="canonical" />
-
     <style>
         body {
             font-family: 'Poppins', sans-serif;
         }
 
         /* Style for the table header columns */
-        #invoiceTable thead th:nth-child(0) {
-            width: 30%;
-            /* Date column takes up 25% of the width */
-        }
+#invoiceTable thead th:nth-child(0) {
+    width: 25%; /* Date column takes up 25% of the width */
+}
 
-        #invoiceTable thead th:nth-child(1) {
-            width: 70%;
-            /* Transaction History column takes up 75% of the width */
-        }
+#invoiceTable thead th:nth-child(1) {
+    width: 75%; /* Transaction History column takes up 75% of the width */
+}
 
-        /* Lebar kolom tanggal (kolom 1) */
-        #invoiceTable tbody td:nth-child(0) {
-            width: 30%;
-            font-size: 0.85rem;
-        }
+/* Style for the table body columns */
+#invoiceTable tbody td:nth-child(0) {
+    width: 25%; /* Date column */
+}
 
-        /* Lebar kolom transaksi (kolom 2) dan font lebih kecil */
-        #invoiceTable tbody td:nth-child(2) {
-            width: 70%;
-            font-size: 0.85rem;
-            /* font lebih kecil */
-        }
+#invoiceTable tbody td:nth-child(1) {
+    width: 75%; /* Transaction History column */
+}
 
 
         .custom-btn {
@@ -412,7 +384,8 @@
         let currentPage = 1;
         const rowsPerPage = 10;  // Atur jumlah user per halaman
         let allUsersList = [];   // Simpan semua user
-	let filteredUsers = [];
+        let filteredUsers = [];   // Simpan semua user
+          let userListHTML = "";
 
 
         document.getElementById("loadingScreen").style.display = "flex";
@@ -506,7 +479,7 @@
                             // Update UI with formatted expiry date
                             document.getElementById("insexpdt").innerText = formattedExpiryDate2 || "Not Available";
 
-                            const referenceValue = document.getElementById("vehicle_no").innerText.trim().toLowerCase() || "defaultreference";
+                            const referenceValue = document.getElementById("vehicle_no").innerText.trim() || "DefaultReference";
 
                             // Fetch invoices using the new custom function getInvoicesData
                             getInvoicesData(referenceValue)
@@ -520,18 +493,10 @@
 
                                     // Check if invoices exist in the data
                                     if (data && data.Invoices && Array.isArray(data.Invoices)) {
-  const filteredInvoices = data.Invoices.filter(invoice => {
-    const invoiceRefPlate = invoice.Reference ? invoice.Reference.trim().split(" ")[0].toLowerCase() : "";
-
-    const validStatuses = ["PAID", "AUTHORISED", "SUBMITTED"]; // hanya ambil yang ini
-
-    return (
-      invoice.Type === "ACCREC" &&
-      validStatuses.includes(invoice.Status) &&
-      invoiceRefPlate === referenceValue
-    );
-  });
-
+                                        // Filter invoices to only include "ACCREC" type and matching reference value
+                                        const filteredInvoices = data.Invoices.filter(invoice =>
+                                            invoice.Type === "ACCREC" && invoice.Reference && invoice.Reference.includes(referenceValue)
+                                        );
 
                                         // If no invoices match, show the empty image
                                         if (filteredInvoices.length === 0) {
@@ -756,21 +721,16 @@
                         });
                         membershipStatus.innerText = `✅ Active until ${formattedDate}`;
                     } else {
-                        membershipStatus.innerText = "❌ You don't have an active membership";
-                        purchaseBtn.innerText = "Purchase Plan";
-                        purchaseBtn.setAttribute("href", "/plans");
-                        purchaseBtn.classList.add("btn-purchase");
-                        purchaseBtn.classList.remove("btn-success");
-                        purchaseBtn.style.cursor = "pointer";
+                        membershipStatus.innerText = `✅ Membership active`;
                     }
                     if (deleteButton) deleteButton.style.display = "block";
                 } else {
-                    membershipStatus.innerText = "❌ You don't have an active membership";
                     purchaseBtn.innerText = "Purchase Plan";
                     purchaseBtn.setAttribute("href", "/plans");
                     purchaseBtn.classList.add("btn-purchase");
                     purchaseBtn.classList.remove("btn-success");
                     purchaseBtn.style.cursor = "pointer";
+                    membershipStatus.innerText = "";
                     if (deleteButton) deleteButton.style.display = "none";
                 }
 
@@ -784,11 +744,7 @@
             <section id="header" class="header">
                 <div class="container p-0">
                     <nav class="navbar navbar-expand-lg">
-                        <a class="navbar-brand" href="/"><img src="images/YellowRanger-Logo.png" loading="lazy" sizes="120px" 
-                srcset="
-                    images/YellowRanger-Logo-p-500.png 500w,
-                    images/YellowRanger-Logo.png 669w
-                " alt="" class="logo" /></a>
+                        <a class="navbar-brand" href="/"><img src="https://www.yellowbull.app/assets/images/logo.png" class="img-fluid"></a>
                         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                             <span class="navbar-toggler-icon"><i class="fa fa-bars" aria-hidden="true"></i></span>
                         </button>
@@ -938,12 +894,12 @@
             <div class="modal-body">
                 <label for="membershipSelect">Choose Membership:</label>
                 <select id="membershipSelect" class="form-control">
-                    <option value="4 Liters Mega Oil basic">4 Liters Mega Oil basic ($188)</option>
-                    <option value="4 Liters Mega Oil">4 Liters Mega Oil ($208)</option>
-                    <option value="5 Liters Mega Oil">5 Liters Mega Oil ($248)</option>
-                    <option value="4 Liters Castrol Oil">4 Liters Castrol Oil ($268)</option>
-                    <option value="5 Liters Castrol Oil">5 Liters Castrol Oil ($298)</option>
-                    <option value="Towing Package">Towing Package ($108)</option>
+                    <option value="4 Liters Mega Oil basic">4 Liters Mega Oil basic</option>
+                    <option value="4 Liters Mega Oil">4 Liters Mega Oil</option>
+                    <option value="5 Liters Mega Oil">5 Liters Mega Oil</option>
+                    <option value="4 Liters Castrol Oil">4 Liters Castrol Oil</option>
+                    <option value="5 Liters Castrol Oil">5 Liters Castrol Oil</option>
+                    <option value="Towing Package">Towing Package</option>
                 </select>
 
                 <!-- New input field for selecting the start date of the membership -->
@@ -6632,7 +6588,7 @@
       </div>
       <div class="modal-body">
         <form id="servicingForm">
-          ${["Pre-Inspection", "Roadside Assistance", "Towing", "Top-Up AC", "Car Servicing", "Jump Start", "Breakdown Assistance"].map(service => `
+          ${["Pre-Inspection", "Roadside Assist", "Towing", "Top-Up AC", "Car Servicing", "Jump Start", "Breakdown Assist"].map(service => `
             <div class="form-group">
               <label>${service}</label>
               <input type="number" class="form-control" id="service-${service.replace(/\s+/g, '')}" min="0" value="0">
@@ -6703,7 +6659,7 @@
             let proofImages = [];
 
             // **Fungsi untuk menampilkan semua user (khusus admin)**
-       async function loadAllUsers(applyFilter = false, page = 1, perPage = rowsPerPage) {
+async function loadAllUsers(applyFilter = false, page = 1, perPage = rowsPerPage) {
     try {
         const usersRef = collection(db, "Users");
         const querySnapshot = await getDocs(usersRef);
@@ -6934,7 +6890,7 @@
                             servicingForm.innerHTML = '';
 
                             // Define all possible services
-                            const services = ["Pre-Inspection", "Roadside Assistance", "Towing", "Top-Up AC", "Car Servicing", "Breakdown Assistance", "Jump Start"];
+                            const services = ["Pre-Inspection", "Roadside Assist", "Towing", "Top-Up AC", "Car Servicing", "Breakdown Assist", "Jump Start"];
 
                             // Dynamically add fields for each service based on the available balance
                             services.forEach(service => {
@@ -6959,7 +6915,7 @@
                         const userId = document.getElementById("saveServicingBtn").getAttribute("data-userid");
 
                         const newBalance = {};
-                        const services = ["Pre-Inspection", "Roadside Assistance", "Towing", "Top-Up AC", "Car Servicing", "Breakdown Assistance", "Jump Start"];
+                        const services = ["Pre-Inspection", "Roadside Assist", "Towing", "Top-Up AC", "Car Servicing", "Breakdown Assist", "Jump Start"];
 
                         // Collect all the values from the inputs
                         services.forEach(service => {
@@ -7235,11 +7191,11 @@
                     function generateServicingBalanceHTML(user, userId) {
                         const balance = user.servicingBalance || {
                             "Pre-Inspection": 0,
-                            "Roadside Assistance": 0,
+                            "Roadside Assist": 0,
                             "Towing": 0,
                             "Top-Up AC": 0,
                             "Car Servicing": 0,
-                            "Breakdown Assistance": 0,
+                            "Breakdown Assist": 0,
                             "Jump Start": 0
                         };
 
@@ -7288,6 +7244,13 @@
                             });
                         }
                     }
+
+                    document.querySelectorAll(".selectMembership").forEach(button => {
+                        button.addEventListener("click", (event) => {
+                            const userId = event.target.dataset.userid;
+                            openMembershipModal(userId);
+                        });
+                    });
                     document.querySelectorAll('.deleteMembershipBtn').forEach(button => {
                         button.addEventListener('click', async (event) => {
                             const userId = event.target.dataset.userid;
@@ -7317,7 +7280,7 @@
                                     membershipEnd: null,  // Clear end date
                                     servicingBalance: {
                                         "Pre-Inspection": 0,
-                                        "Roadside Assistance": 0,
+                                        "Roadside Assist": 0,
                                         "Towing": 0,
                                         "Top-Up AC": 0,
                                         "Car Servicing": 0
@@ -7712,12 +7675,7 @@
                     });
 
                     // Event listener untuk pilih membership
-                    document.querySelectorAll(".selectMembership").forEach(button => {
-                        button.addEventListener("click", (event) => {
-                            const userId = event.target.dataset.userid;
-                            openMembershipModal(userId);
-                        });
-                    });
+                 
 
                 } catch (error) {
 
@@ -7726,7 +7684,7 @@
 
 
 
-            function setupPagination(totalUsers) {
+         function setupPagination(totalUsers) {
                 const totalPages = Math.ceil(totalUsers / rowsPerPage);
                 const pagination = document.getElementById("pagination");
 
@@ -7754,86 +7712,125 @@
                     pagination.appendChild(li);
                 }
             }
-
             function toggleOtherCarCompany() {
                 const select = document.getElementById("car_company");
                 const textarea = document.getElementById("otherCarCompany");
                 textarea.style.display = select.value === "Other" ? "block" : "none";
             }
 
-            function filterTable() {
-                const filterValue = document.getElementById("membershipFilter").value.toLowerCase();
-                const searchValue = document.getElementById("searchInput").value.toLowerCase();
-                const rows = document.querySelectorAll("#userTableBody tr");
+ function filterTable(applyFilter = false, page = 1, perPage = rowsPerPage) {
+    const filterValue = document.getElementById("membershipFilter").value.toLowerCase();
+    const searchValue = document.getElementById("searchInput").value.toLowerCase();
+    const rowsContainer = document.getElementById("userTableBody");
 
-                assignMembershipListeners(); // Tetap perlu
-                // Jangan panggil checkMembershipExpiration() di sini!
+    let visibleCount = 0;
+    let totalPrice = 0;
+    const now = new Date();
+    const sevenDays = 7 * 24 * 60 * 60 * 1000;
 
-                let visibleCount = 0;
-                let totalPrice = 0;
-                const now = new Date();
-                const sevenDays = 7 * 24 * 60 * 60 * 1000;
+    // Calculate start and end index based on pagination
+    const startIndex = (page - 1) * perPage;
+    const endIndex = startIndex + perPage;
 
-                rows.forEach(row => {
-                    const name = row.querySelector("td:nth-child(1)").innerText.toLowerCase();
-                    const email = row.querySelector("td:nth-child(2)").innerText.toLowerCase();
-                    const membershipButton = row.querySelector("td:nth-child(3) button");
-                    const membership = membershipButton.innerText.toLowerCase();
-                    const aboutCar = row.querySelector("td:nth-child(8)").innerText.toLowerCase();
-                    const carPlateMatch = aboutCar.includes(searchValue);
+    // Filter the users first based on search and membership filter
+    const filteredUsersToDisplay = filteredUsers.filter(userObj => {
+        const user = userObj.data;
+        const name = user.userName.toLowerCase();
+        const email = user.email.toLowerCase();
+        const membership = user.membership ? user.membership.toLowerCase() : "none";
+        const carPlate = user.carPlate ? user.carPlate.toLowerCase() : "";
+        
+        let showRow = false;
+        const endDate = new Date(user.membershipEnd);
+        const timeLeft = endDate - now;
 
-                    let showRow = false;
+        if (filterValue === "all") {
+            showRow = true;
+        } else if (filterValue === "renew") {
+            showRow = (timeLeft > 0 && timeLeft <= sevenDays && membership !== "expired");
+        } else {
+            showRow = membership === filterValue;
+        }
 
-                    const userId = row.id.replace("user-", "");
-                    const userData = JSON.parse(localStorage.getItem(`userData-${userId}`));
-                    if (!userData) return;
+        // Apply search filter (name, email, or car plate)
+        const matchSearch = name.includes(searchValue) || email.includes(searchValue) || carPlate.includes(searchValue);
 
-			     const settingsDoc = await getDoc(doc(db, "urlgetusers", "3PxEpnNDALR9UNhrTz2f")); 
-        const apiUrl = settingsDoc.exists() ? settingsDoc.data().apiurl : null;
+        return showRow && matchSearch; // Return only users that match filter criteria
+    });
 
-        // Use the fetched API URL in the fetch request
-        const verifiedEmailsResponse = await fetch(apiUrl);
-        const verifiedUsers = await verifiedEmailsResponse.json();
-        const verifiedEmails = verifiedUsers.map(u => u.email); 
-			
-                    if (userData.role === "admin" || verifiedEmails.includes(user.email)) return;
+    // Paginate the filtered users
+    const paginatedUsers = filteredUsersToDisplay.slice(startIndex, endIndex);
 
-                    const endDate = new Date(userData.membershipEnd);
-                    const timeLeft = endDate - now;
+    // Clear the current rows before appending the new ones
+    rowsContainer.innerHTML = "";  // Clear previous rows
 
-                    // 🔥 Munculkan tombol Renew kalau kurang dari 7 hari dan belum expired
-                    if (timeLeft > 0 && timeLeft <= sevenDays && membership !== "expired") {
+    // Loop through the filtered and paginated users and display them in the table
+    paginatedUsers.forEach(userObj => {
+        const user = userObj.data;
+        const priceStr = user.price || 0;
+        const priceNum = parseFloat(priceStr);
+        const membershipStart = user.membershipStart
+            ? user.membershipStart.toDate().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+            : "Not Available";
+        const membershipEnd = user.membershipEnd
+            ? user.membershipEnd.toDate().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+            : "Not Available";
 
-                    }
+        const membership = user.membership || "None";
+        const carPlate = user.carPlate || "N/A";
+        const carBrand = user.carBrand || "N/A";
+        const carModel = user.carModel || "N/A";
+        const carDescription = user.carModelDescription || "N/A";
+        const insuranceExpiry = user.insuranceExpiry || "N/A";
 
-                    // Tentukan baris ditampilkan atau tidak
-                    if (filterValue === "all") {
-                        showRow = true;
-                    } else if (filterValue === "renew") {
-                        showRow = (timeLeft > 0 && timeLeft <= sevenDays && membership !== "expired");
-                    } else {
-                        showRow = membership === filterValue;
-                    }
+        // Generate Servicing Balance HTML
+        const servicingBalanceHTML = generateServicingBalanceHTML(user, userObj.id);
 
-                    // 🔍 Filter berdasarkan search bar
-                    const matchSearch = name.includes(searchValue) || email.includes(searchValue) || carPlateMatch;
+        // Insert the user row into the table
+        rowsContainer.innerHTML += `
+            <tr id="user-${userObj.id}" data-price="${priceNum}">
+                <td>${user.userName || "Unknown"}</td>
+                <td>${user.email || "No Email"} ${servicingBalanceHTML}</td>
+                <td class="membership-actions">
+                    <button class="btn btn-${membership === "Expired" ? "danger" : "info"} btn-sm selectMembership" data-userid="${userObj.id}">
+                        ${membership}
+                    </button>
+                    ${membership !== "Expired" && membership !== "None" ? `
+                        <button class="btn btn-danger btn-sm deleteMembershipBtn" data-userid="${userObj.id}" title="Delete Membership">
+                            Delete
+                        </button>` : ''}
+                </td>
+                <td>${priceStr}</td>
+                <td>${membershipStart}</td>
+                <td>${membershipEnd}</td>
+                <td>
+                    <button class="btn btn-info btn-sm selectPaymentMethod" data-userid="${userObj.id}">
+                        ${user.paymentMethod === "Not Selected" ? "Select Payment Method" : user.paymentMethod}
+                    </button>
+                    ${user.paymentMethod === "Other" && user.paymentDescription && user.paymentDescription.trim() !== ""
+                        ? `<p style="font-size: 12px; color: #555; margin-top: 5px;">${user.paymentDescription}</p>`
+                        : ''}
+                </td>
+                <td>
+                    Plate: ${carPlate}<br>
+                    Brand: ${carBrand}<br>
+                    Model: ${carModel}<br>
+                    Description: ${carDescription}<br>
+                    Insurance Expiry: ${insuranceExpiry}
+                    <br><button class="btn btn-sm btn-warning editCarBtn" data-userid="${userObj.id}">Edit</button>
+                </td>
+            </tr>
+        `;
 
-                    if (showRow && matchSearch) {
-                        row.style.display = "";
-                        visibleCount++;
-                        const priceStr = row.getAttribute("data-price");
-                        const priceNum = parseFloat(priceStr);
-                        if (!isNaN(priceNum)) totalPrice += priceNum;
-                    } else {
-                        row.style.display = "none";
-                    }
-                });
+        // Update visible count and total price
+        visibleCount++;
+        if (!isNaN(priceNum)) totalPrice += priceNum;
+    });
 
-                document.getElementById("userCount").innerText = `Displayed Users: ${visibleCount} | Total Users: ${filteredUsers.length}`;
+    // Update the user count display
+    document.getElementById("userCount").innerText = `Displayed Users: ${visibleCount} | Total Users: ${filteredUsersToDisplay.length}`;
+}
 
-                // checkMembershipExpiration();  // ⬅️ Tambahkan ini
-
-            }
 
             $(document).on("click", "#infoIcon", function () {
                 Swal.fire({
@@ -7961,25 +7958,25 @@
                     // Save membership data to Firestore
                     const servicingBalance = {
                         "Pre-Inspection": 0,
-                        "Roadside Assistance": 0,
+                        "Roadside Assist": 0,
                         "Towing": 0,
                         "Top-Up AC": 0,
                         "Car Servicing": 0,
                         "Jump Start": 0,
-                        "Breakdown Assistance": 0
+                        "Breakdown Assist": 0
                     };
 
                     if (selectedMembership === "Towing Package") {
                         servicingBalance["Towing"] = 3;
                         servicingBalance["Jump Start"] = 3;
-                        servicingBalance["Breakdown Assistance"] = 1;  // untuk Jump Start
+                        servicingBalance["Breakdown Assist"] = 1;  // untuk Jump Start
                     } else {
                         if (!selectedMembership.includes("basic")) {
                             servicingBalance["Top-Up AC"] = 1;
                         }
                         if (selectedMembership.includes("Mega Oil") || selectedMembership.includes("Castrol")) {
                             servicingBalance["Pre-Inspection"] = 2;
-                            servicingBalance["Roadside Assistance"] = 2;
+                            servicingBalance["Roadside Assist"] = 2;
                             servicingBalance["Towing"] = 2;
                             servicingBalance["Car Servicing"] = 2;
 
@@ -8186,7 +8183,7 @@
                                 paymentStatus: "Not Paid",
                                 servicingBalance: {
                                     "Pre-Inspection": 0,
-                                    "Roadside Assistance": 0,
+                                    "Roadside Assist": 0,
                                     "Towing": 0,
                                     "Top-Up AC": 0,
                                     "Car Servicing": 0
@@ -8243,6 +8240,14 @@
                 const oneDay = 24 * 60 * 60 * 1000;
 
                 membershipActions.dataset.renewShown = "true"; // ✅ tandai sudah dibuat
+
+                if (!lastSent || (now - lastSent > oneDay)) {
+                    console.log(`📧 Sending email reminder to ${userData.email}`);
+                    await sendEmailReminder(userData.email, userData.userName);
+                    await updateDoc(userRef, {
+                        lastReminderSent: Timestamp.now()
+                    });
+                }
 
                 const renewButton = document.createElement("button");
                 renewButton.classList.add("btn", "btn-warning", "btn-sm", "renew-btn");
@@ -8391,82 +8396,82 @@
                                     carModel: newCarModel,
                                     InsExpMonth: formattedExpiryDate2 // Use the correct expiry date
                                 });
-
+                         
                                 getInvoicesData(newCarPlate) // Use new car plate as reference value
-                                    .then(data => {
-                                        const invoiceTable = document.getElementById('invoiceTable').getElementsByTagName('tbody')[0];
-                                        const invoiceTableHeader = document.getElementById('invoiceTable').getElementsByTagName('thead')[0];  // Get the table header
-                                        const emptyImage = document.getElementById("emptyImage");
+    .then(data => {
+        const invoiceTable = document.getElementById('invoiceTable').getElementsByTagName('tbody')[0];
+        const invoiceTableHeader = document.getElementById('invoiceTable').getElementsByTagName('thead')[0];  // Get the table header
+        const emptyImage = document.getElementById("emptyImage");
 
-                                        // Clear the current table data before inserting new rows
+        // Clear the current table data before inserting new rows
+       
 
+        // Set column widths directly in JavaScript for the header
+        const headerCells = invoiceTableHeader.getElementsByTagName('th');
+        if (headerCells.length >= 2) {
+            headerCells[0].style.width = "25%";  // Set Date column width to 25%
+            headerCells[1].style.width = "75%";  // Set Transaction History column width to 75%
+        }
 
-                                        // Set column widths directly in JavaScript for the header
-                                        const headerCells = invoiceTableHeader.getElementsByTagName('th');
-                                        if (headerCells.length >= 2) {
-                                            headerCells[0].style.width = "25%";  // Set Date column width to 25%
-                                            headerCells[1].style.width = "75%";  // Set Transaction History column width to 75%
-                                        }
+        invoiceTable.innerHTML = '';
 
-                                        invoiceTable.innerHTML = '';
+        emptyImage.style.display = "none";  // Hide the empty image initially
+        // Check if invoices exist in the data
+        if (data && data.Invoices && Array.isArray(data.Invoices)) {
+            // Filter invoices to only include "ACCREC" type and matching reference value
+            const filteredInvoices = data.Invoices.filter(invoice =>
+                invoice.Type === "ACCREC" && invoice.Reference && invoice.Reference.includes(newCarPlate) // Use car plate as reference
+            );
 
-                                        emptyImage.style.display = "none";  // Hide the empty image initially
-                                        // Check if invoices exist in the data
-                                        if (data && data.Invoices && Array.isArray(data.Invoices)) {
-                                            // Filter invoices to only include "ACCREC" type and matching reference value
-                                            const filteredInvoices = data.Invoices.filter(invoice =>
-                                                invoice.Type === "ACCREC" && invoice.Reference && invoice.Reference.includes(newCarPlate) // Use car plate as reference
-                                            );
+            // If no invoices match, show the empty image
+            if (filteredInvoices.length === 0) {
+                emptyImage.style.display = "block";  // Show empty image
+                invoiceTable.style.display = "none";  
+                invoiceTableHeader.style.display = "none";  
 
-                                            // If no invoices match, show the empty image
-                                            if (filteredInvoices.length === 0) {
-                                                emptyImage.style.display = "block";  // Show empty image
-                                                invoiceTable.style.display = "none";
-                                                invoiceTableHeader.style.display = "none";
+                return;  // Exit function
+            }
 
-                                                return;  // Exit function
-                                            }
+            // Loop through the filtered invoices and populate the table
+            filteredInvoices.forEach(invoice => {
+                const row = invoiceTable.insertRow();
 
-                                            // Loop through the filtered invoices and populate the table
-                                            filteredInvoices.forEach(invoice => {
-                                                const row = invoiceTable.insertRow();
+                // Create the "Date" cell and populate it
+                const invoiceDateCell = row.insertCell(0);
+                invoiceDateCell.textContent = new Date(invoice.DateString).toLocaleDateString() || 'N/A';  // Format date as needed
+                invoiceDateCell.style.textAlign = "center";  // Center-align the date cell
 
-                                                // Create the "Date" cell and populate it
-                                                const invoiceDateCell = row.insertCell(0);
-                                                invoiceDateCell.textContent = new Date(invoice.DateString).toLocaleDateString() || 'N/A';  // Format date as needed
-                                                invoiceDateCell.style.textAlign = "center";  // Center-align the date cell
+                // Create the "Preview Link" cell and populate it
+                const previewCell = row.insertCell(1); 
+                const previewLink = document.createElement('a');
+                
+                const previewUrl = `/invoice/preview/${invoice.InvoiceID}`;
 
-                                                // Create the "Preview Link" cell and populate it
-                                                const previewCell = row.insertCell(1);
-                                                const previewLink = document.createElement('a');
+                previewInvoiceData(invoice.InvoiceID)  
+                    .then(previewData => {
+                        if (previewData.previewUrl) {
+                            previewLink.href = previewData.previewUrl;
+                            previewLink.textContent = previewData.previewUrl;
+                            previewLink.style.color = "black";
+                            previewLink.style.fontSize = "16px";
+                            previewLink.target = "_blank";  // Open link in a new tab
+                        } else {
+                            previewLink.textContent = "Preview Unavailable";
+                            previewLink.href = "#";  // Disable the link if no preview is available
+                        }
 
-                                                const previewUrl = `/invoice/preview/${invoice.InvoiceID}`;
-
-                                                previewInvoiceData(invoice.InvoiceID)
-                                                    .then(previewData => {
-                                                        if (previewData.previewUrl) {
-                                                            previewLink.href = previewData.previewUrl;
-                                                            previewLink.textContent = previewData.previewUrl;
-                                                            previewLink.style.color = "black";
-                                                            previewLink.style.fontSize = "16px";
-                                                            previewLink.target = "_blank";  // Open link in a new tab
-                                                        } else {
-                                                            previewLink.textContent = "Preview Unavailable";
-                                                            previewLink.href = "#";  // Disable the link if no preview is available
-                                                        }
-
-                                                        previewCell.appendChild(previewLink);
-                                                    })
-                                                    .catch(error => {
-                                                        console.error("Error fetching preview link:", error);
-                                                        previewCell.textContent = "Error fetching preview";
-                                                    });
-                                            });
-                                        } else {
-                                            console.error("No invoices found or incorrect format.");
-                                        }
-                                    })
-                                    .catch(error => console.error("Error fetching invoices:", error));
+                        previewCell.appendChild(previewLink);
+                    })
+                    .catch(error => {
+                        console.error("Error fetching preview link:", error);
+                        previewCell.textContent = "Error fetching preview";
+                    });
+            });
+        } else {
+            console.error("No invoices found or incorrect format.");
+        }
+    })
+    .catch(error => console.error("Error fetching invoices:", error));
 
 
                                 // Update UI with the new car information
@@ -8861,7 +8866,7 @@ z-index: 9999;">
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" href="/profile" style="font-size:16px">Profile</a>
 
-<!--                                 <a class="dropdown-item" href="/my_cart" style="font-size:16px">My Cart</a> -->
+                                <a class="dropdown-item" href="/my_cart" style="font-size:16px">My Cart</a>
 
 
                                 <a class="dropdown-item" href="#" id="logoutBtn" style="font-size:16px">Sign Out</a>
@@ -8935,7 +8940,7 @@ z-index: 9999;">
                 <div style="display: flex; align-items: center;">
                     <p
                         style="margin-right: 10px; font-size: 18px;color: black; margin-bottom: 10px; background-color: #ffc107 ;padding-left: 10px;padding-right: 10px;border-radius: 30px;">
-                        Edit Car Information
+                        Car Information
                     </p>
                     <a href="#editCarModal" data-toggle="modal" data-target="#editCarModal" style="cursor: pointer;">
                         <i class="fas fa-pencil-alt" style="color: #ffc107; font-size: 18px;"></i>
@@ -8965,13 +8970,13 @@ z-index: 9999;">
                 <li class="nav-item" role="presentation">
                     <a class="nav-link active adopt-tab" id="car-service-plan-tab" data-toggle="pill"
                         href="#car-service-plan" role="tab" aria-controls="car-service-plan" aria-selected="true">
-                        My Car Service Plan
+                        Car Service Plan
                     </a>
                 </li>
                 <li class="nav-item" role="presentation">
                     <a class="nav-link donate-tab" id="car-invoice-tab" data-toggle="pill" href="#car-invoice"
                         role="tab" aria-controls="car-invoice" aria-selected="false">
-                        My Transaction History
+                        Car Invoice
                     </a>
                 </li>
             </ul>
@@ -8999,15 +9004,12 @@ z-index: 9999;">
                         style="display: none; max-width: 100%; width: auto; height: auto;">
 
 
-                    <table id="invoiceTable" class="table table-striped table-bordered"
-                        style="table-layout: fixed; width: 100%;">
-			    <caption style="caption-side: top; text-align: left; font-size: 0.9rem; padding-bottom: 0.5rem; color: #6c757d;">
-  <strong>Note:</strong> The payment status shown in each invoice link will be refreshed within 3 working days after payment. </caption>
+                    <table id="invoiceTable" class="table table-striped table-bordered" style="table-layout: fixed; width: 100%;">
                         <thead class="table-light">
                             <tr>
                                 <!-- Set a fixed width for the Invoice Date column and allow Preview column to take more space -->
-                                <th style="width: 30%; word-wrap: break-word;">Date</th>
-                                <th style="width: 70%; word-wrap: break-word;">Transaction History</th>
+                                <th style="width: 25%; word-wrap: break-word;">Date</th>
+                                <th style="width: 75%; word-wrap: break-word;">Transaction History</th>
                             </tr>
                         </thead>
                         <tbody>
