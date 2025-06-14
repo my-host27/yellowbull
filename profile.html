@@ -7797,7 +7797,15 @@
                     const userData = JSON.parse(localStorage.getItem(`userData-${userId}`));
                     if (!userData) return;
 
-                    if (userData.role === "admin" || userData.emailVerified === false) return;
+			     const settingsDoc = await getDoc(doc(db, "urlgetusers", "3PxEpnNDALR9UNhrTz2f")); 
+        const apiUrl = settingsDoc.exists() ? settingsDoc.data().apiurl : null;
+
+        // Use the fetched API URL in the fetch request
+        const verifiedEmailsResponse = await fetch(apiUrl);
+        const verifiedUsers = await verifiedEmailsResponse.json();
+        const verifiedEmails = verifiedUsers.map(u => u.email); 
+			
+                    if (userData.role === "admin" || verifiedEmails.includes(user.email)) return;
 
                     const endDate = new Date(userData.membershipEnd);
                     const timeLeft = endDate - now;
