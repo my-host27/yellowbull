@@ -6703,177 +6703,174 @@
             let proofImages = [];
 
             // **Fungsi untuk menampilkan semua user (khusus admin)**
-            async function loadAllUsers(applyFilter = false, page = 1, perPage = rowsPerPage) {
-                try {
-                    const usersRef = collection(db, "Users");
-                    const querySnapshot = await getDocs(usersRef);
-                    let userListHTML = "";
+       async function loadAllUsers(applyFilter = false, page = 1, perPage = rowsPerPage) {
+    try {
+        const usersRef = collection(db, "Users");
+        const querySnapshot = await getDocs(usersRef);
+        let userListHTML = ""; // Initialize empty string to store HTML
 
-                    allUsersList = []
-                    proofImages = [];
+        allUsersList = [];
+        proofImages = [];
 
-		    const settingsDoc = await getDoc(doc(db, "urlgetusers", "3PxEpnNDALR9UNhrTz2f")); 
-        	    const apiUrl = settingsDoc.exists() ? settingsDoc.data().apiurl : null;
+        const settingsDoc = await getDoc(doc(db, "urlgetusers", "3PxEpnNDALR9UNhrTz2f"));
+        const apiUrl = settingsDoc.exists() ? settingsDoc.data().apiurl : null;
 
-       		    const verifiedEmailsResponse = await fetch(apiUrl);
-        	    const verifiedUsers = await verifiedEmailsResponse.json();
-        	    const verifiedEmails = verifiedUsers.map(u => u.email); 
+        // Fetch the verified users list
+        const verifiedEmailsResponse = await fetch(apiUrl);
+        const verifiedUsers = await verifiedEmailsResponse.json();
+        const verifiedEmails = verifiedUsers.map(u => u.email);
+        const verifiedEmailsLower = verifiedUsers.map(u => u.email.toLowerCase());
 
-        	    filteredUsers = [];
+        filteredUsers = [];
+        querySnapshot.forEach(docSnap => {
+            const user = docSnap.data();
+            if (user.role !== "admin" && verifiedEmailsLower.includes(user.email.toLowerCase())) {
+                filteredUsers.push({ id: docSnap.id, data: user });
+            }
 
-                    querySnapshot.forEach(docSnap => {
-                        const user = docSnap.data();
-                        if (user.role !== "admin" && verifiedEmails.includes(user.email)) {
-        			filteredUsers.push({ id: docSnap.id, data: user });
-    			}
+            // Handle proof image
+            if (user.role !== "admin" && user.proofImage) {
+                proofImages.push({
+                    userId: docSnap.id,
+                    userName: user.userName,
+                    url: user.proofImage,
+                    uploadedAt: user.proofUploadedAt || null
+                });
+            }
+        });
 
-                        // Ambil proof image
-                        if (user.role !== "admin" && user.proofImage) {
-                            proofImages.push({
-                                userId: docSnap.id,
-                                userName: user.userName,
-                                url: user.proofImage,
-                                uploadedAt: user.proofUploadedAt || null
-                            });
-                        }
-                    });
+        // Apply the filter and pagination logic
+        const filterValue = document.getElementById("membershipFilter").value.toLowerCase();
+        const searchValue = document.getElementById("searchInput").value.toLowerCase();
+        const now = new Date();
+        const sevenDays = 7 * 24 * 60 * 60 * 1000;
 
-                    // Lakukan PAGINASI setelah semua user dikumpulkan
-                    const startIndex = (page - 1) * perPage;
-                    const endIndex = startIndex + perPage;
-                    const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+        // Filter the users based on search and membership filter
+        const filteredUsersToDisplay = filteredUsers.filter(userObj => {
+            const user = userObj.data;
+            const name = user.userName.toLowerCase();
+            const email = user.email.toLowerCase();
+            const membership = user.membership ? user.membership.toLowerCase() : "none";
+            const carPlate = user.carPlate ? user.carPlate.toLowerCase() : "";
 
-                    // Sekarang loop `paginatedUsers` dan render tabel
-                    for (const { id, data: user } of paginatedUsers) {
+            let showRow = false;
+            const endDate = new Date(user.membershipEnd);
+            const timeLeft = endDate - now;
 
+            if (filterValue === "all") {
+                showRow = true;
+            } else if (filterValue === "renew") {
+                showRow = (timeLeft > 0 && timeLeft <= sevenDays && membership !== "expired");
+            } else {
+                showRow = membership === filterValue;
+            }
 
-                        let carData = {};  // Initialize carData
+            // Apply search filter (name, email, or car plate)
+            const matchSearch = name.includes(searchValue) || email.includes(searchValue) || carPlate.includes(searchValue);
 
+            return showRow && matchSearch; // Return only users that match filter criteria
+        });
 
-                        // Fetch car data if the carPlate exists
-                        if (user.carPlate) {
-                            const carRef = doc(db, "carPlates", user.carPlate);
-                            const carSnap = await getDoc(carRef);
-                            if (carSnap.exists()) {
-                                carData = carSnap.data();
-                            }
-                        }
+        // Paginate the filtered users
+        const startIndex = (page - 1) * perPage;
+        const endIndex = startIndex + perPage;
+        const paginatedUsers = filteredUsersToDisplay.slice(startIndex, endIndex);
 
-                        // Skip admin users
-                        if (user.role === "admin") continue;
+         // Display the counts above the table
+        document.getElementById("userCount").innerHTML = `
+            <p>Displayed Users: ${paginatedUsers.length} | Total Users: ${filteredUsers.length}</p>
+        `;
+        // Loop through the filtered and paginated users to build the table rows
+        for (const { id, data: user } of paginatedUsers) {
 
+            let carData = {};  // Initialize carData
 
-                        const userId = id;
-                        const paymentMethod = user.paymentMethod || "Not Selected";
-                        const membershipStart = user.membershipStart
-                            ? user.membershipStart.toDate().toLocaleDateString('en-GB', {
-                                day: 'numeric',
-                                month: 'long',
-                                year: 'numeric'
-                            })
-                            : "Not Available";
+            // Fetch car data if the carPlate exists
+            if (user.carPlate) {
+                const carRef = doc(db, "carPlates", user.carPlate);
+                const carSnap = await getDoc(carRef);
+                if (carSnap.exists()) {
+                    carData = carSnap.data();
+                }
+            }
 
-                        const membershipEnd = user.membershipEnd
-                            ? user.membershipEnd.toDate().toLocaleDateString('en-GB', {
-                                day: 'numeric',
-                                month: 'long',
-                                year: 'numeric'
-                            })
-                            : "Not Available";
+            // Skip admin users
+            if (user.role === "admin") continue;
 
+            const userId = id;
+            const paymentMethod = user.paymentMethod || "Not Selected";
+            const membershipStart = user.membershipStart
+                ? user.membershipStart.toDate().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+                : "Not Available";
 
+            const membershipEnd = user.membershipEnd
+                ? user.membershipEnd.toDate().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+                : "Not Available";
 
+            const insuranceExpiry = user.InsExpMonth;
+            let formattedExpiryDate = "N/A"; // Default if no date is available
 
-                        const insuranceExpiry = user.InsExpMonth;
-                        console.log("Insurance Expiry:", insuranceExpiry);
-                        console.log("Type of Insurance Expiry:", typeof insuranceExpiry);
+            if (insuranceExpiry) {
+                let expiryDate;
 
-                        let formattedExpiryDate = "N/A"; // Default if no date is available
+                if (typeof insuranceExpiry === 'string') {
+                    // If the string is in the "yyyy-mm-dd" format, convert it to "dd month yyyy"
+                    const dateParts = insuranceExpiry.split("-");
+                    if (dateParts.length === 3) {
+                        const day = dateParts[2];
+                        const month = getMonthName(dateParts[1]); // Get the full month name
+                        const year = dateParts[0];
+                        formattedExpiryDate = `${day} ${month} ${year}`;
+                    }
+                } else if (insuranceExpiry instanceof Date) {
+                    const year = insuranceExpiry.getFullYear();
+                    const month = ("0" + (insuranceExpiry.getMonth() + 1)).slice(-2);
+                    const day = ("0" + insuranceExpiry.getDate()).slice(-2);
+                    formattedExpiryDate = `${day} ${getMonthName(month)} ${year}`;
+                } else if (insuranceExpiry.toDate) {
+                    const expiryDate = insuranceExpiry.toDate(); // Convert Firestore timestamp to Date
+                    const year = expiryDate.getFullYear();
+                    const month = ("0" + (expiryDate.getMonth() + 1)).slice(-2);
+                    const day = ("0" + expiryDate.getDate()).slice(-2);
+                    formattedExpiryDate = `${day} ${getMonthName(month)} ${year}`;
+                }
+            }
 
-                        if (insuranceExpiry) {
-                            let expiryDate;
+            // Helper function to get the full month name from a numeric month value
+            function getMonthName(monthNumber) {
+                const monthNames = [
+                    "January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"
+                ];
+                return monthNames[parseInt(monthNumber, 10) - 1]; // Map numeric month to month name
+            }
 
-                            if (typeof insuranceExpiry === 'string') {
-                                // If the string is in the "yyyy-mm-dd" format, convert it to "dd month yyyy"
-                                const dateParts = insuranceExpiry.split("-");
-                                if (dateParts.length === 3) {
-                                    const day = dateParts[2];
-                                    const month = getMonthName(dateParts[1]); // Get the full month name
-                                    const year = dateParts[0];
-                                    formattedExpiryDate = `${day} ${month} ${year}`; // Format as dd month yyyy (e.g., 11 November 2025)
-                                }
-                            } else if (insuranceExpiry instanceof Date) {
-                                const year = insuranceExpiry.getFullYear();
-                                const month = ("0" + (insuranceExpiry.getMonth() + 1)).slice(-2);
-                                const day = ("0" + insuranceExpiry.getDate()).slice(-2);
-                                formattedExpiryDate = `${day} ${getMonthName(month)} ${year}`; // Convert Date object into "dd month yyyy"
-                            } else if (insuranceExpiry.toDate) {
-                                // Handle Firestore Timestamp format
-                                const expiryDate = insuranceExpiry.toDate();  // Convert Firestore timestamp to Date
-                                const year = expiryDate.getFullYear();
-                                const month = ("0" + (expiryDate.getMonth() + 1)).slice(-2);
-                                const day = ("0" + expiryDate.getDate()).slice(-2);
-                                formattedExpiryDate = `${day} ${getMonthName(month)} ${year}`; // Format the Firestore date
-                            }
+            // Prepare car data for display
+            const aboutCar = `
+                Plate: ${user.carPlate || "N/A"}<br>
+                Brand: ${carData.carBrand || "Other"}<br>
+                Model: ${carData.carModel || "Other"}<br>
+                Description: ${carData.carModelDescription || "Other"}<br>
+                Insurance Expiry: ${formattedExpiryDate}<br>
+                Birthday Month: ${user.dob || "N/A"}
+            `;
 
-                            // Helper function to get the full month name from a numeric month value
-                            function getMonthName(monthNumber) {
-                                const monthNames = [
-                                    "January", "February", "March", "April", "May", "June",
-                                    "July", "August", "September", "October", "November", "December"
-                                ];
-                                return monthNames[parseInt(monthNumber, 10) - 1]; // Map numeric month to month name
-                            }
+            // Store user data in local storage
+            localStorage.setItem(`userData-${id}`, JSON.stringify({
+                membershipEnd: user.membershipEnd ? user.membershipEnd.toDate() : null,
+                membership: user.membership ? user.membership.toLowerCase() : null
+            }));
 
-                            // If a valid Date object is found, format it as a full date
-                            if (expiryDate instanceof Date && !isNaN(expiryDate)) {
-                                formattedExpiryDate = expiryDate.toLocaleDateString('en-GB', {
-                                    day: 'numeric',
-                                    month: 'long',
-                                    year: 'numeric'
-                                });
-                            }
-                        } else {
-                            formattedExpiryDate = "N/A"; // If no value is provided, set it as "N/A"
-                        }
+            const membership = user.membership || "None";
+            const price = membershipPriceMap[membership] || "-";
+            updatePaymentMethodUI(userId, paymentMethod, user.paymentDescription);
 
-                        console.log("Formatted Insurance Expiry:", formattedExpiryDate);
-
-                        const aboutCar = `
-    Plate: ${user.carPlate || "N/A"}<br>
-    Brand: ${carData.carBrand || "Other"}<br>
-    Model: ${carData.carModel || "Other"}<br>
-    Description: ${carData.carModelDescription || "Other"}<br>
-    Insurance Expiry: ${formattedExpiryDate}<br>
-    Birthday Month: ${user.dob || "N/A"}
-`;
-
-                        // Store user data in local storage
-                        localStorage.setItem(`userData-${id}`, JSON.stringify({
-                            membershipEnd: user.membershipEnd ? user.membershipEnd.toDate() : null,
-                            membership: user.membership ? user.membership.toLowerCase() : null
-                        }));
-
-                        const membership = user.membership || "None";
-                        const paymentStatus = user.paymentStatus || "Not Paid";
-                        const paymentDescription = user.paymentDescription;
-                        const proofImage = user.proofImage
-                            ? `<img src="${user.proofImage}" alt="Proof" style="width: 50px; height: 50px; cursor: pointer;">`
-                            : "No Image";
-
-                        const price = membershipPriceMap[membership] || "-";
-                        updatePaymentMethodUI(userId, paymentMethod, paymentDescription);
-
-                        // Add user data to the table
-                        userListHTML += `
+            // Add user data to the table
+            userListHTML += `
                 <tr id="user-${id}" data-price="${price.replace(/[^\d]/g, '')}">
                     <td>${user.userName || "Unknown"}</td>
-<td>
-  ${user.email || "No Email"}
- ${generateServicingBalanceHTML(user, id)}
-</td>
-
-                    <td class="membership-actions">
+                    <td>${user.email || "No Email"} ${generateServicingBalanceHTML(user, id)}</td>
+                     <td class="membership-actions">
                         <button class="btn btn-${membership === "Expired" ? "danger" : "info"} btn-sm selectMembership" data-userid="${id}">
                             ${membership}
                         </button>
@@ -6884,37 +6881,31 @@
                             </button>` : ''}
                     </td>
                     <td>${price}</td>
-                    <!-- <td>${user.paymentStatus || "Not Paid"}</td> -->
                     <td>${membershipStart}</td>
                     <td>${membershipEnd}</td>
                     <td>
                         <button class="btn btn-info btn-sm selectPaymentMethod" data-userid="${id}">
                             ${paymentMethod === "Not Selected" ? "Select Payment Method" : paymentMethod}
                         </button>
-                        ${paymentMethod === "Other" && paymentDescription && paymentDescription.trim() !== ""
-                                ? `<p style="font-size: 12px; color: #555; margin-top: 5px;">${paymentDescription}</p>`
-                                : ''}
+                        ${paymentMethod === "Other" && user.paymentDescription && user.paymentDescription.trim() !== ""
+                            ? `<p style="font-size: 12px; color: #555; margin-top: 5px;">${user.paymentDescription}</p>`
+                            : ''}
                     </td>
-                    <td>${aboutCar} <br><button class="btn btn-sm btn-warning editCarBtn" data-userid="${userId}">Edit</button></td>
-                    <!--<td>
-                        ${proofImage}
-                        <input type="file" class="form-control-file uploadProof" data-userid="${id}">
-                    </td>-->
+                    <td>${aboutCar} <br><button class="btn btn-sm btn-warning editCarBtn" data-userid="${id}">Edit</button></td>
                 </tr>
             `;
-                    }
-                    document.getElementById("userTableBody").innerHTML = userListHTML;
-                    assignMembershipListeners();  // Pastikan tombol bisa diklik
+        }
+        document.getElementById("userTableBody").innerHTML = userListHTML;
+
                     console.log("Filtering... Value:", document.getElementById("membershipFilter").value);
 
-
                     setupPagination(filteredUsers.length);
-                    filterTable();
+
                     if (applyFilter) {
                         document.querySelectorAll(".membership-actions").forEach(actions => {
                             actions.dataset.renewShown = "false";
                         });
-                        filterTable(); // Now filter after fetch
+    
                     }
 
 
