@@ -26,20 +26,22 @@
 
         /* Style for the table header columns */
 #invoiceTable thead th:nth-child(0) {
-    width: 25%; /* Date column takes up 25% of the width */
+    width: 30%; /* Date column takes up 30% of the width */
 }
 
 #invoiceTable thead th:nth-child(1) {
-    width: 75%; /* Transaction History column takes up 75% of the width */
+    width: 70%; /* Transaction History column takes up 70% of the width */
 }
 
 /* Style for the table body columns */
 #invoiceTable tbody td:nth-child(0) {
-    width: 25%; /* Date column */
+    width: 20%; /* Date column */
+    font-size: 0.85rem;
 }
 
 #invoiceTable tbody td:nth-child(1) {
-    width: 75%; /* Transaction History column */
+    width: 70%; /* Transaction History column */
+    font-size: 0.85rem;
 }
 
 
@@ -493,10 +495,16 @@
 
                                     // Check if invoices exist in the data
                                     if (data && data.Invoices && Array.isArray(data.Invoices)) {
-                                        // Filter invoices to only include "ACCREC" type and matching reference value
-                                        const filteredInvoices = data.Invoices.filter(invoice =>
-                                            invoice.Type === "ACCREC" && invoice.Reference && invoice.Reference.includes(referenceValue)
-                                        );
+                                        const filteredInvoices = data.Invoices.filter(invoice => {
+						const invoiceRefPlate = invoice.Reference ? invoice.Reference.trim().split(" ")[0].toLowerCase() : "";
+						const validStatuses = ["PAID", "AUTHORISED", "SUBMITTED"]; // hanya ambil yang ini
+
+						return (
+						invoice.Type === "ACCREC" &&
+						validStatuses.includes(invoice.Status) &&
+						invoiceRefPlate === referenceValue
+						);
+					});
 
                                         // If no invoices match, show the empty image
                                         if (filteredInvoices.length === 0) {
@@ -721,17 +729,22 @@
                         });
                         membershipStatus.innerText = `✅ Active until ${formattedDate}`;
                     } else {
-                        membershipStatus.innerText = `✅ Membership active`;
+                        membershipStatus.innerText = "❌ You don't have an active membership yet";
+                        // purchaseBtn.innerText = "Purchase Plan";
+                        // purchaseBtn.setAttribute("href", "/plans");
+                        // purchaseBtn.classList.add("btn-purchase");
+                        // purchaseBtn.classList.remove("btn-success");
+                        // purchaseBtn.style.cursor = "pointer";
                     }
                     if (deleteButton) deleteButton.style.display = "block";
                 } else {
-                    purchaseBtn.innerText = "Purchase Plan";
-                    purchaseBtn.setAttribute("href", "/plans");
-                    purchaseBtn.classList.add("btn-purchase");
-                    purchaseBtn.classList.remove("btn-success");
-                    purchaseBtn.style.cursor = "pointer";
-                    membershipStatus.innerText = "";
-                    if (deleteButton) deleteButton.style.display = "none";
+                    membershipStatus.innerText = "❌ You don't have an active membership";
+                    // purchaseBtn.innerText = "Purchase Plan";
+                    // purchaseBtn.setAttribute("href", "/plans");
+                    // purchaseBtn.classList.add("btn-purchase");
+                    // purchaseBtn.classList.remove("btn-success");
+                    // purchaseBtn.style.cursor = "pointer";
+                    // if (deleteButton) deleteButton.style.display = "none";
                 }
 
             }
@@ -9019,11 +9032,13 @@ z-index: 9999;">
 
 
                     <table id="invoiceTable" class="table table-striped table-bordered" style="table-layout: fixed; width: 100%;">
+			     <caption style="caption-side: top; text-align: left; font-size: 0.9rem; padding-bottom: 0.5rem; color: #6c757d;">Add commentMore actions
+  <strong>Note:</strong> The payment status shown in each invoice link will be refreshed within 3 working days after payment. </caption>
                         <thead class="table-light">
                             <tr>
                                 <!-- Set a fixed width for the Invoice Date column and allow Preview column to take more space -->
-                                <th style="width: 25%; word-wrap: break-word;">Date</th>
-                                <th style="width: 75%; word-wrap: break-word;">Transaction History</th>
+                                <th style="width: 30%; word-wrap: break-word;">Date</th>
+                                <th style="width: 70%; word-wrap: break-word;">Transaction History</th>
                             </tr>
                         </thead>
                         <tbody>
