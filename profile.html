@@ -39,7 +39,7 @@
     font-size: 0.85rem;
 }
 
-#invoiceTable tbody td:nth-child(1) {
+#invoiceTable tbody td:nth-child(2) {
     width: 70%; /* Transaction History column */
     font-size: 0.85rem;
 }
@@ -500,8 +500,7 @@
 						const validStatuses = ["PAID", "AUTHORISED", "SUBMITTED"]; // hanya ambil yang ini
 
 						return (
-						invoice.Type === "ACCREC" &&
-						validStatuses.includes(invoice.Status) &&
+						invoice.Type === "ACCREC" &&				validStatuses.includes(invoice.Status) &&
 						invoiceRefPlate === referenceValue
 						);
 					});
@@ -610,7 +609,7 @@
 
 
 
-                            const purchaseBtn = document.querySelector(".btn-purchase");
+                            // const purchaseBtn = document.querySelector(".btn-purchase");
 
                             onSnapshot(userRef, (docSnap) => {
                                 const userData = docSnap.data();
@@ -738,7 +737,7 @@
                     }
                     if (deleteButton) deleteButton.style.display = "block";
                 } else {
-                    membershipStatus.innerText = "❌ You don't have an active membership";
+                    membershipStatus.innerText = "❌ You don't have an active membership yet";
                     // purchaseBtn.innerText = "Purchase Plan";
                     // purchaseBtn.setAttribute("href", "/plans");
                     // purchaseBtn.classList.add("btn-purchase");
@@ -8893,7 +8892,7 @@ z-index: 9999;">
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" href="/profile" style="font-size:16px">Profile</a>
 
-                                <a class="dropdown-item" href="/my_cart" style="font-size:16px">My Cart</a>
+                                <!-- <a class="dropdown-item" href="/my_cart" style="font-size:16px">My Cart</a> -->
 
 
                                 <a class="dropdown-item" href="#" id="logoutBtn" style="font-size:16px">Sign Out</a>
