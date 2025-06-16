@@ -495,10 +495,22 @@
 
 				// Check if invoices exist in the data
                                     if (data && data.Invoices && Array.isArray(data.Invoices)) {
-                                        // Filter invoices to only include "ACCREC" type and matching reference value
-                                        const filteredInvoices = data.Invoices.filter(invoice =>
-                                            invoice.Type === "ACCREC" && invoice.Reference && invoice.Reference.includes(referenceValue)
-                                        );
+  const filteredInvoices = data.Invoices.filter(invoice => {
+    const validStatuses = ["PAID", "AUTHORISED", "SUBMITTED"];
+
+    // Ambil kata pertama dari invoice.Reference dan ubah ke lowercase
+    const invoiceRefPlate = invoice.Reference ? invoice.Reference.trim().split(" ")[0].toLowerCase() : "";
+
+    // Ubah referenceValue user ke lowercase juga agar bisa dibandingkan
+    const normalizedRef = referenceValue.toLowerCase();
+
+    return (
+      invoice.Type === "ACCREC" &&
+      validStatuses.includes(invoice.Status) &&
+      invoiceRefPlate === normalizedRef
+    );
+  });
+}
 
                                         // If no invoices match, show the empty image
                                         if (filteredInvoices.length === 0) {
