@@ -495,15 +495,17 @@
 
                                     // Check if invoices exist in the data
                                     if (data && data.Invoices && Array.isArray(data.Invoices)) {
-                                        const filteredInvoices = data.Invoices.filter(invoice => {
-						const invoiceRefPlate = invoice.Reference ? invoice.Reference.trim().split(" ")[0].toLowerCase() : "";
-						const validStatuses = ["PAID", "AUTHORISED", "SUBMITTED"]; // hanya ambil yang ini
+  const filteredInvoices = data.Invoices.filter(invoice => {
+    const invoiceRefPlate = invoice.Reference ? invoice.Reference.trim().split(" ")[0].toLowerCase() : "";
 
-					return (
-						invoice.Type === "ACCREC" && validStatuses.includes(invoice.Status) &&
-						invoiceRefPlate === referenceValue
-						);
-					});
+    const validStatuses = ["PAID", "AUTHORISED", "SUBMITTED"]; // hanya ambil yang ini
+
+    return (
+      invoice.Type === "ACCREC" &&
+      validStatuses.includes(invoice.Status) &&
+      invoiceRefPlate === referenceValue
+    );
+  });
 
                                         // If no invoices match, show the empty image
                                         if (filteredInvoices.length === 0) {
