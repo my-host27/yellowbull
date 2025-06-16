@@ -499,8 +499,8 @@
 						const invoiceRefPlate = invoice.Reference ? invoice.Reference.trim().split(" ")[0].toLowerCase() : "";
 						const validStatuses = ["PAID", "AUTHORISED", "SUBMITTED"]; // hanya ambil yang ini
 
-						return (
-						invoice.Type === "ACCREC" &&				validStatuses.includes(invoice.Status) &&
+					return (
+						invoice.Type === "ACCREC" && validStatuses.includes(invoice.Status) &&
 						invoiceRefPlate === referenceValue
 						);
 					});
@@ -8429,8 +8429,8 @@ async function loadAllUsers(applyFilter = false, page = 1, perPage = rowsPerPage
         // Set column widths directly in JavaScript for the header
         const headerCells = invoiceTableHeader.getElementsByTagName('th');
         if (headerCells.length >= 2) {
-            headerCells[0].style.width = "25%";  // Set Date column width to 25%
-            headerCells[1].style.width = "75%";  // Set Transaction History column width to 75%
+            headerCells[0].style.width = "30%";  // Set Date column width to 30%
+            headerCells[1].style.width = "70%";  // Set Transaction History column width to 70%
         }
 
         invoiceTable.innerHTML = '';
@@ -9031,7 +9031,7 @@ z-index: 9999;">
 
 
                     <table id="invoiceTable" class="table table-striped table-bordered" style="table-layout: fixed; width: 100%;">
-			     <caption style="caption-side: top; text-align: left; font-size: 0.9rem; padding-bottom: 0.5rem; color: #6c757d;">Add commentMore actions
+			     <caption style="caption-side: top; text-align: left; font-size: 0.9rem; padding-bottom: 0.5rem; color: #6c757d;">
   <strong>Note:</strong> The payment status shown in each invoice link will be refreshed within 3 working days after payment. </caption>
                         <thead class="table-light">
                             <tr>
