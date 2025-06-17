@@ -25,24 +25,26 @@
         }
 
         /* Style for the table header columns */
-#invoiceTable thead th:nth-child(0) {
-    width: 30%; /* Date column takes up 30% of the width */
-}
+        #invoiceTable thead th:nth-child(0) {
+            width: 25%;
+            /* Date column takes up 25% of the width */
+        }
 
-#invoiceTable thead th:nth-child(1) {
-    width: 70%; /* Transaction History column takes up 70% of the width */
-}
+        #invoiceTable thead th:nth-child(1) {
+            width: 75%;
+            /* Transaction History column takes up 75% of the width */
+        }
 
-/* Style for the table body columns */
-#invoiceTable tbody td:nth-child(0) {
-    width: 20%; /* Date column */
-    font-size: 0.85rem;
-}
+        /* Style for the table body columns */
+        #invoiceTable tbody td:nth-child(0) {
+            width: 25%;
+            /* Date column */
+        }
 
-#invoiceTable tbody td:nth-child(2) {
-    width: 70%; /* Transaction History column */
-    font-size: 0.85rem;
-}
+        #invoiceTable tbody td:nth-child(1) {
+            width: 75%;
+            /* Transaction History column */
+        }
 
 
         .custom-btn {
@@ -387,7 +389,7 @@
         const rowsPerPage = 10;  // Atur jumlah user per halaman
         let allUsersList = [];   // Simpan semua user
         let filteredUsers = [];   // Simpan semua user
-          let userListHTML = "";
+        let userListHTML = "";
 
 
         document.getElementById("loadingScreen").style.display = "flex";
@@ -493,24 +495,12 @@
                                     // Hide the empty image initially
                                     emptyImage.style.display = "none";
 
-				// Check if invoices exist in the data
+                                    // Check if invoices exist in the data
                                     if (data && data.Invoices && Array.isArray(data.Invoices)) {
-  const filteredInvoices = data.Invoices.filter(invoice => {
-    const validStatuses = ["PAID", "AUTHORISED", "SUBMITTED"];
-
-    // Ambil kata pertama dari invoice.Reference dan ubah ke lowercase
-    const invoiceRefPlate = invoice.Reference ? invoice.Reference.trim().split(" ")[0].toLowerCase() : "";
-
-    // Ubah referenceValue user ke lowercase juga agar bisa dibandingkan
-    const normalizedRef = referenceValue.toLowerCase();
-
-    return (
-      invoice.Type === "ACCREC" &&
-      validStatuses.includes(invoice.Status) &&
-      invoiceRefPlate === normalizedRef
-    );
-  });
-}
+                                        // Filter invoices to only include "ACCREC" type and matching reference value
+                                        const filteredInvoices = data.Invoices.filter(invoice =>
+                                            invoice.Type === "ACCREC" && invoice.Reference && invoice.Reference.includes(referenceValue)
+                                        );
 
                                         // If no invoices match, show the empty image
                                         if (filteredInvoices.length === 0) {
@@ -616,7 +606,7 @@
 
 
 
-                            // const purchaseBtn = document.querySelector(".btn-purchase");
+                            const purchaseBtn = document.querySelector(".btn-purchase");
 
                             onSnapshot(userRef, (docSnap) => {
                                 const userData = docSnap.data();
@@ -735,22 +725,17 @@
                         });
                         membershipStatus.innerText = `✅ Active until ${formattedDate}`;
                     } else {
-                        membershipStatus.innerText = "❌ You don't have an active membership yet";
-                        // purchaseBtn.innerText = "Purchase Plan";
-                        // purchaseBtn.setAttribute("href", "/plans");
-                        // purchaseBtn.classList.add("btn-purchase");
-                        // purchaseBtn.classList.remove("btn-success");
-                        // purchaseBtn.style.cursor = "pointer";
+                        membershipStatus.innerText = `✅ Membership active`;
                     }
                     if (deleteButton) deleteButton.style.display = "block";
                 } else {
-                    membershipStatus.innerText = "❌ You don't have an active membership yet";
-                    // purchaseBtn.innerText = "Purchase Plan";
-                    // purchaseBtn.setAttribute("href", "/plans");
-                    // purchaseBtn.classList.add("btn-purchase");
-                    // purchaseBtn.classList.remove("btn-success");
-                    // purchaseBtn.style.cursor = "pointer";
-                    // if (deleteButton) deleteButton.style.display = "none";
+                    purchaseBtn.innerText = "Purchase Plan";
+                    purchaseBtn.setAttribute("href", "/plans");
+                    purchaseBtn.classList.add("btn-purchase");
+                    purchaseBtn.classList.remove("btn-success");
+                    purchaseBtn.style.cursor = "pointer";
+                    membershipStatus.innerText = "";
+                    if (deleteButton) deleteButton.style.display = "none";
                 }
 
             }
@@ -763,7 +748,7 @@
             <section id="header" class="header">
                 <div class="container p-0">
                     <nav class="navbar navbar-expand-lg">
-                       <a class="navbar-brand" href="/"><img src="images/YellowRanger-Logo.png" loading="lazy" sizes="120px" 
+                        <a class="navbar-brand" href="/"><img src="images/YellowRanger-Logo.png" loading="lazy" sizes="120px" 
                 srcset="
                     images/YellowRanger-Logo-p-500.png 500w,
                     images/YellowRanger-Logo.png 669w
@@ -6682,150 +6667,150 @@
             let proofImages = [];
 
             // **Fungsi untuk menampilkan semua user (khusus admin)**
-async function loadAllUsers(applyFilter = false, page = 1, perPage = rowsPerPage) {
-    try {
-        const usersRef = collection(db, "Users");
-        const querySnapshot = await getDocs(usersRef);
-        let userListHTML = ""; // Initialize empty string to store HTML
+            async function loadAllUsers(applyFilter = false, page = 1, perPage = rowsPerPage) {
+                try {
+                    const usersRef = collection(db, "Users");
+                    const querySnapshot = await getDocs(usersRef);
+                    let userListHTML = ""; // Initialize empty string to store HTML
 
-        allUsersList = [];
-        proofImages = [];
+                    allUsersList = [];
+                    proofImages = [];
 
-        const settingsDoc = await getDoc(doc(db, "urlgetusers", "3PxEpnNDALR9UNhrTz2f"));
-        const apiUrl = settingsDoc.exists() ? settingsDoc.data().apiurl : null;
+                    const settingsDoc = await getDoc(doc(db, "urlgetusers", "3PxEpnNDALR9UNhrTz2f"));
+                    const apiUrl = settingsDoc.exists() ? settingsDoc.data().apiurl : null;
 
-        // Fetch the verified users list
-        const verifiedEmailsResponse = await fetch(apiUrl);
-        const verifiedUsers = await verifiedEmailsResponse.json();
-        const verifiedEmails = verifiedUsers.map(u => u.email);
-        const verifiedEmailsLower = verifiedUsers.map(u => u.email.toLowerCase());
+                    // Fetch the verified users list
+                    const verifiedEmailsResponse = await fetch(apiUrl);
+                    const verifiedUsers = await verifiedEmailsResponse.json();
+                    const verifiedEmails = verifiedUsers.map(u => u.email);
+                    const verifiedEmailsLower = verifiedUsers.map(u => u.email.toLowerCase());
 
-        filteredUsers = [];
-        querySnapshot.forEach(docSnap => {
-            const user = docSnap.data();
-            if (user.role !== "admin" && verifiedEmailsLower.includes(user.email.toLowerCase())) {
-                filteredUsers.push({ id: docSnap.id, data: user });
-            }
+                    filteredUsers = [];
+                    querySnapshot.forEach(docSnap => {
+                        const user = docSnap.data();
+                        if (user.role !== "admin" && verifiedEmailsLower.includes(user.email.toLowerCase())) {
+                            filteredUsers.push({ id: docSnap.id, data: user });
+                        }
 
-            // Handle proof image
-            if (user.role !== "admin" && user.proofImage) {
-                proofImages.push({
-                    userId: docSnap.id,
-                    userName: user.userName,
-                    url: user.proofImage,
-                    uploadedAt: user.proofUploadedAt || null
-                });
-            }
-        });
+                        // Handle proof image
+                        if (user.role !== "admin" && user.proofImage) {
+                            proofImages.push({
+                                userId: docSnap.id,
+                                userName: user.userName,
+                                url: user.proofImage,
+                                uploadedAt: user.proofUploadedAt || null
+                            });
+                        }
+                    });
 
-        // Apply the filter and pagination logic
-        const filterValue = document.getElementById("membershipFilter").value.toLowerCase();
-        const searchValue = document.getElementById("searchInput").value.toLowerCase();
-        const now = new Date();
-        const sevenDays = 7 * 24 * 60 * 60 * 1000;
+                    // Apply the filter and pagination logic
+                    const filterValue = document.getElementById("membershipFilter").value.toLowerCase();
+                    const searchValue = document.getElementById("searchInput").value.toLowerCase();
+                    const now = new Date();
+                    const sevenDays = 7 * 24 * 60 * 60 * 1000;
 
-        // Filter the users based on search and membership filter
-        const filteredUsersToDisplay = filteredUsers.filter(userObj => {
-            const user = userObj.data;
-            const name = user.userName.toLowerCase();
-            const email = user.email.toLowerCase();
-            const membership = user.membership ? user.membership.toLowerCase() : "none";
-            const carPlate = user.carPlate ? user.carPlate.toLowerCase() : "";
+                    // Filter the users based on search and membership filter
+                    const filteredUsersToDisplay = filteredUsers.filter(userObj => {
+                        const user = userObj.data;
+                        const name = user.userName.toLowerCase();
+                        const email = user.email.toLowerCase();
+                        const membership = user.membership ? user.membership.toLowerCase() : "none";
+                        const carPlate = user.carPlate ? user.carPlate.toLowerCase() : "";
 
-            let showRow = false;
-            const endDate = new Date(user.membershipEnd);
-            const timeLeft = endDate - now;
+                        let showRow = false;
+                        const endDate = new Date(user.membershipEnd);
+                        const timeLeft = endDate - now;
 
-            if (filterValue === "all") {
-                showRow = true;
-            } else if (filterValue === "renew") {
-                showRow = (timeLeft > 0 && timeLeft <= sevenDays && membership !== "expired");
-            } else {
-                showRow = membership === filterValue;
-            }
+                        if (filterValue === "all") {
+                            showRow = true;
+                        } else if (filterValue === "renew") {
+                            showRow = (timeLeft > 0 && timeLeft <= sevenDays && membership !== "expired");
+                        } else {
+                            showRow = membership === filterValue;
+                        }
 
-            // Apply search filter (name, email, or car plate)
-            const matchSearch = name.includes(searchValue) || email.includes(searchValue) || carPlate.includes(searchValue);
+                        // Apply search filter (name, email, or car plate)
+                        const matchSearch = name.includes(searchValue) || email.includes(searchValue) || carPlate.includes(searchValue);
 
-            return showRow && matchSearch; // Return only users that match filter criteria
-        });
+                        return showRow && matchSearch; // Return only users that match filter criteria
+                    });
 
-        // Paginate the filtered users
-        const startIndex = (page - 1) * perPage;
-        const endIndex = startIndex + perPage;
-        const paginatedUsers = filteredUsersToDisplay.slice(startIndex, endIndex);
+                    // Paginate the filtered users
+                    const startIndex = (page - 1) * perPage;
+                    const endIndex = startIndex + perPage;
+                    const paginatedUsers = filteredUsersToDisplay.slice(startIndex, endIndex);
 
-         // Display the counts above the table
-        document.getElementById("userCount").innerHTML = `
+                    // Display the counts above the table
+                    document.getElementById("userCount").innerHTML = `
             <p>Displayed Users: ${paginatedUsers.length} | Total Users: ${filteredUsers.length}</p>
         `;
-        // Loop through the filtered and paginated users to build the table rows
-        for (const { id, data: user } of paginatedUsers) {
+                    // Loop through the filtered and paginated users to build the table rows
+                    for (const { id, data: user } of paginatedUsers) {
 
-            let carData = {};  // Initialize carData
+                        let carData = {};  // Initialize carData
 
-            // Fetch car data if the carPlate exists
-            if (user.carPlate) {
-                const carRef = doc(db, "carPlates", user.carPlate);
-                const carSnap = await getDoc(carRef);
-                if (carSnap.exists()) {
-                    carData = carSnap.data();
-                }
-            }
+                        // Fetch car data if the carPlate exists
+                        if (user.carPlate) {
+                            const carRef = doc(db, "carPlates", user.carPlate);
+                            const carSnap = await getDoc(carRef);
+                            if (carSnap.exists()) {
+                                carData = carSnap.data();
+                            }
+                        }
 
-            // Skip admin users
-            if (user.role === "admin") continue;
+                        // Skip admin users
+                        if (user.role === "admin") continue;
 
-            const userId = id;
-            const paymentMethod = user.paymentMethod || "Not Selected";
-            const membershipStart = user.membershipStart
-                ? user.membershipStart.toDate().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-                : "Not Available";
+                        const userId = id;
+                        const paymentMethod = user.paymentMethod || "Not Selected";
+                        const membershipStart = user.membershipStart
+                            ? user.membershipStart.toDate().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+                            : "Not Available";
 
-            const membershipEnd = user.membershipEnd
-                ? user.membershipEnd.toDate().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-                : "Not Available";
+                        const membershipEnd = user.membershipEnd
+                            ? user.membershipEnd.toDate().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+                            : "Not Available";
 
-            const insuranceExpiry = user.InsExpMonth;
-            let formattedExpiryDate = "N/A"; // Default if no date is available
+                        const insuranceExpiry = user.InsExpMonth;
+                        let formattedExpiryDate = "N/A"; // Default if no date is available
 
-            if (insuranceExpiry) {
-                let expiryDate;
+                        if (insuranceExpiry) {
+                            let expiryDate;
 
-                if (typeof insuranceExpiry === 'string') {
-                    // If the string is in the "yyyy-mm-dd" format, convert it to "dd month yyyy"
-                    const dateParts = insuranceExpiry.split("-");
-                    if (dateParts.length === 3) {
-                        const day = dateParts[2];
-                        const month = getMonthName(dateParts[1]); // Get the full month name
-                        const year = dateParts[0];
-                        formattedExpiryDate = `${day} ${month} ${year}`;
-                    }
-                } else if (insuranceExpiry instanceof Date) {
-                    const year = insuranceExpiry.getFullYear();
-                    const month = ("0" + (insuranceExpiry.getMonth() + 1)).slice(-2);
-                    const day = ("0" + insuranceExpiry.getDate()).slice(-2);
-                    formattedExpiryDate = `${day} ${getMonthName(month)} ${year}`;
-                } else if (insuranceExpiry.toDate) {
-                    const expiryDate = insuranceExpiry.toDate(); // Convert Firestore timestamp to Date
-                    const year = expiryDate.getFullYear();
-                    const month = ("0" + (expiryDate.getMonth() + 1)).slice(-2);
-                    const day = ("0" + expiryDate.getDate()).slice(-2);
-                    formattedExpiryDate = `${day} ${getMonthName(month)} ${year}`;
-                }
-            }
+                            if (typeof insuranceExpiry === 'string') {
+                                // If the string is in the "yyyy-mm-dd" format, convert it to "dd month yyyy"
+                                const dateParts = insuranceExpiry.split("-");
+                                if (dateParts.length === 3) {
+                                    const day = dateParts[2];
+                                    const month = getMonthName(dateParts[1]); // Get the full month name
+                                    const year = dateParts[0];
+                                    formattedExpiryDate = `${day} ${month} ${year}`;
+                                }
+                            } else if (insuranceExpiry instanceof Date) {
+                                const year = insuranceExpiry.getFullYear();
+                                const month = ("0" + (insuranceExpiry.getMonth() + 1)).slice(-2);
+                                const day = ("0" + insuranceExpiry.getDate()).slice(-2);
+                                formattedExpiryDate = `${day} ${getMonthName(month)} ${year}`;
+                            } else if (insuranceExpiry.toDate) {
+                                const expiryDate = insuranceExpiry.toDate(); // Convert Firestore timestamp to Date
+                                const year = expiryDate.getFullYear();
+                                const month = ("0" + (expiryDate.getMonth() + 1)).slice(-2);
+                                const day = ("0" + expiryDate.getDate()).slice(-2);
+                                formattedExpiryDate = `${day} ${getMonthName(month)} ${year}`;
+                            }
+                        }
 
-            // Helper function to get the full month name from a numeric month value
-            function getMonthName(monthNumber) {
-                const monthNames = [
-                    "January", "February", "March", "April", "May", "June",
-                    "July", "August", "September", "October", "November", "December"
-                ];
-                return monthNames[parseInt(monthNumber, 10) - 1]; // Map numeric month to month name
-            }
+                        // Helper function to get the full month name from a numeric month value
+                        function getMonthName(monthNumber) {
+                            const monthNames = [
+                                "January", "February", "March", "April", "May", "June",
+                                "July", "August", "September", "October", "November", "December"
+                            ];
+                            return monthNames[parseInt(monthNumber, 10) - 1]; // Map numeric month to month name
+                        }
 
-            // Prepare car data for display
-            const aboutCar = `
+                        // Prepare car data for display
+                        const aboutCar = `
                 Plate: ${user.carPlate || "N/A"}<br>
                 Brand: ${carData.carBrand || "Other"}<br>
                 Model: ${carData.carModel || "Other"}<br>
@@ -6834,18 +6819,18 @@ async function loadAllUsers(applyFilter = false, page = 1, perPage = rowsPerPage
                 Birthday Month: ${user.dob || "N/A"}
             `;
 
-            // Store user data in local storage
-            localStorage.setItem(`userData-${id}`, JSON.stringify({
-                membershipEnd: user.membershipEnd ? user.membershipEnd.toDate() : null,
-                membership: user.membership ? user.membership.toLowerCase() : null
-            }));
+                        // Store user data in local storage
+                        localStorage.setItem(`userData-${id}`, JSON.stringify({
+                            membershipEnd: user.membershipEnd ? user.membershipEnd.toDate() : null,
+                            membership: user.membership ? user.membership.toLowerCase() : null
+                        }));
 
-            const membership = user.membership || "None";
-            const price = membershipPriceMap[membership] || "-";
-            updatePaymentMethodUI(userId, paymentMethod, user.paymentDescription);
+                        const membership = user.membership || "None";
+                        const price = membershipPriceMap[membership] || "-";
+                        updatePaymentMethodUI(userId, paymentMethod, user.paymentDescription);
 
-            // Add user data to the table
-            userListHTML += `
+                        // Add user data to the table
+                        userListHTML += `
                 <tr id="user-${id}" data-price="${price.replace(/[^\d]/g, '')}">
                     <td>${user.userName || "Unknown"}</td>
                     <td>${user.email || "No Email"} ${generateServicingBalanceHTML(user, id)}</td>
@@ -6867,14 +6852,14 @@ async function loadAllUsers(applyFilter = false, page = 1, perPage = rowsPerPage
                             ${paymentMethod === "Not Selected" ? "Select Payment Method" : paymentMethod}
                         </button>
                         ${paymentMethod === "Other" && user.paymentDescription && user.paymentDescription.trim() !== ""
-                            ? `<p style="font-size: 12px; color: #555; margin-top: 5px;">${user.paymentDescription}</p>`
-                            : ''}
+                                ? `<p style="font-size: 12px; color: #555; margin-top: 5px;">${user.paymentDescription}</p>`
+                                : ''}
                     </td>
                     <td>${aboutCar} <br><button class="btn btn-sm btn-warning editCarBtn" data-userid="${id}">Edit</button></td>
                 </tr>
             `;
-        }
-        document.getElementById("userTableBody").innerHTML = userListHTML;
+                    }
+                    document.getElementById("userTableBody").innerHTML = userListHTML;
 
                     console.log("Filtering... Value:", document.getElementById("membershipFilter").value);
 
@@ -6884,7 +6869,7 @@ async function loadAllUsers(applyFilter = false, page = 1, perPage = rowsPerPage
                         document.querySelectorAll(".membership-actions").forEach(actions => {
                             actions.dataset.renewShown = "false";
                         });
-    
+
                     }
 
 
@@ -7375,173 +7360,172 @@ async function loadAllUsers(applyFilter = false, page = 1, perPage = rowsPerPage
                         }
                     }
 
-         document.getElementById('downloadCSV').addEventListener('click', async function () {
-    try {
-        // Fetch API URL to get verified users from Firestore
-        const settingsDoc = await getDoc(doc(db, "urlgetusers", "3PxEpnNDALR9UNhrTz2f"));
-        const apiUrl = settingsDoc.exists() ? settingsDoc.data().apiurl : null;
+                    document.getElementById('downloadCSV').addEventListener('click', async function () {
+                        try {
+                            // Fetch API URL to get verified users from Firestore
+                            const settingsDoc = await getDoc(doc(db, "urlgetusers", "3PxEpnNDALR9UNhrTz2f"));
+                            const apiUrl = settingsDoc.exists() ? settingsDoc.data().apiurl : null;
 
-        // Fetch the verified users list
-        const verifiedEmailsResponse = await fetch(apiUrl);
-        const verifiedUsers = await verifiedEmailsResponse.json();
-        const verifiedEmails = verifiedUsers.map(u => u.email.toLowerCase()); // Use lowercased emails for comparison
+                            // Fetch the verified users list
+                            const verifiedEmailsResponse = await fetch(apiUrl);
+                            const verifiedUsers = await verifiedEmailsResponse.json();
+                            const verifiedEmails = verifiedUsers.map(u => u.email.toLowerCase()); // Use lowercased emails for comparison
 
-        // Start loading screen (optional)
+                            // Start loading screen (optional)
 
-        // Get filtered users from the global filteredUsers array
-        const usersRef = collection(db, "Users");
-        const querySnapshot = await getDocs(usersRef);
+                            // Get filtered users from the global filteredUsers array
+                            const usersRef = collection(db, "Users");
+                            const querySnapshot = await getDocs(usersRef);
 
-        let data = [];
-        const headers = [
-            'No.', 'Name', 'Created At', 'Handphone', 'Car Plate', 'Email', 'Birthday Month',
-            'Insurance Expiry Month', 'Car Make', 'Car Model'
-        ];
+                            let data = [];
+                            const headers = [
+                                'No.', 'Name', 'Created At', 'Handphone', 'Car Plate', 'Email', 'Birthday Month',
+                                'Insurance Expiry Month', 'Car Make', 'Car Model'
+                            ];
 
-        // Add headers to data array
-        data.push(headers);
+                            // Add headers to data array
+                            data.push(headers);
 
-        let rowNumber = 1; // Start numbering from 1
+                            let rowNumber = 1; // Start numbering from 1
 
-        // Loop through each document (user data) and collect necessary information
-        for (const docSnap of querySnapshot.docs) {
-            const user = docSnap.data();
+                            // Loop through each document (user data) and collect necessary information
+                            for (const docSnap of querySnapshot.docs) {
+                                const user = docSnap.data();
 
-		
-            if (user.role === "admin") continue;
-            // Skip users who are not in the verified emails list
-            if (!verifiedEmails.includes(user.email.toLowerCase())) continue;
+                                if (user.role === "admin") continue;
+                                // Skip users who are not in the verified emails list
+                                if (!verifiedEmails.includes(user.email.toLowerCase())) continue;
 
-            // Format Created At
-            let createdAtFormatted = "Not Available";
-            if (user.createdAt) {
-                if (typeof user.createdAt === "string") {
-                    createdAtFormatted = user.createdAt;
-                } else if (user.createdAt?.toDate) {
-                    const created = user.createdAt.toDate();
-                    createdAtFormatted = created.toLocaleDateString('en-GB', {
-                        day: '2-digit', month: 'short', year: 'numeric',
-                        hour: '2-digit', minute: '2-digit'
+                                // Format Created At
+                                let createdAtFormatted = "Not Available";
+                                if (user.createdAt) {
+                                    if (typeof user.createdAt === "string") {
+                                        createdAtFormatted = user.createdAt;
+                                    } else if (user.createdAt?.toDate) {
+                                        const created = user.createdAt.toDate();
+                                        createdAtFormatted = created.toLocaleDateString('en-GB', {
+                                            day: '2-digit', month: 'short', year: 'numeric',
+                                            hour: '2-digit', minute: '2-digit'
+                                        });
+                                    }
+                                }
+
+                                // Format Insurance Expiry Month
+                                let formattedIns = "Not Available";
+                                if (user.InsExpMonth) {
+                                    if (typeof user.InsExpMonth === "string") {
+                                        formattedIns = user.InsExpMonth;
+                                    } else if (user.InsExpMonth?.toDate) {
+                                        const insDate = user.InsExpMonth.toDate();
+                                        formattedIns = insDate.toLocaleDateString('en-GB', {
+                                            day: '2-digit', month: 'short', year: 'numeric'
+                                        });
+                                    }
+                                }
+
+                                // Add user data to the row
+                                let carData = {};
+                                if (user.carPlate) {
+                                    const carPlateRef = doc(db, "carPlates", user.carPlate);
+                                    const carSnap = await getDoc(carPlateRef);
+                                    carData = carSnap.exists() ? carSnap.data() : {};
+                                }
+
+                                const userData = [
+                                    rowNumber++,                                  // No.
+                                    user.userName || "Unknown",                   // Name
+                                    createdAtFormatted,
+                                    user.userContact || "Not Available",          // Handphone
+                                    user.carPlate || "Not Available",             // Car Plate
+                                    user.email || "Not Available",                // Email
+                                    user.dob || "Not Available",                  // Birthday Month
+                                    formattedIns,                                 // Insurance Expiry Month
+                                    carData.carBrand || "Not Available",          // Car Make
+                                    carData.carModel || "Not Available"           // Car Model
+                                ];
+
+                                // Add row data to the data array
+                                data.push(userData);
+                            }
+
+                            // Create a new Excel workbook
+                            const workbook = new ExcelJS.Workbook();
+                            const worksheet = workbook.addWorksheet('User Data');
+
+                            // Add columns to the worksheet with auto width for "No."
+                            worksheet.columns = headers.map((header, index) => ({
+                                header: header,
+                                key: header,
+                                width: index === 0 ? 10 : 20  // Set a smaller width for 'No.' and larger for others
+                            }));
+
+                            // Add rows to the worksheet
+                            data.slice(1).forEach(row => {
+                                worksheet.addRow(row);
+                            });
+
+                            // Style headers (set background color, bold, center text, etc.)
+                            worksheet.getRow(1).eachCell((cell) => {
+                                cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true }; // Center the text and wrap text
+                                cell.font = { bold: true, size: 12 }; // Make the font bold and larger
+                                cell.fill = {
+                                    type: 'pattern',
+                                    pattern: 'solid',
+                                    fgColor: { argb: 'BEBEBE' } // Light gray background color
+                                };
+                            });
+
+                            // Apply border around the table and wrap text for all cells
+                            worksheet.eachRow((row) => {
+                                row.eachCell((cell) => {
+                                    cell.border = {
+                                        top: { style: 'thin' },
+                                        left: { style: 'thin' },
+                                        bottom: { style: 'thin' },
+                                        right: { style: 'thin' }
+                                    };
+                                    cell.alignment = { wrapText: true, horizontal: 'center', vertical: 'middle' }; // Enable text wrapping and center alignment for each cell
+                                });
+                            });
+
+                            // Get the current date and time to use in the filename (local time)
+                            const now = new Date();
+                            const dateStr = now.toLocaleString('en-US', {
+                                weekday: 'short',
+                                year: 'numeric',
+                                month: '2-digit',
+                                day: '2-digit',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                second: '2-digit',
+                                hour12: false
+                            }).replace(/[^\w\s]/g, '_'); // Format as: Weekday_YYYY_MM_DD_HH_MM_SS
+
+                            // Set up the response and filename
+                            const buffer = await workbook.xlsx.writeBuffer();
+                            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+                            // Create a link element to trigger the download
+                            const link = document.createElement("a");
+                            link.href = URL.createObjectURL(blob);
+                            link.download = `yellowbull_data_${dateStr}.xlsx`; // Filename includes date and time
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+
+                        } catch (error) {
+                            console.error("Error exporting data:", error);
+                            Swal.fire({
+                                title: "❌ Error",
+                                text: "An error occurred while exporting data.",
+                                icon: "error",
+                                confirmButtonColor: "#ff4444"
+                            });
+
+                            // Hide loading screen (optional)
+                            document.getElementById("loadingScreen").style.display = "none";
+                        }
                     });
-                }
-            }
-
-            // Format Insurance Expiry Month
-            let formattedIns = "Not Available";
-            if (user.InsExpMonth) {
-                if (typeof user.InsExpMonth === "string") {
-                    formattedIns = user.InsExpMonth;
-                } else if (user.InsExpMonth?.toDate) {
-                    const insDate = user.InsExpMonth.toDate();
-                    formattedIns = insDate.toLocaleDateString('en-GB', {
-                        day: '2-digit', month: 'short', year: 'numeric'
-                    });
-                }
-            }
-
-            // Add user data to the row
-            let carData = {};
-            if (user.carPlate) {
-                const carPlateRef = doc(db, "carPlates", user.carPlate);
-                const carSnap = await getDoc(carPlateRef);
-                carData = carSnap.exists() ? carSnap.data() : {};
-            }
-
-            const userData = [
-                rowNumber++,                                  // No.
-                user.userName || "Unknown",                   // Name
-                createdAtFormatted,
-                user.userContact || "Not Available",          // Handphone
-                user.carPlate || "Not Available",             // Car Plate
-                user.email || "Not Available",                // Email
-                user.dob || "Not Available",                  // Birthday Month
-                formattedIns,                                 // Insurance Expiry Month
-                carData.carBrand || "Not Available",          // Car Make
-                carData.carModel || "Not Available"           // Car Model
-            ];
-
-            // Add row data to the data array
-            data.push(userData);
-        }
-
-        // Create a new Excel workbook
-        const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet('User Data');
-
-        // Add columns to the worksheet with auto width for "No."
-        worksheet.columns = headers.map((header, index) => ({
-            header: header,
-            key: header,
-            width: index === 0 ? 10 : 20  // Set a smaller width for 'No.' and larger for others
-        }));
-
-        // Add rows to the worksheet
-        data.slice(1).forEach(row => {
-            worksheet.addRow(row);
-        });
-
-        // Style headers (set background color, bold, center text, etc.)
-        worksheet.getRow(1).eachCell((cell) => {
-            cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true }; // Center the text and wrap text
-            cell.font = { bold: true, size: 12 }; // Make the font bold and larger
-            cell.fill = {
-                type: 'pattern',
-                pattern: 'solid',
-                fgColor: { argb: 'BEBEBE' } // Light gray background color
-            };
-        });
-
-        // Apply border around the table and wrap text for all cells
-        worksheet.eachRow((row) => {
-            row.eachCell((cell) => {
-                cell.border = {
-                    top: { style: 'thin' },
-                    left: { style: 'thin' },
-                    bottom: { style: 'thin' },
-                    right: { style: 'thin' }
-                };
-                cell.alignment = { wrapText: true, horizontal: 'center', vertical: 'middle' }; // Enable text wrapping and center alignment for each cell
-            });
-        });
-
-        // Get the current date and time to use in the filename (local time)
-        const now = new Date();
-        const dateStr = now.toLocaleString('en-US', {
-            weekday: 'short',
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false
-        }).replace(/[^\w\s]/g, '_'); // Format as: Weekday_YYYY_MM_DD_HH_MM_SS
-
-        // Set up the response and filename
-        const buffer = await workbook.xlsx.writeBuffer();
-        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-
-        // Create a link element to trigger the download
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = `yellowbull_data_${dateStr}.xlsx`; // Filename includes date and time
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-    } catch (error) {
-        console.error("Error exporting data:", error);
-        Swal.fire({
-            title: "❌ Error",
-            text: "An error occurred while exporting data.",
-            icon: "error",
-            confirmButtonColor: "#ff4444"
-        });
-
-        // Hide loading screen (optional)
-        document.getElementById("loadingScreen").style.display = "none";
-    }
-});
 
                     document.getElementById("paymentMethodSelect").addEventListener("change", function () {
                         const paymentDescriptionInput = document.getElementById("paymentDescriptionInput");
@@ -7702,7 +7686,7 @@ async function loadAllUsers(applyFilter = false, page = 1, perPage = rowsPerPage
                     });
 
                     // Event listener untuk pilih membership
-                 
+
 
                 } catch (error) {
 
@@ -7711,7 +7695,7 @@ async function loadAllUsers(applyFilter = false, page = 1, perPage = rowsPerPage
 
 
 
-         function setupPagination(totalUsers) {
+            function setupPagination(totalUsers) {
                 const totalPages = Math.ceil(totalUsers / rowsPerPage);
                 const pagination = document.getElementById("pagination");
 
@@ -7745,76 +7729,76 @@ async function loadAllUsers(applyFilter = false, page = 1, perPage = rowsPerPage
                 textarea.style.display = select.value === "Other" ? "block" : "none";
             }
 
- function filterTable(applyFilter = false, page = 1, perPage = rowsPerPage) {
-    const filterValue = document.getElementById("membershipFilter").value.toLowerCase();
-    const searchValue = document.getElementById("searchInput").value.toLowerCase();
-    const rowsContainer = document.getElementById("userTableBody");
+            function filterTable(applyFilter = false, page = 1, perPage = rowsPerPage) {
+                const filterValue = document.getElementById("membershipFilter").value.toLowerCase();
+                const searchValue = document.getElementById("searchInput").value.toLowerCase();
+                const rowsContainer = document.getElementById("userTableBody");
 
-    let visibleCount = 0;
-    let totalPrice = 0;
-    const now = new Date();
-    const sevenDays = 7 * 24 * 60 * 60 * 1000;
+                let visibleCount = 0;
+                let totalPrice = 0;
+                const now = new Date();
+                const sevenDays = 7 * 24 * 60 * 60 * 1000;
 
-    // Calculate start and end index based on pagination
-    const startIndex = (page - 1) * perPage;
-    const endIndex = startIndex + perPage;
+                // Calculate start and end index based on pagination
+                const startIndex = (page - 1) * perPage;
+                const endIndex = startIndex + perPage;
 
-    // Filter the users first based on search and membership filter
-    const filteredUsersToDisplay = filteredUsers.filter(userObj => {
-        const user = userObj.data;
-        const name = user.userName.toLowerCase();
-        const email = user.email.toLowerCase();
-        const membership = user.membership ? user.membership.toLowerCase() : "none";
-        const carPlate = user.carPlate ? user.carPlate.toLowerCase() : "";
-        
-        let showRow = false;
-        const endDate = new Date(user.membershipEnd);
-        const timeLeft = endDate - now;
+                // Filter the users first based on search and membership filter
+                const filteredUsersToDisplay = filteredUsers.filter(userObj => {
+                    const user = userObj.data;
+                    const name = user.userName.toLowerCase();
+                    const email = user.email.toLowerCase();
+                    const membership = user.membership ? user.membership.toLowerCase() : "none";
+                    const carPlate = user.carPlate ? user.carPlate.toLowerCase() : "";
 
-        if (filterValue === "all") {
-            showRow = true;
-        } else if (filterValue === "renew") {
-            showRow = (timeLeft > 0 && timeLeft <= sevenDays && membership !== "expired");
-        } else {
-            showRow = membership === filterValue;
-        }
+                    let showRow = false;
+                    const endDate = new Date(user.membershipEnd);
+                    const timeLeft = endDate - now;
 
-        // Apply search filter (name, email, or car plate)
-        const matchSearch = name.includes(searchValue) || email.includes(searchValue) || carPlate.includes(searchValue);
+                    if (filterValue === "all") {
+                        showRow = true;
+                    } else if (filterValue === "renew") {
+                        showRow = (timeLeft > 0 && timeLeft <= sevenDays && membership !== "expired");
+                    } else {
+                        showRow = membership === filterValue;
+                    }
 
-        return showRow && matchSearch; // Return only users that match filter criteria
-    });
+                    // Apply search filter (name, email, or car plate)
+                    const matchSearch = name.includes(searchValue) || email.includes(searchValue) || carPlate.includes(searchValue);
 
-    // Paginate the filtered users
-    const paginatedUsers = filteredUsersToDisplay.slice(startIndex, endIndex);
+                    return showRow && matchSearch; // Return only users that match filter criteria
+                });
 
-    // Clear the current rows before appending the new ones
-    rowsContainer.innerHTML = "";  // Clear previous rows
+                // Paginate the filtered users
+                const paginatedUsers = filteredUsersToDisplay.slice(startIndex, endIndex);
 
-    // Loop through the filtered and paginated users and display them in the table
-    paginatedUsers.forEach(userObj => {
-        const user = userObj.data;
-        const priceStr = user.price || 0;
-        const priceNum = parseFloat(priceStr);
-        const membershipStart = user.membershipStart
-            ? user.membershipStart.toDate().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-            : "Not Available";
-        const membershipEnd = user.membershipEnd
-            ? user.membershipEnd.toDate().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-            : "Not Available";
+                // Clear the current rows before appending the new ones
+                rowsContainer.innerHTML = "";  // Clear previous rows
 
-        const membership = user.membership || "None";
-        const carPlate = user.carPlate || "N/A";
-        const carBrand = user.carBrand || "N/A";
-        const carModel = user.carModel || "N/A";
-        const carDescription = user.carModelDescription || "N/A";
-        const insuranceExpiry = user.insuranceExpiry || "N/A";
+                // Loop through the filtered and paginated users and display them in the table
+                paginatedUsers.forEach(userObj => {
+                    const user = userObj.data;
+                    const priceStr = user.price || 0;
+                    const priceNum = parseFloat(priceStr);
+                    const membershipStart = user.membershipStart
+                        ? user.membershipStart.toDate().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+                        : "Not Available";
+                    const membershipEnd = user.membershipEnd
+                        ? user.membershipEnd.toDate().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+                        : "Not Available";
 
-        // Generate Servicing Balance HTML
-        const servicingBalanceHTML = generateServicingBalanceHTML(user, userObj.id);
+                    const membership = user.membership || "None";
+                    const carPlate = user.carPlate || "N/A";
+                    const carBrand = user.carBrand || "N/A";
+                    const carModel = user.carModel || "N/A";
+                    const carDescription = user.carModelDescription || "N/A";
+                    const insuranceExpiry = user.insuranceExpiry || "N/A";
 
-        // Insert the user row into the table
-        rowsContainer.innerHTML += `
+                    // Generate Servicing Balance HTML
+                    const servicingBalanceHTML = generateServicingBalanceHTML(user, userObj.id);
+
+                    // Insert the user row into the table
+                    rowsContainer.innerHTML += `
             <tr id="user-${userObj.id}" data-price="${priceNum}">
                 <td>${user.userName || "Unknown"}</td>
                 <td>${user.email || "No Email"} ${servicingBalanceHTML}</td>
@@ -7835,8 +7819,8 @@ async function loadAllUsers(applyFilter = false, page = 1, perPage = rowsPerPage
                         ${user.paymentMethod === "Not Selected" ? "Select Payment Method" : user.paymentMethod}
                     </button>
                     ${user.paymentMethod === "Other" && user.paymentDescription && user.paymentDescription.trim() !== ""
-                        ? `<p style="font-size: 12px; color: #555; margin-top: 5px;">${user.paymentDescription}</p>`
-                        : ''}
+                            ? `<p style="font-size: 12px; color: #555; margin-top: 5px;">${user.paymentDescription}</p>`
+                            : ''}
                 </td>
                 <td>
                     Plate: ${carPlate}<br>
@@ -7849,14 +7833,14 @@ async function loadAllUsers(applyFilter = false, page = 1, perPage = rowsPerPage
             </tr>
         `;
 
-        // Update visible count and total price
-        visibleCount++;
-        if (!isNaN(priceNum)) totalPrice += priceNum;
-    });
+                    // Update visible count and total price
+                    visibleCount++;
+                    if (!isNaN(priceNum)) totalPrice += priceNum;
+                });
 
-    // Update the user count display
-    document.getElementById("userCount").innerText = `Displayed Users: ${visibleCount} | Total Users: ${filteredUsersToDisplay.length}`;
-}
+                // Update the user count display
+                document.getElementById("userCount").innerText = `Displayed Users: ${visibleCount} | Total Users: ${filteredUsersToDisplay.length}`;
+            }
 
 
             $(document).on("click", "#infoIcon", function () {
@@ -8423,82 +8407,82 @@ async function loadAllUsers(applyFilter = false, page = 1, perPage = rowsPerPage
                                     carModel: newCarModel,
                                     InsExpMonth: formattedExpiryDate2 // Use the correct expiry date
                                 });
-                         
+
                                 getInvoicesData(newCarPlate) // Use new car plate as reference value
-    .then(data => {
-        const invoiceTable = document.getElementById('invoiceTable').getElementsByTagName('tbody')[0];
-        const invoiceTableHeader = document.getElementById('invoiceTable').getElementsByTagName('thead')[0];  // Get the table header
-        const emptyImage = document.getElementById("emptyImage");
+                                    .then(data => {
+                                        const invoiceTable = document.getElementById('invoiceTable').getElementsByTagName('tbody')[0];
+                                        const invoiceTableHeader = document.getElementById('invoiceTable').getElementsByTagName('thead')[0];  // Get the table header
+                                        const emptyImage = document.getElementById("emptyImage");
 
-        // Clear the current table data before inserting new rows
-       
+                                        // Clear the current table data before inserting new rows
 
-        // Set column widths directly in JavaScript for the header
-        const headerCells = invoiceTableHeader.getElementsByTagName('th');
-        if (headerCells.length >= 2) {
-            headerCells[0].style.width = "30%";  // Set Date column width to 30%
-            headerCells[1].style.width = "70%";  // Set Transaction History column width to 70%
-        }
 
-        invoiceTable.innerHTML = '';
+                                        // Set column widths directly in JavaScript for the header
+                                        const headerCells = invoiceTableHeader.getElementsByTagName('th');
+                                        if (headerCells.length >= 2) {
+                                            headerCells[0].style.width = "25%";  // Set Date column width to 25%
+                                            headerCells[1].style.width = "75%";  // Set Transaction History column width to 75%
+                                        }
 
-        emptyImage.style.display = "none";  // Hide the empty image initially
-        // Check if invoices exist in the data
-        if (data && data.Invoices && Array.isArray(data.Invoices)) {
-            // Filter invoices to only include "ACCREC" type and matching reference value
-            const filteredInvoices = data.Invoices.filter(invoice =>
-                invoice.Type === "ACCREC" && invoice.Reference && invoice.Reference.includes(newCarPlate) // Use car plate as reference
-            );
+                                        invoiceTable.innerHTML = '';
 
-            // If no invoices match, show the empty image
-            if (filteredInvoices.length === 0) {
-                emptyImage.style.display = "block";  // Show empty image
-                invoiceTable.style.display = "none";  
-                invoiceTableHeader.style.display = "none";  
+                                        emptyImage.style.display = "none";  // Hide the empty image initially
+                                        // Check if invoices exist in the data
+                                        if (data && data.Invoices && Array.isArray(data.Invoices)) {
+                                            // Filter invoices to only include "ACCREC" type and matching reference value
+                                            const filteredInvoices = data.Invoices.filter(invoice =>
+                                                invoice.Type === "ACCREC" && invoice.Reference && invoice.Reference.includes(newCarPlate) // Use car plate as reference
+                                            );
 
-                return;  // Exit function
-            }
+                                            // If no invoices match, show the empty image
+                                            if (filteredInvoices.length === 0) {
+                                                emptyImage.style.display = "block";  // Show empty image
+                                                invoiceTable.style.display = "none";
+                                                invoiceTableHeader.style.display = "none";
 
-            // Loop through the filtered invoices and populate the table
-            filteredInvoices.forEach(invoice => {
-                const row = invoiceTable.insertRow();
+                                                return;  // Exit function
+                                            }
 
-                // Create the "Date" cell and populate it
-                const invoiceDateCell = row.insertCell(0);
-                invoiceDateCell.textContent = new Date(invoice.DateString).toLocaleDateString() || 'N/A';  // Format date as needed
-                invoiceDateCell.style.textAlign = "center";  // Center-align the date cell
+                                            // Loop through the filtered invoices and populate the table
+                                            filteredInvoices.forEach(invoice => {
+                                                const row = invoiceTable.insertRow();
 
-                // Create the "Preview Link" cell and populate it
-                const previewCell = row.insertCell(1); 
-                const previewLink = document.createElement('a');
-                
-                const previewUrl = `/invoice/preview/${invoice.InvoiceID}`;
+                                                // Create the "Date" cell and populate it
+                                                const invoiceDateCell = row.insertCell(0);
+                                                invoiceDateCell.textContent = new Date(invoice.DateString).toLocaleDateString() || 'N/A';  // Format date as needed
+                                                invoiceDateCell.style.textAlign = "center";  // Center-align the date cell
 
-                previewInvoiceData(invoice.InvoiceID)  
-                    .then(previewData => {
-                        if (previewData.previewUrl) {
-                            previewLink.href = previewData.previewUrl;
-                            previewLink.textContent = previewData.previewUrl;
-                            previewLink.style.color = "black";
-                            previewLink.style.fontSize = "16px";
-                            previewLink.target = "_blank";  // Open link in a new tab
-                        } else {
-                            previewLink.textContent = "Preview Unavailable";
-                            previewLink.href = "#";  // Disable the link if no preview is available
-                        }
+                                                // Create the "Preview Link" cell and populate it
+                                                const previewCell = row.insertCell(1);
+                                                const previewLink = document.createElement('a');
 
-                        previewCell.appendChild(previewLink);
-                    })
-                    .catch(error => {
-                        console.error("Error fetching preview link:", error);
-                        previewCell.textContent = "Error fetching preview";
-                    });
-            });
-        } else {
-            console.error("No invoices found or incorrect format.");
-        }
-    })
-    .catch(error => console.error("Error fetching invoices:", error));
+                                                const previewUrl = `/invoice/preview/${invoice.InvoiceID}`;
+
+                                                previewInvoiceData(invoice.InvoiceID)
+                                                    .then(previewData => {
+                                                        if (previewData.previewUrl) {
+                                                            previewLink.href = previewData.previewUrl;
+                                                            previewLink.textContent = previewData.previewUrl;
+                                                            previewLink.style.color = "black";
+                                                            previewLink.style.fontSize = "16px";
+                                                            previewLink.target = "_blank";  // Open link in a new tab
+                                                        } else {
+                                                            previewLink.textContent = "Preview Unavailable";
+                                                            previewLink.href = "#";  // Disable the link if no preview is available
+                                                        }
+
+                                                        previewCell.appendChild(previewLink);
+                                                    })
+                                                    .catch(error => {
+                                                        console.error("Error fetching preview link:", error);
+                                                        previewCell.textContent = "Error fetching preview";
+                                                    });
+                                            });
+                                        } else {
+                                            console.error("No invoices found or incorrect format.");
+                                        }
+                                    })
+                                    .catch(error => console.error("Error fetching invoices:", error));
 
 
                                 // Update UI with the new car information
@@ -8835,11 +8819,8 @@ z-index: 9999;">
     <section class="header" id="header" style="display: none;">
         <div class="container p-0">
             <nav class="navbar navbar-expand-lg">
-               <a class="navbar-brand" href="/"><img src="images/YellowRanger-Logo.png" loading="lazy" sizes="120px" 
-                srcset="
-                    images/YellowRanger-Logo-p-500.png 500w,
-                    images/YellowRanger-Logo.png 669w
-                " alt="" class="logo" /></a>
+                <a class="navbar-brand" href="/"><img src="https://yellowbull.com.sg/images/YellowRanger-Logo.png"
+                        class="img-fluid"></a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse"
                     data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
                     aria-label="Toggle navigation">
@@ -8848,9 +8829,9 @@ z-index: 9999;">
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ml-auto">
-                        <!--<li class="nav-item active">-->
-                        <!--<a class="nav-link" href="" style="font-size:16px">Dashboard</a>-->
-                        <!--</li>-->
+                        <li class="nav-item active">
+                            <a class="nav-link" href="" style="font-size:16px">Welcome, to admin Dashboard</a>
+                        </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                                 data-toggle="dropdown" aria-expanded="false" style="font-size:16px">
@@ -8875,8 +8856,8 @@ z-index: 9999;">
     <section class="header">
         <div class="container p-0">
             <nav class="navbar navbar-expand-lg">
-              <a class="navbar-brand" href="/"><img src="images/YellowRanger-Logo.png" loading="lazy" sizes="120px" 
-                srcset="
+                <a class="navbar-brand" href="/"><img src="images/YellowRanger-Logo.png" loading="lazy" sizes="120px"
+                        srcset="
                     images/YellowRanger-Logo-p-500.png 500w,
                     images/YellowRanger-Logo.png 669w
                 " alt="" class="logo" /></a>
@@ -8899,7 +8880,7 @@ z-index: 9999;">
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" href="/profile" style="font-size:16px">Profile</a>
 
-                                <!-- <a class="dropdown-item" href="/my_cart" style="font-size:16px">My Cart</a> -->
+                                <a class="dropdown-item" href="/my_cart" style="font-size:16px">My Cart</a>
 
 
                                 <a class="dropdown-item" href="#" id="logoutBtn" style="font-size:16px">Sign Out</a>
@@ -9037,14 +9018,13 @@ z-index: 9999;">
                         style="display: none; max-width: 100%; width: auto; height: auto;">
 
 
-                    <table id="invoiceTable" class="table table-striped table-bordered" style="table-layout: fixed; width: 100%;">
-			     <caption style="caption-side: top; text-align: left; font-size: 0.9rem; padding-bottom: 0.5rem; color: #6c757d;">
-  <strong>Note:</strong> The payment status shown in each invoice link will be refreshed within 3 working days after payment. </caption>
+                    <table id="invoiceTable" class="table table-striped table-bordered"
+                        style="table-layout: fixed; width: 100%;">
                         <thead class="table-light">
                             <tr>
                                 <!-- Set a fixed width for the Invoice Date column and allow Preview column to take more space -->
-                                <th style="width: 30%; word-wrap: break-word;">Date</th>
-                                <th style="width: 70%; word-wrap: break-word;">Transaction History</th>
+                                <th style="width: 25%; word-wrap: break-word;">Date</th>
+                                <th style="width: 75%; word-wrap: break-word;">Transaction History</th>
                             </tr>
                         </thead>
                         <tbody>
