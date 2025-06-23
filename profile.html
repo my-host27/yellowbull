@@ -26,23 +26,23 @@
 
         /* Style for the table header columns */
         #invoiceTable thead th:nth-child(0) {
-            width: 25%;
-            /* Date column takes up 25% of the width */
+            width: 30%;
+            /* Date column takes up 30% of the width */
         }
 
         #invoiceTable thead th:nth-child(1) {
-            width: 75%;
-            /* Transaction History column takes up 75% of the width */
+            width: 70%;
+            /* Transaction History column takes up 70% of the width */
         }
 
         /* Style for the table body columns */
         #invoiceTable tbody td:nth-child(0) {
-            width: 25%;
+            width: 30%;
             /* Date column */
         }
 
         #invoiceTable tbody td:nth-child(1) {
-            width: 75%;
+            width: 70%;
             /* Transaction History column */
         }
 
@@ -401,6 +401,8 @@
             "5 Liters Castrol Oil": "$298",
             "4 Liters Castrol Oil": "$268",
             "Towing Package": "$108",
+            "Car Servicing Package": "Prices Vary",
+            "Member Package": "Prices Vary",
             "None": "-"
         };
 
@@ -483,7 +485,7 @@
                             // Update UI with formatted expiry date
                             document.getElementById("insexpdt").innerText = formattedExpiryDate2 || "Not Available";
 
-                            const referenceValue = document.getElementById("vehicle_no").innerText.trim() || "DefaultReference";
+                            const referenceValue = document.getElementById("vehicle_no").innerText.trim().toLowerCase() || "DefaultReference";
 
                             // Fetch invoices using the new custom function getInvoicesData
                             getInvoicesData(referenceValue)
@@ -497,9 +499,11 @@
 
                                     // Check if invoices exist in the data
                                     if (data && data.Invoices && Array.isArray(data.Invoices)) {
-                                        // Filter invoices to only include "ACCREC" type and matching reference value
                                         const filteredInvoices = data.Invoices.filter(invoice =>
-                                            invoice.Type === "ACCREC" && invoice.Reference && invoice.Reference.includes(referenceValue)
+                                            invoice.Type === "ACCREC" &&
+                                            invoice.Reference &&
+                                            invoice.Reference.toLowerCase().split(" ")[0] === referenceValue &&
+                                            (invoice.Status === "PAID" || invoice.Status === "AUTHORISED" || invoice.Status === "SUBMITTED")
                                         );
 
                                         // If no invoices match, show the empty image
@@ -725,16 +729,16 @@
                         });
                         membershipStatus.innerText = `✅ Active until ${formattedDate}`;
                     } else {
-                        membershipStatus.innerText = `✅ Membership active`;
+                        membershipStatus.innerText = `❌ You don't have an active membership yet`;
                     }
                     if (deleteButton) deleteButton.style.display = "block";
                 } else {
+                    membershipStatus.innerText = "❌ You don't have an active membership yet";
                     purchaseBtn.innerText = "Purchase Plan";
                     purchaseBtn.setAttribute("href", "/plans");
                     purchaseBtn.classList.add("btn-purchase");
                     purchaseBtn.classList.remove("btn-success");
                     purchaseBtn.style.cursor = "pointer";
-                    membershipStatus.innerText = "";
                     if (deleteButton) deleteButton.style.display = "none";
                 }
 
@@ -794,6 +798,8 @@
     <label for="membershipFilter">Filter Membership:</label>
     <select id="membershipFilter" class="form-control">
       <option value="All">All</option>
+      <option value="Member Package">Member Only Package</option>
+      <option value="Car Servicing Package">Car Servicing Package</option>
       <option value="4 Liters Mega Oil basic">4 Liters Mega Oil basic</option>
       <option value="4 Liters Mega Oil">4 Liters Mega Oil</option>
       <option value="5 Liters Mega Oil">5 Liters Mega Oil</option>
@@ -831,15 +837,15 @@
                     <table class="table table-bordered">
                         <thead class="thead-dark sticky-nav">
                             <tr>
-                           <th style="width: 10%;">Name</th>
+                        <th style="width: 10%;">Name</th>
                         <th style="width: 17%;">Email</th>
-                        <th style="width: 15%;">Membership</th>
+                        <th style="width: 15%;">Package</th>
                         <th style="width: 10%;">Price</th>
                         <!-- <th style="width: 8%;">Payment Status</th> -->
                         <th style="width: 10%;">Date Active</th>
                         <th style="width: 10%;">Date Inactive</th>
-                        <th style="width: 10%;">Payment Method</th> <!-- New column -->
-                        <th style="width: 20%;">About Car</th>
+                        <th style="width: 10%;">Payment Method</th>
+                        <th style="width: 28%;">About Car</th>
                         <!-- <th style="width: 15%;">Upload Payment Proof</th> -->
                             </tr>
                         </thead>
@@ -902,6 +908,8 @@
             <div class="modal-body">
                 <label for="membershipSelect">Choose Membership:</label>
                 <select id="membershipSelect" class="form-control">
+                    <option value="Member Package">Member Only Package</option>
+                    <option value="Car Servicing Package">Car Servicing Package</option>
                     <option value="4 Liters Mega Oil basic">4 Liters Mega Oil basic</option>
                     <option value="4 Liters Mega Oil">4 Liters Mega Oil</option>
                     <option value="5 Liters Mega Oil">5 Liters Mega Oil</option>
@@ -923,7 +931,7 @@
 </div>
 
 
-        <div class="modal fade" id="paymentMethodModal" tabindex="-1" role="dialog" aria-labelledby="paymentMethodModalLabel" aria-hidden="true">
+ <div class="modal fade" id="paymentMethodModal" tabindex="-1" role="dialog" aria-labelledby="paymentMethodModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -7922,6 +7930,8 @@
                 "4 Liters Castrol Oil": 2,
                 "5 Liters Castrol Oil": 2,
                 "Towing Package": 0,
+                "Car Servicing Package": 3,
+                "Member Package": 0
             };
 
 
@@ -8420,8 +8430,8 @@
                                         // Set column widths directly in JavaScript for the header
                                         const headerCells = invoiceTableHeader.getElementsByTagName('th');
                                         if (headerCells.length >= 2) {
-                                            headerCells[0].style.width = "25%";  // Set Date column width to 25%
-                                            headerCells[1].style.width = "75%";  // Set Transaction History column width to 75%
+                                            headerCells[0].style.width = "30%";  // Set Date column width to 30%
+                                            headerCells[1].style.width = "70%";  // Set Transaction History column width to 70%
                                         }
 
                                         invoiceTable.innerHTML = '';
@@ -8883,7 +8893,7 @@ z-index: 9999;">
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" href="/profile" style="font-size:16px">Profile</a>
 
-                                <a class="dropdown-item" href="/my_cart" style="font-size:16px">My Cart</a>
+                                <!-- <a class="dropdown-item" href="/my_cart" style="font-size:16px">My Cart</a> -->
 
 
                                 <a class="dropdown-item" href="#" id="logoutBtn" style="font-size:16px">Sign Out</a>
@@ -9023,11 +9033,16 @@ z-index: 9999;">
 
                     <table id="invoiceTable" class="table table-striped table-bordered"
                         style="table-layout: fixed; width: 100%;">
+                        <caption
+                            style="caption-side: top; text-align: left; font-size: 0.9rem; padding-bottom: 0.5rem; color: #6c757d;">
+                            <strong>Note:</strong> The payment status shown in each invoice link will be refreshed
+                            within 3 working days after payment.
+                        </caption>
                         <thead class="table-light">
                             <tr>
                                 <!-- Set a fixed width for the Invoice Date column and allow Preview column to take more space -->
-                                <th style="width: 25%; word-wrap: break-word;">Date</th>
-                                <th style="width: 75%; word-wrap: break-word;">Transaction History</th>
+                                <th style="width: 30%; word-wrap: break-word;">Date</th>
+                                <th style="width: 70%; word-wrap: break-word;">Transaction History</th>
                             </tr>
                         </thead>
                         <tbody>
