@@ -1,0 +1,649 @@
+.toggle-switch:after {
+    display: none;
+}
+.form-group.email:before {
+    /*position: absolute;*/
+    /*content: "\f003";*/
+    font-size: 30px;
+    left: -30px;
+}
+
+.form-group.email {
+    position: relative;
+}
+.my_cart p.renewal {
+    color: #000 !important;
+}
+section.withdrawl_request h4 {
+margin-top: 40px;
+}
+section.withdrawl_request form {
+max-width: 450px;
+margin: auto;
+margin-top: 40px;
+}
+.form-group.withdrawnow .btn {
+background-color: #ffbc13;
+color: #fff;
+padding: 10px;
+}
+.powered-stripe {
+    display: flex;
+    justify-content: center;
+}
+.padding.stripe-wrap {
+    overflow-x: hidden;
+}
+a.join_now:hover {
+    color: #fff;
+}
+h5.cart-premium img {
+    height: 20px;
+}
+button#copy_button {
+    background: #ffbc13;
+    padding: 10px 20px;
+    font-size: 15px;
+    border: none;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 25px;
+}
+.powered-stripe img {
+    max-width: 250px;
+}
+img.facebook {
+    width: 36px !important;
+    margin-top: -4px;
+}
+img.twitter {
+    width: 37px !important;
+}
+.form-group.addnumber .btn {
+border: none;
+text-align: right;
+padding-right: 0;
+color: #ffbc13;
+}
+section.withdrawl_request .btn {
+width: 100%;
+border: 1px solid #ced4da;
+}
+.withdrawl_request {
+  padding: 40px 0;
+}
+section.payment-method .btn {
+background: #ffbc13;
+color: #fff;
+width: 100%;
+padding: 10px;
+margin-top: 20px;
+}
+.payment-method {
+padding: 40px 0;
+}
+.payment-head {
+margin-bottom: 40px;
+}
+.point-head {
+  margin-bottom: 20px;
+}
+nav.navbar li a {
+color: #000;
+}
+.social-icons p {
+width: 100px;
+}
+
+.social-icons {
+display: flex;
+}
+.earn-points {
+display: flex;
+justify-content: center;
+}
+.point-head .row {
+display: flex;
+align-items: center;
+justify-content: center;
+}
+.rupees {
+display: flex;
+flex-direction: column;
+max-width: 300px;
+text-align: left;
+margin: auto;
+}
+p {
+font-size: 17px;
+font-family: 'Poppins', sans-serif;
+line-height: 31px;
+}
+h1, h2, h3, h4, h5, h6 p, a, div {
+font-family: 'Poppins', sans-serif;
+}
+p, a, div, li {
+font-family: 'Poppins', sans-serif;
+font-size: 17px;
+}
+.wallet_head ul li {
+list-style: none;
+}
+.wallet_head ul {
+padding-left: 0;
+}
+.joi-now a {
+background: #ffbc13;
+padding: 10px;
+color: #fff;
+display: flex;
+justify-content: center;
+max-width: 350px;
+margin: auto;
+margin-top: 30px;
+border: 2px solid #ffbc13;
+}
+.form-control:focus {
+    box-shadow: none !important;
+}
+.affiliate-wrap {
+padding: 30px 0;
+}
+.header li a {
+font-size: 20px;
+}
+.affiliate h1 {
+text-align: center;
+margin-bottom: 20px;
+}
+a.navbar-brand img {
+width: 250px;
+}
+.header {
+padding: 20px 0;
+}
+.affiliate h2 {
+margin-top: 30px;
+margin-bottom: 10px;
+}
+.points-wrap {
+padding: 30px 0;
+}
+.rupees img {
+width: 40px;
+margin-right: 10px;
+}
+.points-wrap div b {
+font-weight: 600;
+}
+.withdraw-button a {
+background: #ffbc13;
+color: #fff;
+width: 100%;
+padding: 10px;
+}
+.wallet_head a {
+color: #212529;
+margin-top: 10px;
+display: block;
+}
+.wallet_wrap tbody tr td {
+width: 60%;
+padding-left: 0;
+}
+.wallet_head {
+padding-left: 15px;
+}
+.wallet_wrap {
+padding: 30px 0;
+}
+a:hover {
+text-decoration: none;
+}
+.landing-url-wrap ul {
+display: flex;
+padding-left: 0;
+}
+.landing-url-wrap ul li {
+list-style: none;
+margin-right: 20px;
+}
+.landing-url-wrap ul li a img {
+width: 30px;
+}
+.landing-url-wrap h5 {
+margin-bottom: 10px;
+}
+.landing-url-wrap div b {
+margin-bottom: 10px;
+display: block;
+}
+.welcome_member h1 span {
+color: #ffbc13;
+}
+.welcome_member h1 {
+font-size: 30px !important;
+text-align: center;
+}
+.welcome-member-wrap {
+padding: 40px 0;
+}
+.welcome_member {
+width: 100%;
+padding: 0 100px;
+}
+.welcome_member p {
+text-align: center;
+margin-top: 20px;
+}
+.plan-box h1 {
+font-size: 30px;
+}
+.plan-box {
+width: 100%;
+text-align: center;
+display: flex;
+justify-content: center;
+}
+.plan-wrap {
+padding: 30px 0;
+}
+.row.purchase_box {
+margin: auto;
+max-width: 80%;
+margin-top: 40px;
+text-align: center;
+}
+.basic {
+padding: 20px 0px;
+border: 1px solid #d9d6d6;
+min-height: 550px;
+border-radius: 10px;
+}
+.basic h4 {
+margin-bottom: 40px;
+}
+.basic.primium {
+background: #e6edff;
+}
+.basic p {
+padding: 0 40px;
+}
+.row.eallet-top div:first-child {
+    width: 60%;
+}
+.beinsure {
+background-image: url("https://yellowbull.app/yellowbullaffilate/assets/images/dash.png");
+width: 100%;
+height: 90vh;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+section.beinsure-wrap {
+    max-width: 850px !important;
+    width: 100% !important;
+}
+.insure-wrap img {
+max-width: 400px;
+width: 100%;
+}
+.insure-wrap {
+width: 100%;
+margin: auto;
+display: flex;
+justify-content: center;
+flex-direction: column;
+align-items: center;
+}
+.insure-wrap a {
+color: #ffbc13;
+border: 1px solid #ffbc13;
+padding: 10px 20px;
+margin-top: 60px;
+max-width: 300px;
+width: 100%;
+}
+.beinsure-info {
+text-align: center;
+padding: 50px 0;
+}
+.login-form form label {
+font-size: 12px;
+margin-bottom: 0;
+}
+.login form .form-group {
+border: 1px solid #d7d3d3;
+border-radius: 4px;
+padding: 4px 10px;
+}
+.login form .form-group input {
+border: none;
+padding: 0 !important;
+height: 20px;
+font-size: 13px;
+}
+.login .btn {
+background: #ffbc13;
+color: #fff;
+margin-top: 30px;
+padding: 10px;
+}
+p.login-info .btn {
+margin-top: 0;
+background: transparent;
+color: #ffbc13;
+padding: 0;
+}
+p.login-info {
+text-align: center;
+margin-top: 10px;
+}
+.login-form h1 {
+font-size: 30px;
+}
+.login-image img {
+width: 100%;
+max-width: 400px;
+margin: auto;
+display: flex;
+}
+.login {
+padding: 30px 0;
+}
+.sign-up form .form-group {
+border: 1px solid #d7d3d3;
+border-radius: 4px;
+padding: 4px 10px;
+}
+section.sign-up .btn {
+background: #ffbc13;
+color: #fff;
+padding: 10px;
+margin-top: 30px;
+}
+.sign-up form .form-group input {
+border: none;
+padding: 0 !important;
+height: 20px;
+font-size: 13px;
+}
+.sign-up form label {
+font-size: 12px;
+margin-bottom: 0;
+}
+section.sign-up {
+padding: 30px 0;
+}
+.form-group.murge-column {
+display: flex;
+}
+.insure-wrap .btn:hover {
+    background-color: #ffbc13;
+    color: #fff;
+}
+ul.navbar-nav li:hover a {
+    color: #ffbc13;
+}
+.becoming-member {
+    margin-bottom: 30px;
+}
+.joi-now .btn:hover {
+    background: transparent;
+    color: #ffbc13;
+    border: 2px solid #ffbc13;
+}
+.toggle-switch:after {
+    width: 32px;
+    content: "OFF" !important;
+    font-size: 13px;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 5px;
+    padding-bottom: 2px;
+    top: 2px;
+    position: absolute;
+    background: #fff;
+    border-radius: 100%;
+    height: 31px;
+}
+.toggle-switch .modal-body p {
+    font-size: 15px;
+    line-height: 30px;
+}
+.toggle-switch {
+    height: 35px !important;
+}
+p.Renewal__content {
+    font-size: 15px;
+    font-weight: 500;
+    line-height: initial;
+}
+.toggle-switch:before {
+    content: "ON" !important;
+    font-size: 14px;
+    padding-left: 2px;
+    padding-right: 2px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+.toggle-switch:before {
+    width: 26px !important;
+    height: 26px !important;
+}
+.toggle-switch {
+    width: 68px;
+}
+@media screen and (max-width: 767px) {
+    .review-image {
+    min-height: auto;
+}
+  .insure-wrap img {
+    max-width: 250px;
+    width: 100%;
+}
+.row.eallet-top div:first-child {
+    width: 100%;
+}
+form#signup {
+    margin-bottom: 30px !important;
+}
+section.sign-up {
+    margin-bottom: 30px !important;
+}
+span.navbar-toggler-icon {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+a.navbar-brand img {
+    width: 200px;
+}
+.navbar-toggler {
+    border: 1px solid #000000de !important;
+}
+.row.purchase_box {
+    max-width: 100%;
+}
+.joi-now {
+    max-width: 260px;
+    margin: auto;
+}
+.purchase_box .col-md-6 {
+    margin-bottom: 30px;
+}
+.text-right {
+    text-align: center;
+    margin-top: 10px !important;
+}
+.card-header {
+    text-align: center;
+}
+.padding .card .card-body {
+    height: auto !important;
+}
+}
+
+*{
+    box-sizing: border-box;
+    margin: 0px;
+    padding: 0px;
+}
+section.hero {
+    overflow: hidden;
+}
+
+section.hero img {
+    width: 100%;
+}
+section.about_section {
+    text-align: center;
+    padding: 60px 0px;
+}
+
+section.about_section p {
+    font-size: 18px;
+}
+
+section.about_section a {
+    background: #ffbc13;
+    color: white;
+    width: 50%;
+    display: block;
+    margin: 0 auto;
+    height: 50px;
+    line-height: 35px;
+    font-size: 18px;
+    font-weight: 700;
+    text-decoration: none;
+    margin-top: 30px;
+}
+section.bull_benifits {
+    background: #2f2f2f;
+    padding-top: 40px;
+    padding-bottom: 35px;
+}
+
+.bull_content h2 {
+    color: #fcb714;
+}
+
+.text_descrption h3 {
+    color: #fcb714;
+    font-size: 25px;
+}
+
+.text_descrption p {
+    color: white;
+    font-size: 18px;
+}
+
+.text_descrption {
+    margin-top: 25px;
+}
+section.roadside_section h2 {
+    color: #fcb714;
+    font-weight: bold;
+    font-size: 45px;
+    margin-bottom: 0px;
+}
+
+section.roadside_section h3 {
+    font-size: 30px;
+    color: #fcb714;
+}
+
+section.roadside_section p {
+    font-size: 17px;
+}
+section.roadside_section hr {
+    border-top: 2px solid #ccc;
+    margin-top: 45px;
+    width: 100%;
+    margin-bottom: 45px;
+}
+.roadside_section {
+    padding: 60px 0px;
+}
+.yellow-box {
+    background: #2e2f2f;
+}
+section.yellow-box .btn {
+    color: #ffbc13;
+    border: 1px solid #ffbc13;
+    display: block;
+    padding: 10px 30px;
+    max-width: 300px;
+    margin: auto;
+}
+.row.boy-section {
+    display: flex;
+    align-items: center;
+}
+img.boy-image {
+    max-height: 400px;
+}
+p.copyright a {
+    color: #ffbc13;
+}
+section.yellow-box p {
+    color: #fff;
+    padding: 50px 20px 20px 0;
+}
+p.copyright {
+    padding-top: 20px !important;
+}
+section.yellow-box {
+    padding: 70px 0;
+}
+.yellow-btn {
+    width: 100%;
+    margin-bottom: 50px;
+}
+section.yellow-box img {
+    max-width: 300px;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+}img.img-fluid.desktop {
+    display: block;
+}
+img.img-fluid.mobile {
+    display: none;
+}
+
+
+
+@media screen and (max-width: 767px) {
+    .row.boy-section {
+        display: block;
+        align-items: center;
+    }
+    .bull_benifits img {
+        height: 300px;
+        margin: auto;
+        display: flex;
+        margin-bottom: 50px;
+    }
+    section.bull_benifits {
+        padding: 70px 0;
+    }
+    section.yellow-box p {
+        color: #fff;
+        padding: 50px 20px 20px 20px;
+        text-align: center;
+    }
+    img.boy-image {
+        max-height: 300px;
+        margin: auto;
+        display: flex;
+    }
+    img.img-fluid.desktop {
+        display: none;
+    }
+    img.img-fluid.mobile {
+        display: block;
+    }
+
+
+}

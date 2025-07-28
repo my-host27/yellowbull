@@ -18,7 +18,8 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
     rel="stylesheet">
-
+  <link rel="stylesheet" href="/css/stylesheetYBapp.css">
+  <link href="images/favicon.png" rel="shortcut icon" type="image/x-icon" />
   <title>yellowbull membership</title>
   <style>
     input.form-control error {
@@ -153,13 +154,11 @@
                 My Account
               </a>
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <a class="dropdown-item" href="/profile" style="font-size:16px">Profile</a>
-
-                <!-- <a class="dropdown-item" href="/my_cart" style="font-size:16px">My Cart</a> -->
-
-
+                <a class="dropdown-item" href="/" style="font-size:16px">Home</a>
+                <a class="dropdown-item" href="/profile" style="font-size:16px">My Profile</a>
+                <a class="dropdown-item" href="/plans" style="font-size:16px">Packages Plan</a>
+                <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="#" id="logoutBtn" style="font-size:16px">Sign Out</a>
-              </div>
             </li>
           </ul>
         </div>
@@ -363,7 +362,7 @@
       <!-- Nav pills -->
       <ul class="nav nav-pills justify-content-center sticky-nav" role="tablist">
         <li class="nav-item">
-          <a class="nav-link active" data-bs-toggle="pill" href="#home">Yellow Bull Package</a>
+          <a class="nav-link active" data-bs-toggle="pill" href="#home">Car Servicing Package</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" data-bs-toggle="pill" href="#menu1">Towing Package</a>
@@ -373,7 +372,7 @@
       <!-- Tab panes -->
       <div class="tab-content">
         <div id="home" class=" tab-pane active container-fluid"><br>
-          <div class="row justify-content-center align-items-start">
+          <!-- <div class="row justify-content-center align-items-start">
             <div class="col-md-3" style="margin-bottom: 20px;">
               <img src="images/YBjune2025.png" class="img-fluid" alt="Yellow bull Package Poster.">
             </div>
@@ -394,7 +393,7 @@
               </div>
 
               <div class="mt-3">
-                <a href="https://wa.me/6591013232?text=I%20want%20to%20inquire%20the%20Yellow%20Bull%20*Member%20Package.*%20Below%20are%20my%20details.%0AName%3A%20%0AEmail%3A%20%0ACar Make%3A%20%0ACar%20plate%20number%3A%20"
+                <a href="https://wa.me/6591013232?text=I%20want%20to%20inquire%20the%20Yellow%20Bull%20*Towing%20Package.*%20Below%20are%20my%20details.%0AName%3A%20%0AEmail%3A%20%0ACar Make%3A%20%0ACar%20plate%20number%3A%20"
                   class="btn btn-purchase">
                   Purchase Plan
                 </a>
@@ -435,34 +434,77 @@
               </div>
               <p class="mt-3" style="font-size: 14px;">*Prices vary based on car make, TnC apply</p>
             </div>
-          </div>
-        </div>
-        <div id="menu1" class="container tab-pane fade"><br>
+          </div> -->
           <div class="row justify-content-center align-items-start">
             <div class="col-md-3" style="margin-bottom: 20px;">
-              <img src="images/towingpackage.jpeg" class="img-fluid" alt="Towing Package Poster.">
+              <img src="images/NEW-Servicing.jpg" class="img-fluid" alt="Car Servicing Package Poster.">
             </div>
             <div class="col-md-6">
 
               <h4 style="background-color: 
-              #ffbc13;border-radius: 15px;padding-top: 10px;padding-bottom: 10px;text-align: center;">Towing
+              #ffbc13;border-radius: 15px;padding-top: 10px;padding-bottom: 10px;text-align: center;">Car Servicing
                 Package</h4>
-              <p class="dollar" style="color:black;font-size:20px"><b>S$108/year</b></p>
+              <p class="dollar" style="color:black;font-size:20px"><b>S$208/Year*</b></p></p>
 
               <div class="collapse-details">
                 <ul>
-                  <li>3 FREE Emergency Towing in Singapore</li>
-                  <li>3 FREE Jump Start Service in Singapore</li>
-                  <li>Onsite Breakdown Assistance in selected part of Malaysia</li>
-                  <li>30 Minutes Fast Response Time</li>
+                  <li>2 times Car Servicing</li>
+                  <ul style="padding-left: 20px;">
+                    <li class="no-icon"> <b>Japanese Model: S$208/year</b></li>
+                    <li class="no-icon"> <b>Euro Model: S$248/year</b> </li>
+                  </ul>
+                  <li>2 times Towing in Singapore</li>
+                  <li>2 times Car Jump Start</li>
+                  <li>2 times FREE AC Top-up</li>
+                  <li><b>Renew Insurance From Yellow Bull to get FREE Car Battery!</b></li>
                 </ul>
               </div>
 
+              <div class="mt-3">
+                <a href="https://wa.me/6591013232?text=I%20want%20to%20inquire%20the%20Yellow%20Bull%20*Car Servicing%20Package.*%20Below%20are%20my%20details.%0AName%3A%20%0AEmail%3A%20%0ACar Make%3A%20%0ACar%20plate%20number%3A%20"
+                  class="btn btn-purchase">
+                  Purchase Plan
+                </a>
+              </div>
+              <p class="mt-3" style="font-size: 14px;">*Prices vary based on car make, <a
+                  class='text-link margin-top-40 w-inline-block' href='/yellow-bull-terms-and-conditions'
+                  target='_blank'> TnC apply </a></p>
+            </div>
+          </div>
+        </div>
+
+        <div id="menu1" class="container tab-pane fade"><br>
+          <div class="row justify-content-center align-items-start">
+            <div class="col-md-3" style="margin-bottom: 20px;">
+              <img src="images/NEW-Towing.jpg" class="img-fluid" alt="Towing Package Poster.">
+            </div>
+            <div class="col-md-6">
+              <h4 style="background-color: 
+              #ffbc13;border-radius: 15px;padding-top: 10px;padding-bottom: 10px;text-align: center;">Towing
+                Package</h4>
+              <p class="dollar" style="color:black;font-size:20px"><b>S$60/Year*</b></p>
+
+              <div class="collapse-details">
+                <ul>
+                  <li>2 times Towing in Singapore</li>
+                  <li>2 times Car Jump Start</li>
+                  <li>2 times FREE AC Top-up</li>
+                  <li><b>Renew Insurance From Yellow Bull to get EXTRA BONUS!</b></li>
+                  <ul style="padding-left: 20px;">
+                    <li class="no-icon"> Can choose one: FREE Car Battery/ 1x Car Servicing/ 1 set Brake pads (front/
+                      rear)</li>
+                  </ul>
+              </div>
 
               <div class="mt-3">
-                <a href="https://wa.me/6591013232?text=I%20want%20to%20subscribe%20the%20Yellow%20Bull%20*Towing%20Package.*%20Below%20are%20my%20details.%0AName%3A%20%0AEmail%3A%20%0ACar Make%3A%20%0ACar%20plate%20number%3A%20"
-                  class="btn btn-purchase" onclick="addToCart('Towing Car Package', this, 108)">Purchase Plan</a>
+                <a href="https://wa.me/6591013232?text=I%20want%20to%20inquire%20the%20Yellow%20Bull%20*Towing%20Package.*%20Below%20are%20my%20details.%0AName%3A%20%0AEmail%3A%20%0ACar Make%3A%20%0ACar%20plate%20number%3A%20"
+                  class="btn btn-purchase">
+                  Purchase Plan
+                </a>
               </div>
+              <p class="mt-3" style="font-size: 14px;">*Prices vary based on car make, <a
+                  class='text-link margin-top-40 w-inline-block' href='/yellow-bull-terms-and-conditions'
+                  target='_blank'> TnC apply </a></p>
             </div>
 
           </div>
