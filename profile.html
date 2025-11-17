@@ -7403,7 +7403,7 @@
 
                                 if (user.role === "admin") continue;
                                 // Skip users who are not in the verified emails list
-                                if (!verifiedEmails.includes(user.email.toLowerCase())) continue;
+                                // if (!verifiedEmails.includes(user.email.toLowerCase())) continue;
 
                                 // Format Created At
                                 let createdAtFormatted = "Not Available";
@@ -7931,7 +7931,7 @@
                 "4 Liters Castrol Oil": 2,
                 "5 Liters Castrol Oil": 2,
                 "Towing Package": 0,
-                "Car Servicing Package": 3,
+                "Car Servicing Package": 2,
                 "Member Package": 0
             };
 
@@ -7988,11 +7988,21 @@
                         "Breakdown Assist": 0
                     };
 
+                    // For the new towing packages (start June 2025)
                     if (selectedMembership === "Towing Package") {
-                        servicingBalance["Towing"] = 3;
-                        servicingBalance["Jump Start"] = 3;
-                        servicingBalance["Breakdown Assist"] = 1;  // untuk Jump Start
+                        servicingBalance["Towing"] = 2;
+                        servicingBalance["Jump Start"] = 2;
+                        servicingBalance["Top-Up AC"] = 2;  
                     } else {
+                        // For the new car servicing packages (start June 2025)
+                        if (selectedMembership === "Car Servicing Package") {
+                            servicingBalance["Car Servicing"] = 2;
+                            servicingBalance["Towing"] = 2;
+                            servicingBalance["Jump Start"] = 2;
+                            servicingBalance["Top-Up AC"] = 2;
+                        }  
+
+                        // For the old Mega Oil and Castrol Car Care Packages
                         if (!selectedMembership.includes("basic")) {
                             servicingBalance["Top-Up AC"] = 1;
                         }
@@ -8911,7 +8921,7 @@ z-index: 9999;">
                 <p class="ht-ctc-cta  ht-ctc-cta-hover "
                     style="padding: 0px 16px; background-color: rgb(37, 211, 102); color: rgb(255, 255, 255); border-radius: 10px; margin: 0px 10px; order: 0; display: none;">
                     WhatsApp us</p>
-                <a href="https://wa.me/+6591013232/?text=yellowbull" target="_blank" class="ht_ctc_padding"
+                <a href="https://wa.me/+6591012323/" target="_blank" class="ht_ctc_padding"
                     style="background-color: #25D366; padding: 14px; border-radius: 50%; box-shadow: 0px 0px 11px rgba(0,0,0,.5);">
                     <svg style="pointer-events:none; display:block; height:40px; width:40px;" width="40px" height="40px"
                         viewBox="0 0 1219.547 1225.016">
